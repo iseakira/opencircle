@@ -1,0 +1,11 @@
+# SQLite
+*.db
+*.sqlite
+*.sqlite3
+
+# Flaskのinstanceフォルダ
+# このフォルダごと無視することで、中のDBファイルや設定ファイルも対象になる
+instance/
+
+# その他のデータベースダンプファイルなど
+dump.sql
