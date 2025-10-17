@@ -1,7 +1,7 @@
 // frontend/src/App.jsx
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import './App.css'
+import './css/App.css' //css\App.css
 
 
 function App() {
@@ -37,9 +37,13 @@ function App() {
     <div>
     
       <body>
-        <h1>サークル情報</h1>
-        <p>サークルを掲載しています。</p>
+        <header class="page-header">
+          <h1><a href="images/head_images.png"></a></h1>
+        </header>
+        <h1>東京理科大学サークル情報</h1>
+        <p>ここでは東京理科大学のサークル情報を掲載しています。</p>
         <h2>サークル一覧</h2>
+
 
 
       </body>
