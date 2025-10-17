@@ -1,7 +1,7 @@
 // frontend/src/App.jsx
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import './css/App.css' //css\App.css
+import './css/App.css' 
 
 
 function App() {
