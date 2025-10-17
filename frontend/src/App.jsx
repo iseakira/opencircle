@@ -1,6 +1,7 @@
 // frontend/src/App.jsx
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import './App.css'
 
 
 function App() {
@@ -33,20 +34,21 @@ function App() {
 
 
   return (
-    <>
-      <div>
+    <div>
+    
+      <body>
         <h1>サークル情報</h1>
         <p>サークルを掲載しています。</p>
         <h2>サークル一覧</h2>
 
 
-      </div>
+      </body>
 
       <footer>
         <p>created by 東京理科大学IS科3年</p>
         <a href="https://www.tus.ac.jp/" target="_blank">東京理科大学ホームページ</a>
       </footer>
-    </>
+    </div>
   )
 }
 
