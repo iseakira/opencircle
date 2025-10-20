@@ -102,9 +102,8 @@ function Toggle() {
             <label>雰囲気</label>
             <select value={mood} onChange={change_mood}>
               <option value="">未選択</option>
-              <option value="賑やか">落ち着いている</option>
-              <option value="energetic">エネルギッシュ</option>
-              <option value="focused">集中</option>
+              <option value="賑やか">賑やか</option>
+              <option value="落ち着いている">落ち着いている</option>
             </select>
             <br/>
             <label>活動頻度</label>
