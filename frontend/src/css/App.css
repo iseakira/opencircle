@@ -37,3 +37,9 @@
   padding: 10px;
   width: auto
 }
+
+.tags {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
