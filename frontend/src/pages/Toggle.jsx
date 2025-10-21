@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function Toggle() {
+function Toggle({receivedData_fb}) {
   //トグル操作
   const [visible, setVisible] = useState(false);
   const make_visible = () => {
@@ -71,6 +71,9 @@ function Toggle() {
 
       const result = await response.json();
       console.log("サーバーからの応答:", result);
+      if (receivedData_fb) {
+        receivedData_fb(result);
+      }
       alert("データを送信しました")
 
     }catch (error) {
