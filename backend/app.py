@@ -18,8 +18,13 @@ def say_hello():
 
 @app.route('/hometest', methods=['POST'])
 def search():
+<<<<<<< HEAD
     joson_data = request.get_json()
     print("okjson")
+=======
+    #joson_data = request.get_json()
+
+>>>>>>> e69963ce22665b0b61f4fb0aab565d7ce1fc55c5
     return jsonify({"message": "test"})
 
 # --- ここまでテスト用のコード ---
