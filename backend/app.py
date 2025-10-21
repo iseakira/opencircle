@@ -1,5 +1,7 @@
 from flask import Flask, jsonify
 from flask_cors import CORS # ◀ flask_corsをインポート
+from flask import request
+import json
 
 # Flaskアプリケーションのインスタンスを作成
 app = Flask(__name__)
@@ -18,7 +20,8 @@ def say_hello():
 
 @app.route('/hometest', methods=['POST'])
 def search():
-    #json_data = request.get_json()
+    json_data = request.get_json()
+    print(json.dumps(json_data))
 
     return jsonify({"message": "test"})
 
