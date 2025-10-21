@@ -7,9 +7,9 @@ function Toggle() {
     setVisible(!visible);
   };
   //検索エンジン
-  const [searchTerm, setSearchTerm] = useState('');
-  const change_searchTerm = (e) => {
-    setSearchTerm(e.target.value);
+  const [search_term, setSearch_term] = useState('');
+  const change_search_term = (e) => {
+    setSearch_term(e.target.value);
   };
 
   //タグのステート
@@ -41,7 +41,7 @@ function Toggle() {
   //jsonデータ取得
   const get_jsontags = () => {
     const dataTosend = {
-      searchTerm: searchTerm,
+      search_term: search_term,
       field: field,
       circle_fee: circle_fee,
       gender_ratio: gender_ratio,
@@ -89,7 +89,7 @@ function Toggle() {
 
           
           <div className="tags">
-            キーワード検索:<input type="text" placeholder="キーワードを入力" value={searchTerm} onChange={change_searchTerm} />
+            キーワード検索:<input type="text" placeholder="キーワードを入力" value={search_term} onChange={change_search_term} />
             <br/>
             <label>分野</label>
             <select value={field} onChange={change_field}>
