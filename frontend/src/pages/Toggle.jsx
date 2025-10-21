@@ -57,7 +57,7 @@ function Toggle() {
   };
   const sendData = async (json_stringdata) => {
     try {
-      const response = await fetch("http://localhost:3000/hometest",{
+      const response = await fetch("http://localhost:5001/hometest",{
         method: "POST",
         headers:{
           'Content-Type': 'application/json',

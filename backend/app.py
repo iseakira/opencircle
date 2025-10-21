@@ -19,7 +19,7 @@ def say_hello():
 @app.route('/hometest', methods=['POST'])
 def search():
     joson_data = request.get_json()
-    
+    print("okjson")
     return jsonify({"message": "test"})
 
 # --- ここまでテスト用のコード ---
