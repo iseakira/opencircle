@@ -34,8 +34,13 @@ function Home() {
         <div>
           {response_data ? (
             <>
-              <li>メッセージ１: {response_data.circle_name}</li>
-              <li>メッセージ２: {response_data.circle_description}</li>
+              {response_data.map((circle, index) => (
+                <div key={index} className="circle-info">
+                  <h3>サークル名: {circle.circle_name}</h3>
+                  <p>活動内容: {circle.circle_description}</p>
+                </div>
+              ))}
+              <br />
             </>
           ) : (<br/>)}
         </div>
