@@ -51,8 +51,24 @@ function Toggle() {
     }
     const json_stringdata = JSON.stringify(dataTosend);
     console.log('タグのjsonデータ:', json_stringdata);
+    sendData(json_stringdata);
     return json_stringdata;
 
+  };
+  const sendData = (json_stringdata) => {
+    try {
+      const response =  fetch("http://localhost:3000/hometest",{
+        method: "POST",
+        headers:{
+          'Content-Type': 'application/json',
+        },
+        body: json_stringdata,
+      });
+
+    }catch (error) {
+      console.error("通信エラー", error);
+      alert("通信に失敗しました");
+    }
   };
   return (
     <div>
