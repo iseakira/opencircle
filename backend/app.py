@@ -26,7 +26,7 @@ def search():
     print(json.dumps(json_data))
     f = open("testdata.txt")
     json_text = f.read()
-    f.close
+    f.close()
 
     return jsonify(json_text)
 
