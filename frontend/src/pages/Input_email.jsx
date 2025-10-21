@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import headImage from '../images/head_image.png';
 
-function Login() {
+function Input_email() {
   return (
     <div>
       <header className="page-header">
@@ -13,22 +13,16 @@ function Login() {
       </header>
       <h1>東京理科大学サークル情報サイト</h1>
       <main>
-        <h3>メールアドレスとパスワードを入力してください</h3>
+        <h3>登録したいメールアドレスを入力してください</h3>
         <form>
           <label>メールアドレス：</label>
           <input type="email" name="email" required />
           
           <br />
-          <label>パスワード：</label>
-          <input type="password" name="password" required />
         </form>
         <br />
-        <button type="submit">ログイン</button>
-        <h3>
-          <Link to="/Input_email" >
-            アカウント作成はこちら
-          </Link>
-        </h3>
+        <button type="submit">認証コードを送信する</button>
+
       </main>
       <footer>
         <p>created by 東京理科大学IS科3年</p>
@@ -40,4 +34,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Input_email;
