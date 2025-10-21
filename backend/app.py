@@ -1,5 +1,7 @@
 from flask import Flask, jsonify
 from flask_cors import CORS # ◀ flask_corsをインポート
+from flask import request
+import json
 
 # Flaskアプリケーションのインスタンスを作成
 app = Flask(__name__)
@@ -16,9 +18,13 @@ def say_hello():
     # JSON形式でメッセージを返す
     return jsonify({"message": "バックエンドからの返事です！🎉"})
 
+#'/hometest'というURLにPOSTリクエストが来たら動く関数
 @app.route('/hometest', methods=['POST'])
 def search():
-    # JSON形式でメッセージを返す
+    #json_dataのキーは["search_term","field","circle_fee","gender_ration","place","mood","frequency"]
+    json_data = request.get_json()
+    print(json.dumps(json_data))
+
     return jsonify({"message": "test"})
 
 # --- ここまでテスト用のコード ---
