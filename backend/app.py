@@ -18,8 +18,10 @@ def say_hello():
     # JSON形式でメッセージを返す
     return jsonify({"message": "バックエンドからの返事です！🎉"})
 
+#'/hometest'というURLにPOSTリクエストが来たら動く関数
 @app.route('/hometest', methods=['POST'])
 def search():
+    #json_dataのキーは["search_term","field","circle_fee","gender_ration","place","mood","frequency"]
     json_data = request.get_json()
     print(json.dumps(json_data))
 
