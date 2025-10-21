@@ -89,7 +89,7 @@ function Toggle() {
 
           
           <div className="tags">
-            キーワード検索:<input type="text" placeholder="キーワードを入力" value={searchTerm} onChange={change_searchTerm} />
+            キーワード検索:<input type="text" placeholder="キーワードを入力" value={search_term} onChange={change_search_term} />
             <br/>
             <label>分野</label>
             <select value={field} onChange={change_field}>
