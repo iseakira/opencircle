@@ -24,11 +24,12 @@ def search():
     #json_dataのキーは["search_term","field","circle_fee","gender_ration","place","mood","frequency"]
     json_data = request.get_json()
     print(json.dumps(json_data))
-    f = open("testdata.txt")
-    json_text = f.read()
-    f.close()
+    #f = open("testdata.txt")
+    #json_text = f.read()
+    #f.close
 
-    return jsonify(json_text)
+    return jsonify({"circle_name": "サークルA",
+                    "circle_description": "これはサークルAの説明です。"})
 
 # --- ここまでテスト用のコード ---
 

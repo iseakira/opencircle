@@ -34,8 +34,8 @@ function Home() {
         <div>
           {response_data ? (
             <>
-              <li>メッセージ１: {response_data.message}</li>
-              <li>メッセージ２: {response_data.message2}</li>
+              <li>メッセージ１: {response_data.circle_name}</li>
+              <li>メッセージ２: {response_data.circle_description}</li>
             </>
           ) : (<br/>)}
         </div>
