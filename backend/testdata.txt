@@ -1,0 +1,31 @@
+{
+    {
+        "number_of_data":3
+    },
+    [
+        {
+            "circle_name": "文学探求クラブ",
+            "circle_description": "古典から現代文学まで幅広く読み、議論する会です。",
+            "circle_fee": 1000,
+            "number_of_male": 12,
+            "number_of_female": 8,
+            "circle_icon_path": "/images/icons/bungaku.png"
+        },
+        {
+            "circle_name": "週末写真部",
+            "circle_description": "毎週、様々な場所で撮影会を実施。初心者歓迎。",
+            "circle_fee": 500,
+            "number_of_male": 5,
+            "number_of_female": 15,
+            "circle_icon_path": "/images/icons/shashin.png"
+        },
+        {
+            "circle_name": "プログラミング勉強会",
+            "circle_description": "最新技術のキャッチアップと実践的な開発スキルを学びます。",
+            "circle_fee": 0,
+            "number_of_male": 20,
+            "number_of_female": 4,
+            "circle_icon_path": "/images/icons/program.svg"
+        }
+    ]
+}

@@ -25,7 +25,11 @@ def search():
     json_data = request.get_json()
     print(json.dumps(json_data))
 
-    return jsonify({"message": "test"})
+    f = open("testdata.txt")
+    json_text = f.read()
+    f.close
+
+    return jsonify(json_text)
 
 # --- ここまでテスト用のコード ---
 
