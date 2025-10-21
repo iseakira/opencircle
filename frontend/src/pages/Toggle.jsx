@@ -55,15 +55,23 @@ function Toggle() {
     return json_stringdata;
 
   };
-  const sendData = (json_stringdata) => {
+  const sendData = async (json_stringdata) => {
     try {
-      const response =  fetch("http://localhost:3000/hometest",{
+      const response = await fetch("http://localhost:3000/hometest",{
         method: "POST",
         headers:{
           'Content-Type': 'application/json',
         },
         body: json_stringdata,
       });
+
+      if(!response.ok){
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log("サーバーからの応答:", result);
+      alert("データを送信しました")
 
     }catch (error) {
       console.error("通信エラー", error);
