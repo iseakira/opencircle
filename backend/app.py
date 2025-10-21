@@ -16,6 +16,10 @@ def say_hello():
     # JSON形式でメッセージを返す
     return jsonify({"message": "バックエンドからの返事です！🎉"})
 
+@app.route('/hometest', methods=['POST'])
+def search():
+    return jsonify({"message": "test"})
+
 # --- ここまでテスト用のコード ---
 
 if __name__ == '__main__':
