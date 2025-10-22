@@ -140,7 +140,7 @@ function Toggle({receivedData_fb}) {
               <option value="週3以上">週3以上</option>
               <option value="不定期">不定期</option>
             </select>
-            
+            <br />
           </div>
           <br/>
           <button onClick={get_jsontags}>絞り込む</button>
