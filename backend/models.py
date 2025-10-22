@@ -8,6 +8,11 @@ base_dir = os.path.dirname(__file__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///"+os.path.join(base_dir,"project.db")
 db = SQLAlchemy(app)
 
+circle_tags = db.Table('circle_tags',
+    db.Column('circle_id', db.Integer, db.ForeignKey('circles.circle_id'), primary_key=True),
+    db.Column('tag_id', db.Integer, db.ForeignKey('tags.tag_id'), primary_key=True)
+)
+
 class Circle(db.Model):
   __tablename__="circles"
   circle_id = db.Column(db.Integer,primary_key=True)
