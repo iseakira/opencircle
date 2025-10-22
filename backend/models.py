@@ -15,12 +15,12 @@ circle_tags = db.Table('circle_tags',
 
 class Circle(db.Model):
   __tablename__="circles"
-  circle_id = db.Column(db.Integer,primary_key=True)
+  circle_id = db.Column(db.Integer,primary_key=True,autoincrement=True)
   circle_name = db.Column(db.String(100),nullable=False)
   circle_description=db.Column(db.Text,nullable=False)
   circle_fee=db.Column(db.Integer,nullable=True)
-  number_of_male = db.Column(db.Integer,nullable=False,default=0)
-  number_of_female=db.Column(db.Integer,nullable=False,default=0)
+  number_of_male = db.Column(db.Integer,nullable=True,default=0)
+  number_of_female=db.Column(db.Integer,nullable=True,default=0)
   circle_icon_path=db.Column(db.String(255),nullable=True)
 
   tags = db.relationship('Tag', secondary=circle_tags, back_populates='circles', lazy='dynamic')
