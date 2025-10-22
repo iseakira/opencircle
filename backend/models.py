@@ -8,10 +8,7 @@ base_dir = os.path.dirname(__file__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///"+os.path.join(base_dir,"project.db")
 db = SQLAlchemy(app)
 
-circle_tags = db.Table('circle_tags',
-    db.Column('circle_id', db.Integer, db.ForeignKey('circles.circle_id'), primary_key=True),
-    db.Column('tag_id', db.Integer, db.ForeignKey('tags.tag_id'), primary_key=True)
-)
+
 
 class Circle(db.Model):
   __tablename__="circles"
@@ -23,7 +20,9 @@ class Circle(db.Model):
   number_of_female=db.Column(db.Integer,nullable=False,default=0)
   circle_icon_path=db.Column(db.String(255),nullable=True)
 
-  tags = db.relationship('Tag', secondary=circle_tags, back_populates='circles', lazy='dynamic')
+  ## TagモデルとCircleモデルの多対多のリレーションシップ
+  tags = db.relationship('Tag', secondary='circle_tag', backref=db.backref('circles', lazy=True))
+
 class User(db.Model):
   __tablename__ = "users"
   user_id = db.Column(db.Integer,primary_key=True)
@@ -31,17 +30,25 @@ class User(db.Model):
   mail_adress = db.Column(db.String(255),unique=True,nullable=False)
   password = db.Column(db.String(255), nullable=False)
 
-  sessions = db.relationship('Session', backref='user', lazy=True)
-
-  
 
 class Tag(db.Model):
   __tablename__ = "tags"
   tag_id = db.Column(db.Integer,primary_key=True)
   tag_name = db.Column(db.String(50),unique=True,nullable=False)
 
-  circles = db.relationship('Circle', secondary=circle_tags, back_populates='tags', lazy='dynamic')
+  ## CircleモデルとTagモデルの多対多のリレーションシップ
+  circles = db.relationship('Circle', secondary='circle_tag', backref=db.backref('tags', lazy=True))
 
+
+class AccountCreate(db.Model):
+  __tablename__ = "account_creates"
+  tmp_id = db.Column(db.Integer,primary_key=True)
+  user_id = db.Column(db.Integer,db.ForeignKey('users.user_id'),nullable=False)
+  auth_code = db.Column(db.String(100),nullable=False)
+  account_expire_time = db.Column(db.DateTime,nullable=False)
+  account_create_time = db.Column(db.DateTime,nullable=False)
+
+ 
 class Session(db.Model):
   __tablename__ = "sessions"
   session_id = db.Column(db.Integer,primary_key=True)
@@ -49,11 +56,17 @@ class Session(db.Model):
   session_create_time = db.Column(db.DateTime,nullable=False)
   session_last_access_time = db.Column(db.DateTime,nullable=False)
 
+  ## Userモデルとセッションのリレーションシップ
+  user = db.relationship('User', backref=db.backref('sessions', lazy=True))
+  sessions = db.relationship('Session', backref='user', lazy=True)
 
-circle_tags = db.Table('circle_tags',
-    db.Column('circle_id', db.Integer, db.ForeignKey('circles.circle_id'), primary_key=True),
-    db.Column('tag_id', db.Integer, db.ForeignKey('tags.tag_id'), primary_key=True)
+
+## circlesとtagsの多対多の関係を定義する中間テーブル
+circle_tag_table = db.Table('circle_tag',
+  db.Column('circle_id',db.Integer,db.ForeignKey('circles.circle_id'),primary_key=True),
+  db.Column('tag_id',db.Integer,db.ForeignKey('tags.tag_id'),primary_key=True)
 )
+
 
 
 if __name__ == '__main__':
