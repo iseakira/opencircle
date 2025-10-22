@@ -11,6 +11,8 @@ __インフラ;__ Docker
 ① Github(オンライン上のデータ)の最新のコードを自分のパソコンに反映させる場合
 
  __git fetch origin__
+ 
+ __git pull origin main__
 
 ②ファイルを編集してGithub上に反映させる
 
