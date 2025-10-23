@@ -104,7 +104,8 @@ function Toggle({receivedData_fb}) {
             </select>
             <br/>
             <label>費用</label>
-            <select value={circle_fee} onChange={change_circle_fee}>
+            <select value={circle_fee}
+             onChange={change_circle_fee}>
               <option value="">未選択</option>
               <option value="0">無料</option>
               <option value="2000円未満">2000円未満</option>
