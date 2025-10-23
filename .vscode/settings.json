@@ -21,6 +21,8 @@
             },
             "ssh": "Disabled",
             "previewLimit": 50,
+<<<<<<< HEAD
+=======
             "server": "localhost",
             "port": 3306,
             "driver": "MariaDB",
@@ -63,6 +65,7 @@
             },
             "ssh": "Disabled",
             "previewLimit": 50,
+>>>>>>> bc68fa4b81d7e907697666fcfb18e4bb0cf7b7ec
             "server": "www.dmgpt.site",
             "port": 3306,
             "driver": "MariaDB",

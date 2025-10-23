@@ -1,10 +1,12 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, redirect
 from flask_cors import CORS # ◀ flask_corsをインポート
 from flask import request
 import json
 from models import db, Circle, Tag  # models.py に db = SQLAlchemy() とモデル定義がある前提
 import os
 from sqlalchemy.exc import IntegrityError
+import database_oparating as dbop
+import send_mail.py as sm
 
 # Flaskアプリケーションのインスタンスを作成
 def create_app():
@@ -51,8 +53,10 @@ def search():
 @app.route('/add_account', methods=['POST'])
 def make_tmp_account():
     json_dict = request.get_json()
-    mail_str = json_dict["mailaddress"]
-    
+    mailaddress = json_dict["mailaddress"]
+    auth_code = dbop.temp_registration(mailaddress)
+    sm.send_auth_code(mailaddress, auth_code)
+    return redirect('/registration'), 302
 
 #'/api/circles'というURLにPOSTリクエストが来たら動く関数#
 @app.route('/api/circles', methods=['POST'])
@@ -78,7 +82,7 @@ def add_circle():
     new_circle = Circle(**circle_data)
 
     # タグ紐付け（任意）
-    selected_tag_ids = data.get("selected_tag_ids", [])
+    selected_tag_ids = data.get("tags", [])
     if selected_tag_ids:
         tags = Tag.query.filter(Tag.tag_id.in_(selected_tag_ids)).all()
         for tag in tags:

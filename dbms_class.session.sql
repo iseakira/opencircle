@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+SELECT name FROM classA
+UNION
+SELECT name FROM classB;
+
+
+=======
 show tables;
 DESCRIBE test;
 select * from test;
@@ -12,3 +19,4 @@ select a.name from classA a left join classB b on a.name = b.name where b.name i
 
 insert into score(student_id, subject, score) values(6323073,'Database', 100);
 select * from score;
+>>>>>>> bc68fa4b81d7e907697666fcfb18e4bb0cf7b7ec
