@@ -19,7 +19,7 @@ function Toggle({receivedData_fb}) {
   const [place, setPlace] = useState('');
   const [mood, setMood] = useState('');
   const [frequency, setFrequency] = useState('');
-  //タグ選択時の処理
+  //タグ 選択時の処理
   const change_field =(e) =>{
     setField(e.target.value);
   };
@@ -97,48 +97,49 @@ function Toggle({receivedData_fb}) {
             <label>分野</label>
             <select value={field} onChange={change_field}>
               <option value="">未選択</option>
-              <option value="運動">運動</option>
-              <option value="文化">文化</option>
-              <option value="音楽">音楽</option>
-              <option value="学生自治">学生自治</option>
+              <option value="1">運動</option>
+              <option value="2">文化</option>
+              <option value="3">音楽</option>
+              <option value="4">学生自治</option>
             </select>
             <br/>
             <label>費用</label>
-            <select value={circle_fee} onChange={change_circle_fee}>
+            <select value={circle_fee}
+             onChange={change_circle_fee}>
               <option value="">未選択</option>
-              <option value="0">無料</option>
-              <option value="2000円未満">2000円未満</option>
-              <option value="2000円以上">2000円以上</option>
+              <option value="5">無料</option>
+              <option value="6">2000円未満</option>
+              <option value="7">2000円以上</option>
             </select>
             <br/>
             <label>男女比</label>
             <select value={gender_ratio} onChange={change_gender_ratio}>
               <option value="">未選択</option>
-              <option value="男性多め">男性多め</option>
-              <option value="女性多め">女性多め</option>
-              <option value="男女半々">男女半々</option>
+              <option value="8">男性多め</option>
+              <option value="9">女性多め</option>
+              <option value="10">男女半々</option>
             </select>
             <br/>
             <label>活動場所</label>
             <select value={place} onChange={change_place}>
               <option value="">未選択</option>
-              <option value="学内">学内</option>
-              <option value="学外">学外</option>
+              <option value="11">学内</option>
+              <option value="12">学外</option>
             </select>
             <br/>
             <label>雰囲気</label>
             <select value={mood} onChange={change_mood}>
               <option value="">未選択</option>
-              <option value="賑やか">賑やか</option>
-              <option value="落ち着いている">落ち着いている</option>
+              <option value="13">賑やか</option>
+              <option value="14">落ち着いている</option>
             </select>
             <br/>
             <label>活動頻度</label>
             <select value={frequency} onChange={change_frequency}>
               <option value="">未選択</option>
-              <option value="週3未満">週3未満</option>
-              <option value="週3以上">週3以上</option>
-              <option value="不定期">不定期</option>
+              <option value="15">週3未満</option>
+              <option value="16">週3以上</option>
+              <option value="17">不定期</option>
             </select>
             <br />
           </div>

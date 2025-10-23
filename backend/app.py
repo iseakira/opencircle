@@ -35,8 +35,8 @@ def say_hello():
 @app.route('/hometest', methods=['POST'])
 def search():
     #json_dataのキーは["search_term","field","circle_fee","gender_ration","place","mood","frequency"]
-    json_data = request.get_json()
-    print(json.dumps(json_data))
+    json_dict = request.get_json()
+    print(json.dumps(json_dict))
     #f = open("testdata.txt")
     #json_text = f.read()
     #f.close
@@ -47,6 +47,12 @@ def search():
                      "circle_description": "これはサークルBの説明です。"},
                     {"circle_name": "サークルC",
                      "circle_description": "これはサークルCの説明です。"}])
+
+@app.route('/add_account', methods=['POST'])
+def make_tmp_account():
+    json_dict = request.get_json()
+    mail_str = json_dict["mailaddress"]
+    
 
 #'/api/circles'というURLにPOSTリクエストが来たら動く関数#
 @app.route('/api/circles', methods=['POST'])
