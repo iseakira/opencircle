@@ -52,6 +52,7 @@ def search():
 def make_tmp_account():
     json_dict = request.get_json()
     mail_str = json_dict["mailaddress"]
+    
 
 #'/api/circles'というURLにPOSTリクエストが来たら動く関数#
 @app.route('/api/circles', methods=['POST'])
