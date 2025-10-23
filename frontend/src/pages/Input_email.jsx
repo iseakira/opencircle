@@ -21,7 +21,7 @@ function Input_email() {
   
   const sendData = async (json_stringemail) => {
     try {
-      const response = await fetch("http://localhost:5001/hometest",{
+      const response = await fetch("http://localhost:5001/add_account",{
         method: "POST",
         headers:{
           'Content-Type': 'application/json',
