@@ -43,6 +43,7 @@ function Input_email() {
       alert("通信に失敗しました");
     }
   };
+  
   return (
     <div>
       <header className="page-header">
