@@ -7,6 +7,7 @@ function Input_email() {
   const retain_email = (e) => {
     setEmail(e.target.value);
   };
+
   const email_processing =(e) =>{
     e.preventDefault();
     const mailTosend ={
@@ -17,6 +18,7 @@ function Input_email() {
     sendData(json_stringemail);
     return json_stringemail;
   }
+  
   const sendData = async (json_stringemail) => {
     try {
       const response = await fetch("http://localhost:5001/hometest",{
@@ -43,7 +45,7 @@ function Input_email() {
       alert("通信に失敗しました");
     }
   };
-  
+
   return (
     <div>
       <header className="page-header">
