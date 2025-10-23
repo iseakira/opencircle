@@ -8,6 +8,11 @@ base_dir = os.path.dirname(__file__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///"+os.path.join(base_dir,"project.db")
 db = SQLAlchemy(app)
 
+## circlesとtagsの多対多の関係を定義する中間テーブル
+circle_tag_table = db.Table('circle_tag',
+  db.Column('circle_id',db.Integer,db.ForeignKey('circles.circle_id'),primary_key=True),
+  db.Column('tag_id',db.Integer,db.ForeignKey('tags.tag_id'),primary_key=True)
+)
 
 
 class Circle(db.Model):
@@ -59,14 +64,6 @@ class Session(db.Model):
   ## Userモデルとセッションのリレーションシップ
   user = db.relationship('User', backref=db.backref('sessions', lazy=True))
   sessions = db.relationship('Session', backref='user', lazy=True)
-
-
-## circlesとtagsの多対多の関係を定義する中間テーブル
-circle_tag_table = db.Table('circle_tag',
-  db.Column('circle_id',db.Integer,db.ForeignKey('circles.circle_id'),primary_key=True),
-  db.Column('tag_id',db.Integer,db.ForeignKey('tags.tag_id'),primary_key=True)
-)
-
 
 
 if __name__ == '__main__':

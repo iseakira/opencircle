@@ -13,6 +13,62 @@
             "name": "dbms_class",
             "database": "class_db",
             "username": "root"
+        },
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MariaDB",
+            "name": "student",
+            "database": "class_db",
+            "username": "student"
+        },
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "www.dmgpt",
+            "port": 3306,
+            "driver": "MariaDB",
+            "name": "dbms_class",
+            "database": "class_db",
+            "username": "student"
+        },
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "www.dmgpt.site",
+            "port": 3306,
+            "driver": "MariaDB",
+            "name": "student_class",
+            "database": "class_db",
+            "username": "student"
+        },
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "www.dmgpt.site",
+            "port": 3306,
+            "driver": "MariaDB",
+            "name": "dbms_class",
+            "database": "sample_db",
+            "username": "student"
         }
     ]
 }
