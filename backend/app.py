@@ -82,7 +82,7 @@ def add_circle():
     new_circle = Circle(**circle_data)
 
     # タグ紐付け（任意）
-    selected_tag_ids = data.get("selected_tag_ids", [])
+    selected_tag_ids = data.get("tags", [])
     if selected_tag_ids:
         tags = Tag.query.filter(Tag.tag_id.in_(selected_tag_ids)).all()
         for tag in tags:

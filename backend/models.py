@@ -66,6 +66,10 @@ class Session(db.Model):
   sessions = db.relationship('Session', backref='user', lazy=True)
 
 
+
+
+
+
 if __name__ == '__main__':
   with app.app_context():
     db.create_all()

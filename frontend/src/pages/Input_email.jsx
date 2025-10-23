@@ -3,15 +3,15 @@ import { useState } from 'react';
 import headImage from '../images/head_image.png';
 
 function Input_email() {
-  const [email, setEmail] = useState('');
+  const [emailadress, setEmailadress] = useState('');
   const retain_email = (e) => {
-    setEmail(e.target.value);
+    setEmailadress(e.target.value);
   };
 
   const email_processing =(e) =>{
     e.preventDefault();
     const mailTosend ={
-      email: email
+      emailadress: emailadress
     }
     const json_stringemail = JSON.stringify(mailTosend);
     console.log("入力されたメールアドレス:", json_stringemail);
