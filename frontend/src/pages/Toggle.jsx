@@ -40,15 +40,12 @@ function Toggle({receivedData_fb}) {
   };
   //jsonデータ取得
   const get_jsontags = () => {
+
     const dataTosend = {
       search_term: search_term,
-      field: field,
-      circle_fee: circle_fee,
-      gender_ratio: gender_ratio,
-      place: place,
-      mood: mood,
-      frequency: frequency
+      tags: [field, circle_fee, gender_ratio, place, mood, frequency]
     }
+    dataTosend.tags = dataTosend.tags.filter(tag => tag !== "");
     const json_stringdata = JSON.stringify(dataTosend);
     console.log('タグのjsonデータ:', json_stringdata);
     sendData(json_stringdata);
