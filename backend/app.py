@@ -35,8 +35,8 @@ def say_hello():
 @app.route('/hometest', methods=['POST'])
 def search():
     #json_dataのキーは["search_term","field","circle_fee","gender_ration","place","mood","frequency"]
-    json_data = request.get_json()
-    print(json.dumps(json_data))
+    json_dic = request.get_json()
+    print(json.dumps(json_dic))
     #f = open("testdata.txt")
     #json_text = f.read()
     #f.close
