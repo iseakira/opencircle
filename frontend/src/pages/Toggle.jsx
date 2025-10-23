@@ -78,6 +78,7 @@ function Toggle({receivedData_fb}) {
       alert("通信に失敗しました");
     }
   };
+
   return (
     <div>
       <button onClick={make_visible} aria-expanded={visible}>
@@ -85,9 +86,7 @@ function Toggle({receivedData_fb}) {
       </button>
       {visible && (
         <div className="tag-select">
-          <h4>キーワードを入力するかタグを選択してください</h4>
-
-          
+          <h4>キーワードを入力するかタグを選択してください</h4>       
           <div className="tags">
             キーワード検索:<input type="text" placeholder="キーワードを入力" value={search_term} onChange={change_search_term} />
             <br/>
