@@ -19,7 +19,7 @@ function Toggle({receivedData_fb}) {
   const [place, setPlace] = useState('');
   const [mood, setMood] = useState('');
   const [frequency, setFrequency] = useState('');
-  //タグ選択時の処理
+  //タグ 選択時の処理
   const change_field =(e) =>{
     setField(e.target.value);
   };
