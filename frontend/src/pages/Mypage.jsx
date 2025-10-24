@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { MoreVertical } from "lucide-react";
 
-export function Mypage() {
+function Mypage() {
   const navigate = useNavigate();
   const [circles, setCircles] = useState([]);
   useEffect(() => {
