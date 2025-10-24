@@ -3,7 +3,6 @@ import {useNavigate} from "react-router-dom";
 import React, { useState } from 'react';
 import headImage from '../images/head_image.png';
 
-
 function Login() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ 
@@ -32,8 +31,13 @@ function Login() {
         <h3>メールアドレスとパスワードを入力してください</h3>
         <form onSubmit={handleSubmit}>
           <label>メールアドレス：</label>
+<<<<<<< HEAD
           <input type="email" name="email" required value={formData.email} onChange={handleChange} />
           
+=======
+          <input type="email" name="email" required />
+
+>>>>>>> 50dcb6436e6a85181d7499ecf0ad88f3cf79ffec
           <br />
           <label>パスワード：</label>
           <input type="password" name="password" required value={formData.password} onChange={handleChange} />
@@ -41,9 +45,13 @@ function Login() {
         </form>
         <br />
         <h3>
+<<<<<<< HEAD
           <Link to="/input_email" >
             アカウント作成はこちら
           </Link>
+=======
+          <Link to="/Input_email">アカウント作成はこちら</Link>
+>>>>>>> 50dcb6436e6a85181d7499ecf0ad88f3cf79ffec
         </h3>
       </main>
       <footer>
