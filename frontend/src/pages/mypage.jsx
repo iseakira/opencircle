@@ -5,7 +5,6 @@ import { MoreVertical } from "lucide-react";
 export default function Mypage() {
   const navigate = useNavigate();
   const [circles, setCircles] = useState([]);
-
   useEffect(() => {
     fetch("http://localhost:5001/api/mypage", {
       credentials: "include", // Flask の session を維持
