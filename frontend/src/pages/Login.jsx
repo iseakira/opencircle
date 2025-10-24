@@ -1,8 +1,23 @@
 import { Link } from 'react-router-dom';
+import {useNavigate} from "react-router-dom";
+import React, { useState } from 'react';
 import headImage from '../images/head_image.png';
-import Mypage from '../Mypage.jsx'
+
 
 function Login() {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({ 
+    email: '', // 👈 初期値を設定
+    password: '',
+  });
+  const handleChange = (e) => {
+    // 入力フィールドの名前をキーとして state を更新
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    navigate('/mypage');
+  }
   return (
     <div>
       <header className="page-header">
@@ -15,20 +30,18 @@ function Login() {
       <h1>東京理科大学サークル情報サイト</h1>
       <main>
         <h3>メールアドレスとパスワードを入力してください</h3>
-        <form>
+        <form onSubmit={handleSubmit}>
           <label>メールアドレス：</label>
-          <input type="email" name="email" required />
+          <input type="email" name="email" required value={formData.email} onChange={handleChange} />
           
           <br />
           <label>パスワード：</label>
-          <input type="password" name="password" required />
+          <input type="password" name="password" required value={formData.password} onChange={handleChange} />
+          <button type="submit">ログイン</button>
         </form>
         <br />
-        <Link to="/Mypage">
-          <button type="submit">ログイン</button>
-        </Link>
         <h3>
-          <Link to="/Input_email" >
+          <Link to="/input_email" >
             アカウント作成はこちら
           </Link>
         </h3>

@@ -1,6 +1,7 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { MoreVertical } from "lucide-react";
+import headImage from '../images/head_image.png';
 
 function Mypage() {
   const navigate = useNavigate();
@@ -17,11 +18,20 @@ function Mypage() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col items-center p-4 sm:p-8 bg-gray-50">
-      <div className="w-full max-w-md flex justify-between items-center mb-6">
+    <>
+    <header className="page-header">
+      <h1>
+        <Link to="/">
+          <img className="logo" src={headImage} alt="アイコン" />
+        </Link>
+      </h1>
+    </header>
+    <main>
+      <div className="min-h-screen flex flex-col items-center p-4 sm:p-8 bg-gray-50">
+        <div className="w-full max-w-md flex justify-between items-center mb-6">
         <h1 className="text-xl sm:text-2xl font-bold">マイページ</h1>
         <button
-          className="p-2 hover:bg-gray-100 rounded-full"
+          className="p-2"
           onClick={() => alert("編集権限メニューを開く")}
         >
           <MoreVertical size={24} />
@@ -58,6 +68,8 @@ function Mypage() {
         </div>
       </div>
     </div>
+    </main>
+    </>
   );
 }
 export default Mypage;
