@@ -16,6 +16,10 @@ function Login() {
     e.preventDefault();
     navigate('/mypage');
   }
+  const handleCreateAccount = (e) => {
+    e.preventDefault();
+    navigate('/input_email');
+  }
   return (
     <div>
       <header className="page-header">
@@ -38,10 +42,7 @@ function Login() {
         </form>
         <br />
         <h3>
-          <Link to="/input_email" >
-            アカウント作成はこちら
-          </Link>
-          <Link to="/Input_email">アカウント作成はこちら</Link>
+          <button type="submit" onClick={handleCreateAccount}>アカウント作成はこちら</button>
         </h3>
       </main>
       <footer>

@@ -11,7 +11,7 @@ function Input_email() {
   const email_processing =(e) =>{
     e.preventDefault();
     const mailTosend ={
-      emailadress: emailadress
+      mailaddress: emailadress
     }
     const json_stringemail = JSON.stringify(mailTosend);
     console.log("入力されたメールアドレス:", json_stringemail);
@@ -60,7 +60,7 @@ function Input_email() {
         <h3>登録したいメールアドレスを入力してください</h3>
         <form onSubmit={email_processing}>
           <label>メールアドレス：</label>
-          <input type="text" name="text" placeholder="メールアドレス" value={email} onChange={retain_email} required />
+          <input type="text" name="text" placeholder="メールアドレス" value={emailadress} onChange={retain_email} required />
           <br />
           <button type="submit">認証コードを送信する</button>
         </form>

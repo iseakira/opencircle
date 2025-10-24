@@ -54,7 +54,7 @@ def search():
 def make_tmp_account():
     json_dict = request.get_json()
     mailaddress = json_dict["mailaddress"]
-    auth_code = dbop.temp_registration(mailaddress)
+    auth_code = dbop.tmp_registration(mailaddress)
     sm.send_auth_code(mailaddress, auth_code)
     return redirect('/registration'), 302
 
