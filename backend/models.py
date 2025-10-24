@@ -65,7 +65,14 @@ class Session(db.Model):
   user = db.relationship('User', backref=db.backref('sessions', lazy=True))
   sessions = db.relationship('Session', backref='user', lazy=True)
 
-
+class EditAuthorization(db.Model):
+    __tablename__ = "edit_authorizations"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"), nullable=False)
+    circle_id = db.Column(db.Integer, db.ForeignKey("circles.circle_id"), nullable=False)
+    role = db.Column(db.String(50), nullable=True)
+    user = db.relationship("User", backref="edit_authorizations")
+    circle = db.relationship("Circle", backref="edit_authorizations")
 
 
 
