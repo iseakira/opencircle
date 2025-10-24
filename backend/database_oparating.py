@@ -7,7 +7,7 @@ import string
 
 def get_circle_search(json_dict):
     #database.dbは仮
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect('project.db')
     cursor = conn.cursor()
     #tmp_dictは検索内容をidに変換して保存する
     tmp_dict = dict()
@@ -29,7 +29,7 @@ def get_circle_search(json_dict):
 
 def tmp_registration(mailaddress):
     #database.dbは仮
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect('project.db')
     cursor = conn.cursor()
     auth_code = random.randint(100000, 999999)
     tmp_id = int(''.join(secrets.choice(string.digits) for _ in range(6)))
