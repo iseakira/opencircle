@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import headImage from '../images/head_image.png';
-import Mypage from '../Mypage.jsx'
 
 function Login() {
   return (
@@ -18,7 +17,7 @@ function Login() {
         <form>
           <label>メールアドレス：</label>
           <input type="email" name="email" required />
-          
+
           <br />
           <label>パスワード：</label>
           <input type="password" name="password" required />
@@ -28,9 +27,7 @@ function Login() {
           <button type="submit">ログイン</button>
         </Link>
         <h3>
-          <Link to="/Input_email" >
-            アカウント作成はこちら
-          </Link>
+          <Link to="/Input_email">アカウント作成はこちら</Link>
         </h3>
       </main>
       <footer>
