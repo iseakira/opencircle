@@ -6,7 +6,7 @@ import headImage from '../images/head_image.png';
 function Login() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ 
-    email: '', // 👈 初期値を設定
+    email: '',
     password: '',
   });
   const handleChange = (e) => {
