@@ -3,6 +3,7 @@ import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
 import Input_email from './pages/Input_email.jsx';
 import Mypage from './pages/mypage.jsx';
+import CircleAdd from './pages/CircleAdd.jsx';
 
 function AppRouter() {
   return (
@@ -12,6 +13,7 @@ function AppRouter() {
         <Route path="/login" element={<Login />} />
         <Route path="/input_email" element={<Input_email />} />
         <Route path="/mypage" element={<Mypage />} />
+        <Route path="/add_circle" element={<CircleAdd/>}/>
       </Routes>
     </>
   );

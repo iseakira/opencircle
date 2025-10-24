@@ -1,0 +1,20 @@
+/* .react-select__control{ */
+     /* width: 50%;  */
+    /* margin:0 auto; */
+/* } */
+.tag-list{
+    display: flex; 
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+.tag-row{
+    /* display: flex;   */
+    align-items: center;
+    gap: 8px;
+}
+
+.tag-row.select{
+    width: 200px;
+    height:20px;
+}
