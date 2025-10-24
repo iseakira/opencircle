@@ -56,7 +56,7 @@ def make_tmp_account():
     mailaddress = json_dict["mailaddress"]
     auth_code = dbop.tmp_registration(mailaddress)
     sm.send_auth_code(mailaddress, auth_code)
-    return redirect('/registration'), 302
+    return redirect('/input_email'), 302
 
 #'/api/circles'というURLにPOSTリクエストが来たら動く関数#
 @app.route('/api/circles', methods=['POST'])

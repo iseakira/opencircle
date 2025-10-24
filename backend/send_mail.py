@@ -18,7 +18,7 @@ def send_auth_code(mailaddress, auth_code):
     SENDER_EMAIL = "OpenCircleTUS@gmail.com"
     SENDER_PASSWORD = "bggr fcqj fote zmtz"
     try:
-        with smtplib.SMTP(SMTP_SERVER, STTP_PORT) as server:
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
             server.starttls()
             server.login(SENDER_EMAIL, SENDER_PASSWORD)
             server.sendmail(SENDER_EMAIL, mailaddress, msg.as_string())
