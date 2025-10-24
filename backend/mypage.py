@@ -11,6 +11,9 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
 
+
+
+
 #--- ここからマイページ画面用のコード ---
 
 

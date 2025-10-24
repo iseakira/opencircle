@@ -26,7 +26,7 @@ def create_app():
 app = create_app()
 
 # --- ここからテスト用のコード ---
-
+# SSSS.GRIDMANgit
 # `/api/hello` というURLにアクセスが来たら動く関数
 @app.route('/api/hello', methods=['GET'])
 def say_hello():

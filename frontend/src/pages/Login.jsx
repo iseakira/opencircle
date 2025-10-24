@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import headImage from '../images/head_image.png';
+import Mypage from './mypage.jsx'
 
 function Login() {
   return (

@@ -2,10 +2,9 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { MoreVertical } from "lucide-react";
 
-export default function Mypage() {
+export function Mypage() {
   const navigate = useNavigate();
   const [circles, setCircles] = useState([]);
-
   useEffect(() => {
     fetch("http://localhost:5001/api/mypage", {
       credentials: "include", // Flask の session を維持
@@ -61,3 +60,4 @@ export default function Mypage() {
     </div>
   );
 }
+export default Mypage;
