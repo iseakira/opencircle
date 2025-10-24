@@ -6,7 +6,7 @@ from models import db, Circle, Tag  # models.py に db = SQLAlchemy() とモデ�
 import os
 from sqlalchemy.exc import IntegrityError
 import database_oparating as dbop
-import send_mail.py as sm
+import send_mail as sm
 
 # Flaskアプリケーションのインスタンスを作成
 def create_app():
