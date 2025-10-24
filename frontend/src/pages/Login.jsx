@@ -10,7 +10,6 @@ function Login() {
     password: '',
   });
   const handleChange = (e) => {
-    // 入力フィールドの名前をキーとして state を更新
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
   const handleSubmit = (e) => {
