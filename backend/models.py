@@ -48,10 +48,10 @@ class Tag(db.Model):
 class AccountCreate(db.Model):
   __tablename__ = "account_creates"
   tmp_id = db.Column(db.Integer,primary_key=True)
-  user_id = db.Column(db.Integer,db.ForeignKey('users.user_id'),nullable=False)
   auth_code = db.Column(db.String(100),nullable=False)
   account_expire_time = db.Column(db.DateTime,nullable=False)
   account_create_time = db.Column(db.DateTime,nullable=False)
+  attempt_count = db.Column(db.Integer,nullable=False,default=0)
 
  
 class Session(db.Model):
