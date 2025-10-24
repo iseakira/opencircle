@@ -6,11 +6,10 @@ import headImage from '../images/head_image.png';
 function Login() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ 
-    email: '', // 👈 初期値を設定
+    email: '',
     password: '',
   });
   const handleChange = (e) => {
-    // 入力フィールドの名前をキーとして state を更新
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
   const handleSubmit = (e) => {
