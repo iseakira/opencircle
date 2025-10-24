@@ -15,6 +15,8 @@ circle_tag_table = db.Table('circle_tag',
 )
 
 
+
+
 class Circle(db.Model):
   __tablename__="circles"
   circle_id = db.Column(db.Integer,primary_key=True,autoincrement=True)
