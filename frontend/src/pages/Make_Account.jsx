@@ -12,41 +12,52 @@ function Make_Account() {
     };
     const navigate = useNavigate();
     //imput_email.jsxで入力されたメールアドレスを取得
-    const emailadress = localStorage.getItem('emailadress');
+    const mailaddress = localStorage.getItem('emailaddress');
     const [formData, setFormData] = useState({ 
-        email: emailadress,
+        mailaddress: mailaddress,
         password: '',
+        auth_code: '',
         user_name: '',
     });
+    const [result, setResult] = useState(null);
     const [passwordConfirm, setPasswordConfirm] = useState('');
-    const [sendAuthcode, setSendAuthcode] = useState(null);
     const handleCreateAccount = async (e) => {
         e.preventDefault();
 
-        const password = e.target.password.value;
-        const user_name = e.target.user_name.value;
-        const inputAuthCode =e.target.inputAuthCode.value;
+        const password = formData.password;
+        const user_name = formData.user_name;
+        const auth_code = formData.auth_code;
 
+        if(password !== passwordConfirm){
+            alert("パスワードが一致しません");
+            return;
+        }
         const dataToSend = {
-            email: emailadress,
+            mailaddress: mailaddress,
             password: password,
+            auth_code: auth_code,
             user_name: user_name,
         };
         try {
-            if(password == passwordConfirm && sendAuthcode == inputAuthCode){
-                const response = await fetch("http://localhost:5001/create_account",{
-                    method: "POST",
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(dataToSend),})
+            const response = await fetch("http://localhost:5001/create_account",{
+                method: "POST",
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(dataToSend),})
                 if(response.ok){
-                    navigate('/');
+                    const data = await response.json();
+                    setResult(data);
+                    console.log("受信したデータ：",data);
+                    if(data.success === true){
+                        localStorage.removeItem('emailaddress');
+                        alert("アカウントを作成しました！");
+                        navigate('/');
+                        
+                    }
                 }else{
-                    alert("アカウント作成に失敗しました：${response.status}");
+                    alert(`アカウント作成に失敗しました：${response.status}`);
                 }
-            }else{
-                alert("パスワードまたは認証コードが間違っています");
-                return;
-            }
+
+            
         }catch(error){
                 console.error("通信に失敗",error);
                 alert("通信に失敗しました");
@@ -74,7 +85,7 @@ function Make_Account() {
                 </div>
                     <br />
                 <label>認証コード：</label>
-                    <input type="text" name="inputAuthCode" required />
+                    <input type="text" name="auth_code" value={formData.auth_code} required onChange={handleChange}/>
                     <br />
                 <label>ユーザー名：</label>
                     <input type="text" name="user_name" value={formData.user_name} required onChange={handleChange}/>
@@ -82,6 +93,19 @@ function Make_Account() {
                 <button type="submit" >アカウントを作成する</button>
             </form>
             <br />
+            <div>
+                {result ? (
+                    <>
+                    {result.map((item, index) => (
+                        <div key={index}>
+                            <p>{item.message}</p>
+                        </div>
+                    ))}
+                    </>
+                    ):(<br />
+                    )
+                }
+                </div>
         </main>
         <footer>
             <p>created by 東京理科大学IS科3年</p>
@@ -91,7 +115,6 @@ function Make_Account() {
         </footer>
     </div>
     )
-    ;
 };
 
 export default Make_Account;

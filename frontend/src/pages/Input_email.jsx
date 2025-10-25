@@ -5,24 +5,24 @@ import headImage from '../images/head_image.png';
 
 function Input_email() {
   //入力されたメールアドレスを保持するステート
-  const [emailadress, setEmailadress] = useState('');
+  const [emailaddress, setEmailaddress] = useState('');
   
   const navigate = useNavigate();
   const retain_email = (e) => {
-    setEmailadress(e.target.value);
+    setEmailaddress(e.target.value);
   };
 
   const email_processing =(e) =>{
     e.preventDefault();
     const mailTosend ={
-      mailaddress: emailadress
+      mailaddress: emailaddress
     }
-    localStorage.setItem('emailadress', emailadress);
-    navigate('/Make_Account');
+    localStorage.setItem('emailaddress', emailaddress);
     const json_stringemail = JSON.stringify(mailTosend);
     console.log("入力されたメールアドレス:", json_stringemail);
     sendData(json_stringemail);
-    return json_stringemail;
+    
+    return;
   }
   
   const sendData = async (json_stringemail) => {
@@ -35,17 +35,14 @@ function Input_email() {
         body: json_stringemail,
       });
     
-      if(!response.ok){
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      //if(!response.ok){
+        //throw new Error(`HTTP error! status: ${response.status}`);
+      //}
 
       const result = await response.json();
       console.log("サーバーからの応答:", result);
-      //if (receivedData_fb) {
-      //  receivedData_fb(result);
-      //}
       alert("データを送信しました")
-
+      //navigate('/Make_Account');
     }catch (error) {
       console.error("通信エラー", error);
       alert("通信に失敗しました");
@@ -66,7 +63,7 @@ function Input_email() {
         <h3>登録したいメールアドレスを入力してください</h3>
         <form onSubmit={email_processing}>
           <label>メールアドレス：</label>
-          <input type="text" name="text" placeholder="メールアドレス" value={emailadress} onChange={retain_email} required />
+          <input type="text" name="text" placeholder="メールアドレス" value={emailaddress} onChange={retain_email} required />
           <br />
           <button type="submit">認証コードを送信する</button>
         </form>
