@@ -1,9 +1,13 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import headImage from '../images/head_image.png';
 
 function Input_email() {
+  //入力されたメールアドレスを保持するステート
   const [emailadress, setEmailadress] = useState('');
+  
+  const navigate = useNavigate();
   const retain_email = (e) => {
     setEmailadress(e.target.value);
   };
@@ -13,6 +17,8 @@ function Input_email() {
     const mailTosend ={
       mailaddress: emailadress
     }
+    localStorage.setItem('emailadress', emailadress);
+    navigate('/Make_Account');
     const json_stringemail = JSON.stringify(mailTosend);
     console.log("入力されたメールアドレス:", json_stringemail);
     sendData(json_stringemail);
