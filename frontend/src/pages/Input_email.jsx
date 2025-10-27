@@ -15,7 +15,7 @@ function Input_email() {
   const email_processing =(e) =>{
     e.preventDefault();
     const mailTosend ={
-      mailaddress: emailaddress
+      emailaddress: emailaddress
     }
     localStorage.setItem('emailaddress', emailaddress);
     const json_stringemail = JSON.stringify(mailTosend);

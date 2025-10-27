@@ -53,9 +53,9 @@ def search():
 @app.route('/add_account', methods=['POST'])
 def make_tmp_account():
     json_dict = request.get_json()
-    mailaddress = json_dict["mailaddress"]
-    auth_code = dbop.tmp_registration(mailaddress)
-    sm.send_auth_code(mailaddress, auth_code)
+    emailaddress = json_dict["emailaddress"]
+    auth_code = dbop.tmp_registration(emailaddress)
+    sm.send_auth_code(emailaddress, auth_code)
     return redirect('/input_email'), 302
 
 #'/api/circles'というURLにPOSTリクエストが来たら動く関数#
