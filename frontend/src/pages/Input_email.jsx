@@ -11,14 +11,17 @@ function Input_email() {
   const retain_email = (e) => {
     setEmailaddress(e.target.value);
   };
-
   const email_processing =(e) =>{
     e.preventDefault();
-    const mailTosend ={
+    const emailTosend ={
       emailaddress: emailaddress
     }
-    localStorage.setItem('emailaddress', emailaddress);
-    const json_stringemail = JSON.stringify(mailTosend);
+    const to_Make_Account = JSON.stringify({
+      emailaddress: emailaddress,
+      tmp_id: tmp_id
+    })
+    localStorage.setItem('to_Make_Account', to_Make_Account)
+    const json_stringemail = JSON.stringify(emailTosend);
     console.log("入力されたメールアドレス:", json_stringemail);
     sendData(json_stringemail);
     
@@ -41,8 +44,12 @@ function Input_email() {
 
       const result = await response.json();
       console.log("サーバーからの応答:", result);
-      alert("データを送信しました")
-      //navigate('/Make_Account');
+      if(result.message == success){
+        alert("データを送信しました")
+        navigate('/Make_Account');
+      }else{
+        alert("もう一度入力してください")
+      }
     }catch (error) {
       console.error("通信エラー", error);
       alert("通信に失敗しました");
@@ -68,6 +75,7 @@ function Input_email() {
           <button type="submit">認証コードを送信する</button>
         </form>
         <br />
+ 
       </main>
       <footer>
         <p>created by 東京理科大学IS科3年</p>

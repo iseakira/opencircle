@@ -49,8 +49,10 @@ function Make_Account() {
                     console.log("受信したデータ：",data);
                     if(data.message === success){
                         localStorage.removeItem('emailaddress');
-                        alert("アカウントを作成しました！");
-                        navigate('/');
+                        alert("アカウントを作成しました!3秒後にホーム画面に遷移します!");
+                        setTimeout(() =>{
+                            navigate('/');
+                        },3000);
                         
                     }
                 }else{
