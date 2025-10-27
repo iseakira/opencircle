@@ -33,4 +33,13 @@ def tmp_registration(mailaddress):
                     "VALUES ({}, {}, datetime('now','+10 minute'), datetime('now'), 0)".format(tmp_id,auth_code))
     cursor.close()
     conn.close()
-    return auth_code
+    return (auth_code,tmp_id)
+    """
+def check_auth_code(auth_code, tmp_id):
+    conn = sqlite3.connect("project.db")
+    cursor = conn.cursor()
+    res = cursor.execute("SELECT auth_code, account_expire_time, account_create_time, attempt_count " \
+                        "FROM account_creates WHERE tmp_id = {}".format(tmp_id))
+    cursor.close()
+    conn.close()
+    """
