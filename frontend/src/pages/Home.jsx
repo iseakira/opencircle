@@ -36,8 +36,9 @@ function Home() {
             <>
               {response_data.map((circle, index) => (
                 <div key={index} className="circle-info">
-                  <h3>サークル名: {circle.circle_name}</h3>
-                  <p>活動内容: {circle.circle_description}</p>
+                  <img src={circle.circle_icon_path} className="circle_icon"/>
+                  <p>サークル名: {circle.circle_name}</p>
+                  <p>分野：{circle.tag_name}</p>
                 </div>
               ))}
               <br />
