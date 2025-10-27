@@ -56,3 +56,8 @@
   
   border-style: outset;
 }
+
+.circle_icon {
+  height: 1.5em;
+  width: auto;
+}
