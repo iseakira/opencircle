@@ -1,22 +1,31 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import headImage from '../images/head_image.png';
 
 function Input_email() {
-  const [emailadress, setEmailadress] = useState('');
+  //入力されたメールアドレスを保持するステート
+  const [emailaddress, setEmailaddress] = useState('');
+  
+  const navigate = useNavigate();
   const retain_email = (e) => {
-    setEmailadress(e.target.value);
+    setEmailaddress(e.target.value);
   };
-
   const email_processing =(e) =>{
     e.preventDefault();
-    const mailTosend ={
-      emailadress: emailadress
+    const emailTosend ={
+      emailaddress: emailaddress
     }
-    const json_stringemail = JSON.stringify(mailTosend);
+    const to_Make_Account = JSON.stringify({
+      emailaddress: emailaddress,
+      tmp_id: tmp_id
+    })
+    localStorage.setItem('to_Make_Account', to_Make_Account)
+    const json_stringemail = JSON.stringify(emailTosend);
     console.log("入力されたメールアドレス:", json_stringemail);
     sendData(json_stringemail);
-    return json_stringemail;
+    
+    return;
   }
   
   const sendData = async (json_stringemail) => {
@@ -29,17 +38,18 @@ function Input_email() {
         body: json_stringemail,
       });
     
-      if(!response.ok){
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      //if(!response.ok){
+        //throw new Error(`HTTP error! status: ${response.status}`);
+      //}
 
       const result = await response.json();
       console.log("サーバーからの応答:", result);
-      //if (receivedData_fb) {
-      //  receivedData_fb(result);
-      //}
-      alert("データを送信しました")
-
+      if(result.message == success){
+        alert("データを送信しました")
+        navigate('/Make_Account');
+      }else{
+        alert("もう一度入力してください")
+      }
     }catch (error) {
       console.error("通信エラー", error);
       alert("通信に失敗しました");
@@ -60,11 +70,12 @@ function Input_email() {
         <h3>登録したいメールアドレスを入力してください</h3>
         <form onSubmit={email_processing}>
           <label>メールアドレス：</label>
-          <input type="text" name="text" placeholder="メールアドレス" value={email} onChange={retain_email} required />
+          <input type="text" name="text" placeholder="メールアドレス" value={emailaddress} onChange={retain_email} required />
           <br />
           <button type="submit">認証コードを送信する</button>
         </form>
         <br />
+ 
       </main>
       <footer>
         <p>created by 東京理科大学IS科3年</p>

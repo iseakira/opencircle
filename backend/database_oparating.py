@@ -30,7 +30,16 @@ def tmp_registration(mailaddress):
     tmp_id = int(''.join(secrets.choice(string.digits) for _ in range(6)))
     #tmp_idが重複した時の処理を後で書く
     cursor.execute("INSERT INTO account_creates(tmp_id, auth_code, account_expire_time, account_create_time, attempt_count) " \
-                    "VALUE ({}, {}, NOW(), DATE_ADD(NOW(), INTERVAL 10 MINUTE), 0)".format(tmp_id,auth_code))
+                    "VALUES ({}, {}, datetime('now','+10 minute'), datetime('now'), 0)".format(tmp_id,auth_code))
     cursor.close()
     conn.close()
-    return auth_code
+    return (auth_code,tmp_id)
+    """
+def check_auth_code(auth_code, tmp_id):
+    conn = sqlite3.connect("project.db")
+    cursor = conn.cursor()
+    res = cursor.execute("SELECT auth_code, account_expire_time, account_create_time, attempt_count " \
+                        "FROM account_creates WHERE tmp_id = {}".format(tmp_id))
+    cursor.close()
+    conn.close()
+    """

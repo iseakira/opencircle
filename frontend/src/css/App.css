@@ -31,7 +31,18 @@
   width: auto;
 
 }
+.p-2 {
+  position: fixed;
 
+  right: 0;
+  top: 0;
+
+  z-index: 1000;
+
+  height: 2em;
+  width: auto;
+
+}
 .tag-select {
   border: 1px solid gray;
   padding: 10px;
@@ -44,4 +55,9 @@
   gap: 10px;
   
   border-style: outset;
+}
+
+.circle_icon {
+  height: 1.5em;
+  width: auto;
 }

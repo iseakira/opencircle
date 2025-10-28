@@ -3,10 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
 
-app = Flask(__name__)
-base_dir = os.path.dirname(__file__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///"+os.path.join(base_dir,"project.db")
-db = SQLAlchemy(app)
+db = SQLAlchemy()
 
 ## circlesとtagsの多対多の関係を定義する中間テーブル
 circle_tag_table = db.Table('circle_tag',
@@ -79,10 +76,10 @@ class EditAuthorization(db.Model):
 
 
 
-if __name__ == '__main__':
-  with app.app_context():
-    db.create_all()
-    print('DB作ったよ')
+# if __name__ == '__main__':
+#   with app.app_context():
+#     db.create_all()
+#      print('DB作ったよ')
 
 
 

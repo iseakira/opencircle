@@ -19,7 +19,7 @@ def create_app():
 
     # CORSを有効にする（これでフロントからの通信が許可される）
     # origins=["http://localhost:3000"] のように限定することも可能
-    CORS(app)
+    CORS(app, origins="http://localhost:3000")
     db.init_app(app)
     return app
 
@@ -43,12 +43,12 @@ def search():
     #json_text = f.read()
     #f.close
 
-    return jsonify([{"circle_name": "サークルA",
-                    "circle_description": "これはサークルAの説明です。"},
-                    {"circle_name": "サークルB",
-                     "circle_description": "これはサークルBの説明です。"},
-                    {"circle_name": "サークルC",
-                     "circle_description": "これはサークルCの説明です。"}])
+    return jsonify([{"circle_icon_path": "/test_image/head_image.png",
+                    "circle_name": "サークルAの名前",
+                    "tag_name":"サークルAの分野のタグ"},
+                    {"circle_icon_path": "サークルBのアイコン",
+                    "circle_name": "サークルBの名前",
+                    "tag_name":"サークルBの分野のタグ"}])
 
 @app.route('/home', methods=['POST'])
 def initial_circles():
@@ -72,10 +72,18 @@ def circle_page():
 @app.route('/add_account', methods=['POST'])
 def make_tmp_account():
     json_dict = request.get_json()
-    mailaddress = json_dict["mailaddress"]
-    auth_code = dbop.temp_registration(mailaddress)
-    sm.send_auth_code(mailaddress, auth_code)
-    return redirect('/registration'), 302
+    emailaddress = json_dict["emailaddress"]
+    #data_tuple は (auth_code, tmp_id) の形
+    data_tuple = dbop.tmp_registration(emailaddress)
+    sm.send_auth_code(emailaddress, data_tuple[0])
+    return jsonify({"message": "success", "tmp_id": data_tuple[1]})
+
+"""
+@app.route("/create_account", methods=["POST"])
+def create_account():
+    json_dict = request.get_json()
+    checked_dict = dbop.check_auth_code(json_dict["auth_code"], json_dict["tmp_id"])
+"""
 
 #'/api/circles'というURLにPOSTリクエストが来たら動く関数#
 @app.route('/api/circles', methods=['POST'])
