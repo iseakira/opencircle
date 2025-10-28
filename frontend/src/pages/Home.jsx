@@ -1,17 +1,45 @@
 import { Link, useNavigate } from 'react-router-dom';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../css/App.css';
 import headImage from '../images/head_image.png';
 import Toggle from './Toggle.jsx';
 
 
 function Home() {
-  //バックエンドからの応答ステート
+  //初期値となる全サークルデータと絞り込み結果の表示
+  const [all_circles, setAll_circles] = useState(null);
+    //バックエンドからの応答ステート（絞り込み結果を受け取る）
   const [response_data, setResponse_data] = useState(null);
   const handleResponse = (data) => {
     console.log("受信したデータ:", data);
     setResponse_data(data);
   };
+
+  const catch_all_circles = async () => {
+    try {
+      const initial_response = await fetch("http://localhost:5001/hometeset", {
+        method: "GET",
+        headers: {'Content-Type': 'application/json',
+      },
+    });
+    if(initial_response.ok){
+      const data = await initial_response.json();
+      console.log("初期値として受け取った全サークル情報:", data);
+      setAll_circles(data);
+      setResponse_data(data);
+    };
+
+
+    }catch(error){
+      console.error("エラーが発生しました", error);
+
+    }
+  }
+  useEffect(() => {
+    catch_all_circles();
+  }, []);
+
+  //サークルの項目をクリックしたときに行う処理
   const to_circle_page = (circle_id) => {
     const json_circle_id = JSON.stringify({circle_id: circle_id})
     console.log("取得したいサークルのid:", json_circle_id)
@@ -68,7 +96,7 @@ function Home() {
               ))}
               <br />
             </>
-          ) : (<br/>)}
+          ) : (<p>サークル情報の取得に失敗しました</p>)}
         </div>
       </main>
       <footer>
