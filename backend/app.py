@@ -63,7 +63,7 @@ def search_results():
                     {"circle_name": "サークルC",
                      "circle_description": "これはサークルCの説明です。"}])
 
-@app.route('Circle_Page', methods=['POST'])
+@app.route('/Circle_Page', methods=['POST'])
 def circle_page():
     json_dict = request.get_json()
     circle_id = json_dict["circle_id"]
