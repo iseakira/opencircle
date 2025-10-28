@@ -11,7 +11,7 @@ function Home() {
     //バックエンドからの応答ステート（絞り込み結果を受け取る）
   const [response_data, setResponse_data] = useState(null);
   const handleResponse = (data) => {
-    console.log("受信したデータ:", data);
+    console.log("絞り込み結果:", data);
     setResponse_data(data);
   };
 
