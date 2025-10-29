@@ -30,8 +30,7 @@ db.init_app(app)
 # 編集可能サークル一覧取得
 @app.route("/api/mypage", methods=["GET"])
 def get_editable_circles():
-   
-    #　ログインチェック
+    #ログインチェック
     if "user_id" not in session:
         return jsonify({"error": "ログインが必要です"}), 401
 
