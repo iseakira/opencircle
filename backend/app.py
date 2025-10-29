@@ -7,7 +7,6 @@ import os
 from sqlalchemy.exc import IntegrityError
 import database_oparating as dbop
 import send_mail as sm
-
 # Flaskアプリケーションのインスタンスを作成
 def create_app():
     app = Flask(__name__)
