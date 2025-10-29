@@ -11,7 +11,7 @@ function Circle_Page(){
         console.log("受信したデータ:", data);
         setResponse_data(data);
     };
-    return 
+    return (
     <div>
         <header className="page-header">
             <Link to="/">
@@ -36,5 +36,5 @@ function Circle_Page(){
             </div>
         </main>
     </div>
-
+    )
 }

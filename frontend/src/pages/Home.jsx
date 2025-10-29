@@ -6,6 +6,7 @@ import Toggle from './Toggle.jsx';
 
 
 function Home() {
+  const navigate = useNavigate();
   //初期値となる全サークルデータと絞り込み結果の表示
   const [all_circles, setAll_circles] = useState(null);
     //バックエンドからの応答ステート（絞り込み結果を受け取る）
@@ -17,8 +18,8 @@ function Home() {
 
   const catch_all_circles = async () => {
     try {
-      const initial_response = await fetch("http://localhost:5001/hometeset", {
-        method: "GET",
+      const initial_response = await fetch("http://localhost:5001/homestart", {
+        method: "POST",
         headers: {'Content-Type': 'application/json',
       },
     });
@@ -57,7 +58,7 @@ function Home() {
         body: json_circle_id,
       });
       console
-      navigate('/Circle_page');
+      navigate('/Circle_Page');
     }catch{
       console.error("サークルページへの遷移に失敗しました")
       alert("サークルページへの遷移に失敗しました");
