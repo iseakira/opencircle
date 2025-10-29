@@ -38,3 +38,4 @@ function Circle_Page(){
     </div>
     )
 }
+export default Circle_Page;

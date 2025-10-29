@@ -19,7 +19,7 @@ function AppRouter() {
         <Route path="/mypage" element={<Mypage />} />
         <Route path="/add_circle" element={<CircleAdd/>}/>
         <Route path="/Make_Account" element={<Make_Account/>}/>
-        <Route path="/Circle_Page" element={<Circle_Page/>}/>
+        <Route path="/Circle_Page" element={<Circle_Page />} />
       </Routes>
     </>
   );
