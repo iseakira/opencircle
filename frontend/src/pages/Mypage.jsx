@@ -53,14 +53,32 @@ function Mypage() {
 
         <h2 className="text-lg font-semibold mb-3">編集できるサークル一覧</h2>
         <div className="w-full max-w-md space-y-3">
+
+        <button
+          onClick={() => navigate("/edit-circle/1")} // ID:1 に飛ぶテスト
+          className="bg-yellow-500 text-black w-full sm:w-2/3 py-2 rounded-xl shadow-md hover:bg-yellow-600 transition mb-6"
+        >
+          編集ページ(ID:1)へのテストボタン
+        </button>
           {circles.length > 0 ? (
             circles.map((c) => (
-              <div
+             
+             
+             
+              /*テストテスト岸変更ここ
+               <div
                 key={c.circle_id}
                 className="p-3 border rounded-lg bg-white shadow-sm"
               >
                 {c.circle_name}
-              </div>
+              </div>   */
+              <div
+                key={c.circle_id}
+                className="p-3 border rounded-lg bg-white shadow-sm cursor-pointer hover:bg-gray-50 transition"
+                onClick={() => navigate(`/edit-circle/${c.circle_id}`)}
+              >
+                {c.circle_name}
+              </div>
             ))
           ) : (
             <p className="text-gray-500">編集できるサークルがありません。</p>

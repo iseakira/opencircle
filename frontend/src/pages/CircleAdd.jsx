@@ -14,6 +14,7 @@ import Image from '../conponents/image'
 import { OPTIONS } from '../conponents/option'
 import CircleMen from '../conponents/CircleMen'
 import CircleFemen from '../conponents/CircleFemen'
+import CircleLogo from '../conponents/CircleLogo'
 function CircleAdd() {
   const [circleData,setCircleData]=useState({
     circle_name:"",
@@ -91,22 +92,22 @@ function CircleAdd() {
       ...circleData,
       tags:selectedValues,
      })
-    alert(`${preview}サークルを追加しました`);
+    alert(`${selectedValues}サークルを追加しました`);
   }else{
    // alert("キャンセルしました");
   }
   }
   };
 
-  const [selectedBunya,setSelectedBunya]=useState(null);
-  const [selectedFee,setSelectedFee]=useState(null);
-  const [selectedRatio,setSelectedRatio]=useState(null);
-  const [selectedPlace,setSelectedPlace]=useState(null);
-  const [selectedMood,setSelectedMood]=useState(null);
-  const [selectedActive,setSelectedActive]=useState(null);
+  const [selectedBunya,setSelectedBunya]=useState(0);
+  const [selectedFee,setSelectedFee]=useState(0);
+  const [selectedRatio,setSelectedRatio]=useState(0);
+  const [selectedPlace,setSelectedPlace]=useState(0);
+  const [selectedMood,setSelectedMood]=useState(0);
+  const [selectedActive,setSelectedActive]=useState(0);
  
 
-  const [preview,setPreview]=useState(null);
+  const [preview,setPreview]=useState("");
   const [image,setImage]=useState(null);
   
   const hadleImageChange=(e)=>{
@@ -120,12 +121,20 @@ function CircleAdd() {
   const get_jsontags = () => {
     const dataTosend = {
       circle_name:circleData.circle_name,
-      circle_description:circleData.circle_discription,
-      circle_fee:circleData.circle_fee,
-      number_of_male:circleData.number_of_male,
-      number_of_female:circleData.number_of_female,
+      circle_description:circleData.circle_description,
+      circle_fee:Number(circleData.circle_fee),
+      number_of_male:Number(circleData.number_of_male),
+      number_of_female:Number(circleData.number_of_female),
       circle_icon_path:preview,
-      tags:circleData.selectedValues,
+      // tags:circleData.selectedValues,
+      tags:[
+        Number(selectedBunya),
+       Number(selectedFee),
+       Number(selectedRatio),
+       Number(selectedPlace),
+       Number(selectedMood),
+       Number(selectedActive),
+      ]
     }
     const json_stringdata = JSON.stringify(dataTosend);
     console.log('タグのjsonデータ:', json_stringdata);
@@ -135,7 +144,7 @@ function CircleAdd() {
   };
   const sendData = async (json_stringdata) => {
     try {
-      const response = await fetch("http://localhost:5001/hometest",{
+      const response = await fetch("http://localhost:5001/api/circles",{
         method: "POST",
         headers:{
           'Content-Type': 'application/json',
@@ -149,21 +158,28 @@ function CircleAdd() {
 
       const result = await response.json();
       console.log("サーバーからの応答:", result);
-      if (receivedData_fb) {
-        receivedData_fb(result);
-      }
+      // if (receivedData_fb) {
+       // receivedData_fb(result);
+      //}
       alert("データを送信しました")
 
     }catch (error) {
       console.error("通信エラー", error);
-    //  alert("通信に失敗しました");
+    //alert("通信に失敗しました");
     }
   };
 
+
+   const [response_data, setResponse_data] = useState(null);
+    const handleResponse = (data) => {
+      console.log("受信したデータ:", data);
+      setResponse_data(data);
+    };
   return (
     <>
     {/* <AddCircle></AddCircle> */}
     <form onSubmit={handleKey}> 
+    <CircleLogo></CircleLogo>
     <CircleName value={circleData.circle_name} onChange={NameChange} ></CircleName>
     <CircleDescription value={circleData.circle_description} onChange={DesChange}></CircleDescription>
     <CircleMen value={circleData.number_of_male} onChange={MemChange}></CircleMen>

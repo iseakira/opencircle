@@ -41,7 +41,8 @@ class Tag(db.Model):
   tag_name = db.Column(db.String(50),unique=True,nullable=False)
 
   ## CircleモデルとTagモデルの多対多のリレーションシップ
-  circles = db.relationship('Circle', secondary='circle_tag', backref=db.backref('tags', lazy=True))
+  ## circles = db.relationship('Circle', secondary='circle_tag', backref=db.backref('tags', lazy=True))
+  ##岸変更なにかのバグが発生（多対多のリレーションシップが二重に定義されているため？）
 
 
 class AccountCreate(db.Model):
@@ -62,7 +63,7 @@ class Session(db.Model):
 
   ## Userモデルとセッションのリレーションシップ
   user = db.relationship('User', backref=db.backref('sessions', lazy=True))
-  sessions = db.relationship('Session', backref='user', lazy=True)
+  ##sessions = db.relationship('Session', backref='user', lazy=True)
 
 class EditAuthorization(db.Model):
     __tablename__ = "edit_authorizations"
