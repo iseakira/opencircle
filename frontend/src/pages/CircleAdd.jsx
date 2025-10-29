@@ -15,6 +15,7 @@ import { OPTIONS } from '../conponents/option'
 import CircleMen from '../conponents/CircleMen'
 import CircleFemen from '../conponents/CircleFemen'
 import CircleLogo from '../conponents/CircleLogo'
+import { Link } from 'react-router-dom'
 function CircleAdd() {
   const [circleData,setCircleData]=useState({
     circle_name:"",
@@ -192,7 +193,7 @@ function CircleAdd() {
   {/* <Toggle></Toggle> */}
     {/* <Button type="submit" onClick={handleKey} ></Button> */}
     <Button type="submit" onClick={get_jsontags} ></Button>
-
+ <Link to={"/mypage"}>マイページに戻る</Link>
     </form> 
  
     </>

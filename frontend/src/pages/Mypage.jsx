@@ -40,11 +40,12 @@ function Mypage() {
 
       <div className="w-full max-w-md flex flex-col items-center">
         <button
-          onClick={() => navigate("/add-circle")}
+          onClick={() => navigate("/add_circle")}
           className="bg-blue-500 text-white w-full sm:w-2/3 py-3 rounded-xl shadow-md hover:bg-blue-600 transition"
         >
           追加
         </button>
+
         <p className="text-gray-600 mt-2 mb-6 text-sm sm:text-base">
           （サークル追加用の画面へ）
         </p>
