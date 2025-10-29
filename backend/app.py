@@ -48,22 +48,7 @@ def search():
     json_text = dbop.search_circles(json_dict)
     return jsonify(json_text)
 
-<<<<<<< HEAD
-    return jsonify([{"circle_id": 1,
-                    "circle_icon_path": "/test_image/head_image.png",
-                    "circle_name": "サークルAの名前",
-                    "tag_name":"サークルAの分野のタグ"},
-                    {"circle_id": 2,
-                     "circle_icon_path": "サークルBのアイコン",
-                    "circle_name": "サークルBの名前",
-                    "tag_name":"サークルBの分野のタグ"}])
 
-@app.route('/home', methods=['POST'])
-def initial_circles():
-    return jsonify({"message": "初期サークルデータの取得成功"})
-#絞り込み検索をする前のサークル情報モデル
-@app.route('/homestart', methods=['POST'])
-=======
     # return jsonify([{"circle_icon_path": "/test_image/head_image.png",
     #                 "circle_name": "サークルAの名前",
     #                 "tag_name":"サークルAの分野のタグ"},
@@ -71,7 +56,7 @@ def initial_circles():
     #                 "circle_name": "サークルBの名前",
     #                 "tag_name":"サークルBの分野のタグ"}])
 
-@app.route('/home', methods=['POST'])
+@app.route('/homestart', methods=['POST'])
 def initial_circles():
     # DB から初期表示用のサークル一覧を取得して返す
     try:
@@ -83,7 +68,6 @@ def initial_circles():
         return jsonify({"error": "サーバーエラー"}), 500
 
 @app.route('/home', methods=['GET'])
->>>>>>> 4e509d2ea6ecef73fa383e9734d6386f8ea5dc23
 def search_results():
     return jsonify([{"circle_name": "サークルA",
                     "circle_description": "これはサークルAの説明です。"},
