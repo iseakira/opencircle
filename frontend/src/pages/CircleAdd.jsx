@@ -18,7 +18,6 @@ import headImage from '../images/head_image.png';
 import { Link } from 'react-router-dom';
 
 import CircleLogo from '../conponents/CircleLogo'
-import { Link } from 'react-router-dom'
 function CircleAdd() {
   const [circleData,setCircleData]=useState({
     circle_name:"",
@@ -202,10 +201,6 @@ function CircleAdd() {
         <Tag onChangeBunya={setSelectedBunya} onChangeFee={setSelectedFee} onChangeRatio={setSelectedRatio} onChangePlace={setSelectedPlace} onChangeMood={setSelectedMood} onChangeActive={setSelectedActive} 
         ></Tag> 
   
-        {/* <Toggle></Toggle> */}
-        {/* <Button type="submit" onClick={handleKey} ></Button> */}
-        <Button type="submit" onClick={get_jsontags} ></Button>
-     
         {/* <Toggle></Toggle> */}
         {/* <Button type="submit" onClick={handleKey} ></Button> */}
         <Button type="submit" onClick={get_jsontags} ></Button>
