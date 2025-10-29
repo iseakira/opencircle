@@ -56,3 +56,13 @@
   
   border-style: outset;
 }
+
+.circle_icon {
+  height: 1.5em;
+  width: auto;
+}
+
+.circle-info:hover {
+  background: #f0f0f0;
+  transition: background-color 0.3s ease;
+}
