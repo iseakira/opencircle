@@ -41,18 +41,27 @@ def search():
     print(json.dumps(json_dict))
     #f = open("testdata.txt")
     #json_text = f.read()
-    #f.close
+    #f.close()
+    json_text = dbop.search_circles(json_dict)
+    return jsonify(json_text)
 
-    return jsonify([{"circle_icon_path": "/test_image/head_image.png",
-                    "circle_name": "サークルAの名前",
-                    "tag_name":"サークルAの分野のタグ"},
-                    {"circle_icon_path": "サークルBのアイコン",
-                    "circle_name": "サークルBの名前",
-                    "tag_name":"サークルBの分野のタグ"}])
+    # return jsonify([{"circle_icon_path": "/test_image/head_image.png",
+    #                 "circle_name": "サークルAの名前",
+    #                 "tag_name":"サークルAの分野のタグ"},
+    #                 {"circle_icon_path": "サークルBのアイコン",
+    #                 "circle_name": "サークルBの名前",
+    #                 "tag_name":"サークルBの分野のタグ"}])
 
 @app.route('/home', methods=['POST'])
 def initial_circles():
-    return jsonify({"message": "初期サークルデータの取得成功"})
+    # DB から初期表示用のサークル一覧を取得して返す
+    try:
+        items = dbop.get_initial_circles()
+        return jsonify({"items": items, "total": len(items)})
+    except Exception as e:
+        # エラー時はログ出力して 500 を返す
+        print('get_initial_circles error:', e)
+        return jsonify({"error": "サーバーエラー"}), 500
 
 @app.route('/home', methods=['GET'])
 def search_results():
