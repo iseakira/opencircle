@@ -204,7 +204,7 @@ function CircleAdd() {
         {/* <Toggle></Toggle> */}
         {/* <Button type="submit" onClick={handleKey} ></Button> */}
         <Button type="submit" onClick={get_jsontags} ></Button>
-        <Link to={"/mypage"}>マイページに戻る</Link>
+        <Link to={"/mypage"}>マイページへ戻る</Link>
       </form> 
     </div>
   
