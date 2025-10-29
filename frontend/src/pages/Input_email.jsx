@@ -17,18 +17,15 @@ function Input_email() {
       emailaddress: emailaddress
     }
     const to_Make_Account = JSON.stringify({
-      emailaddress: emailaddress,
-      tmp_id: tmp_id
+      emailaddress: emailaddress
     })
-    localStorage.setItem('to_Make_Account', to_Make_Account)
     const json_stringemail = JSON.stringify(emailTosend);
     console.log("入力されたメールアドレス:", json_stringemail);
-    sendData(json_stringemail);
-    
+    sendData(json_stringemail, to_Make_Account);
     return;
   }
   
-  const sendData = async (json_stringemail) => {
+  const sendData = async (json_stringemail, to_Make_Account_data) => {
     try {
       const response = await fetch("http://localhost:5001/add_account",{
         method: "POST",
@@ -38,14 +35,15 @@ function Input_email() {
         body: json_stringemail,
       });
     
-      //if(!response.ok){
-        //throw new Error(`HTTP error! status: ${response.status}`);
-      //}
+      if(!response.ok){
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       const result = await response.json();
       console.log("サーバーからの応答:", result);
-      if(result.message == success){
+      if(result.message == "success"){
         alert("データを送信しました")
+        localStorage.setItem('to_Make_Account', to_Make_Account_data)
         navigate('/Make_Account');
       }else{
         alert("もう一度入力してください")

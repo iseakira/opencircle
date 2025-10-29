@@ -54,7 +54,26 @@ def search():
                     "circle_name": "サークルBの名前",
                     "tag_name":"サークルBの分野のタグ"}])
 
-@app.route("/add_account", methods=["POST"])
+@app.route('/home', methods=['POST'])
+def initial_circles():
+    return jsonify({"message": "初期サークルデータの取得成功"})
+
+@app.route('/home', methods=['GET'])
+def search_results():
+    return jsonify([{"circle_name": "サークルA",
+                    "circle_description": "これはサークルAの説明です。"},
+                    {"circle_name": "サークルB",
+                     "circle_description": "これはサークルBの説明です。"},
+                    {"circle_name": "サークルC",
+                     "circle_description": "これはサークルCの説明です。"}])
+
+@app.route('/Circle_Page', methods=['POST'])
+def circle_page():
+    json_dict = request.get_json()
+    circle_id = json_dict["circle_id"]
+    return jsonify({"message": f"サークルID {circle_id} の詳細情報の取得成功"})
+
+@app.route('/add_account', methods=['POST'])
 def make_tmp_account():
     json_dict = request.get_json()
     emailaddress = json_dict["emailaddress"]
