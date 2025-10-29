@@ -91,12 +91,14 @@ def make_tmp_account():
     sm.send_auth_code(emailaddress, data_tuple[0])
     return jsonify({"message": "success", "tmp_id": data_tuple[1]})
 
-"""
 @app.route("/create_account", methods=["POST"])
 def create_account():
     json_dict = request.get_json()
     checked_dict = dbop.check_auth_code(json_dict["auth_code"], json_dict["tmp_id"])
-"""
+    if checked_dict["message"] == "failure":
+        return jsonify(checked_dict)
+    dbop.create_account(json_dict["emailaddress"], json_dict["password"], json_dict["user_name"])
+    return jsonify(checked_dict)
 
 #'/api/circles'というURLにPOSTリクエストが来たら動く関数#
 @app.route('/api/circles', methods=['POST'])
