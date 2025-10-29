@@ -7,7 +7,6 @@ function EditCircle() {
   const navigate = useNavigate();
 
   // 2. フォームの各項目を管理するための State
-  // FlaskのAPI仕様に合わせて項目を用意
   const [circleName, setCircleName] = useState("");
   const [description, setDescription] = useState("");
   const [fee, setFee] = useState(""); // circle_fee
@@ -25,7 +24,7 @@ function EditCircle() {
   useEffect(() => {
     setLoading(true);
     fetch(`http://localhost:5001/api/circles/${circleId}`, { 
-      credentials: "include" 
+      //credentials: "include" 
     })
       .then(res => {
         if (!res.ok) {

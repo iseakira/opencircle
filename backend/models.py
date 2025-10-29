@@ -3,10 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
 
-app = Flask(__name__)
-base_dir = os.path.dirname(__file__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///"+os.path.join(base_dir,"project.db")
-db = SQLAlchemy(app)
+db = SQLAlchemy()
 
 ## circlesとtagsの多対多の関係を定義する中間テーブル
 circle_tag_table = db.Table('circle_tag',
@@ -44,7 +41,8 @@ class Tag(db.Model):
   tag_name = db.Column(db.String(50),unique=True,nullable=False)
 
   ## CircleモデルとTagモデルの多対多のリレーションシップ
-  circles = db.relationship('Circle', secondary='circle_tag', backref=db.backref('tags', lazy=True))
+  ## circles = db.relationship('Circle', secondary='circle_tag', backref=db.backref('tags', lazy=True))
+  ##岸変更なにかのバグが発生（多対多のリレーションシップが二重に定義されているため？）
 
 
 class AccountCreate(db.Model):
@@ -65,7 +63,7 @@ class Session(db.Model):
 
   ## Userモデルとセッションのリレーションシップ
   user = db.relationship('User', backref=db.backref('sessions', lazy=True))
-  sessions = db.relationship('Session', backref='user', lazy=True)
+  ##sessions = db.relationship('Session', backref='user', lazy=True)
 
 class EditAuthorization(db.Model):
     __tablename__ = "edit_authorizations"
@@ -79,10 +77,10 @@ class EditAuthorization(db.Model):
 
 
 
-if __name__ == '__main__':
-  with app.app_context():
-    db.create_all()
-    print('DB作ったよ')
+# if __name__ == '__main__':
+#   with app.app_context():
+#     db.create_all()
+#      print('DB作ったよ')
 
 
 

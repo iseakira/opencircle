@@ -15,18 +15,22 @@ def create_app():
     # DB の場所をプロジェクトの backend ディレクトリ内の project.db に設定
     base_dir = os.path.dirname(__file__)
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(base_dir, "project.db")
+    
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     # CORSを有効にする（これでフロントからの通信が許可される）
     # origins=["http://localhost:3000"] のように限定することも可能
-    CORS(app)
+    CORS(app, 
+     resources={r"/api/*": {"origins": "http://localhost:3000"}},  #変更クッキー関係
+     supports_credentials=True
+)
     db.init_app(app)
     return app
 
 app = create_app()
 
 # --- ここからテスト用のコード ---
-# SSSS.GRIDMANgit
+
 # `/api/hello` というURLにアクセスが来たら動く関数
 @app.route('/api/hello', methods=['GET'])
 def say_hello():
@@ -43,20 +47,28 @@ def search():
     #json_text = f.read()
     #f.close
 
-    return jsonify([{"circle_name": "サークルA",
-                    "circle_description": "これはサークルAの説明です。"},
-                    {"circle_name": "サークルB",
-                     "circle_description": "これはサークルBの説明です。"},
-                    {"circle_name": "サークルC",
-                     "circle_description": "これはサークルCの説明です。"}])
+    return jsonify([{"circle_icon_path": "/test_image/head_image.png",
+                    "circle_name": "サークルAの名前",
+                    "tag_name":"サークルAの分野のタグ"},
+                    {"circle_icon_path": "サークルBのアイコン",
+                    "circle_name": "サークルBの名前",
+                    "tag_name":"サークルBの分野のタグ"}])
 
-@app.route('/add_account', methods=['POST'])
+@app.route("/add_account", methods=["POST"])
 def make_tmp_account():
     json_dict = request.get_json()
-    mailaddress = json_dict["mailaddress"]
-    auth_code = dbop.temp_registration(mailaddress)
-    sm.send_auth_code(mailaddress, auth_code)
-    return redirect('/registration'), 302
+    emailaddress = json_dict["emailaddress"]
+    #data_tuple は (auth_code, tmp_id) の形
+    data_tuple = dbop.tmp_registration(emailaddress)
+    sm.send_auth_code(emailaddress, data_tuple[0])
+    return jsonify({"message": "success", "tmp_id": data_tuple[1]})
+
+"""
+@app.route("/create_account", methods=["POST"])
+def create_account():
+    json_dict = request.get_json()
+    checked_dict = dbop.check_auth_code(json_dict["auth_code"], json_dict["tmp_id"])
+"""
 
 #'/api/circles'というURLにPOSTリクエストが来たら動く関数#
 @app.route('/api/circles', methods=['POST'])
@@ -189,6 +201,107 @@ def update_circle(circle_id):
         "circle_id": circle_to_update.circle_id
     }), 200
 # --- ここまでテスト用のコード ---
+
+
+@app.route("/api/mypage", methods=["GET"])
+def get_editable_circles():
+   
+    #　ログインチェック
+    if "user_id" not in session:
+        return jsonify({"error": "ログインが必要です"}), 401
+
+
+    user_id = session["user_id"]
+
+
+
+
+    # 編集権限を取得
+    auths = EditAuthorization.query.filter_by(user_id=user_id).all()
+    circle_ids = [a.circle_id for a in auths]
+
+
+
+
+    # 編集できるサークルがない場合
+    if not circle_ids:
+        return jsonify({"items": [], "total": 0})
+
+
+
+
+    # 対応するサークル情報を取得
+    circles = Circle.query.filter(Circle.circle_id.in_(circle_ids)).all()
+
+
+    # 取得したサークル情報をJSON化
+    result = [
+        {
+            "circle_id": c.circle_id,
+            "circle_name": c.circle_name,
+            "circle_description": c.circle_description,
+        }
+        for c in circles
+    ]
+
+
+    return jsonify({"items": result, "total": len(result)})
+
+
+   
+
+
+
+
+# 新しいサークル追加ボタン押下時
+@app.route("/api/mypage/circle/new", methods=["POST"])
+def prepare_new_circle():
+   
+    # ログインチェック
+    if "user_id" not in session:
+        return jsonify({"error": "ログインが必要です"}), 401
+
+
+
+
+    # DB処理は不要（画面遷移のみ）
+    return jsonify({
+        "message": "新しいサークル作成ページへ移動します。",
+        "next": "/create-circle"
+    }), 200
+
+
+
+
+# セッション確認API
+@app.route("/api/session/debug", methods=["GET"])
+def debug_session():
+    """現在のセッション情報を確認"""
+    return jsonify(dict(session))
+
+
+
+
+# データベース初期化コマンド
+@app.cli.command("initdb")
+def initdb():
+    """データベースを初期化"""
+    db.drop_all()
+    db.create_all()
+    print("Database initialized.")
+
+
+
+
+# アプリ起動設定
+if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
+    app.run(host="0.0.0.0", port=5001, debug=True)
+
+
+#--- ここまでマイページ画面用のコード ---
+
 
 if __name__ == '__main__':
     # ポート5001でサーバーを起動
