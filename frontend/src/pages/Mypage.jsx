@@ -45,6 +45,7 @@ function Mypage() {
         >
           追加
         </button>
+
         <p className="text-gray-600 mt-2 mb-6 text-sm sm:text-base">
           （サークル追加用の画面へ）
         </p>
