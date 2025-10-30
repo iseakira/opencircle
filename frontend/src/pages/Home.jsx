@@ -18,7 +18,7 @@ function Home() {
 
   const catch_all_circles = async () => {
     try {
-      const initial_response = await fetch("http://localhost:5001/homestart", {
+      const initial_response = await fetch("http://localhost:5001/homestart___", {
         method: "POST",
         headers: {'Content-Type': 'application/json',
       },
