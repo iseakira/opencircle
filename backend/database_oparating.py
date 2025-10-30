@@ -51,24 +51,75 @@ def get_initial_circles():
 
 
 def get_circle_search(json_dict):
-    #database.dbは仮
+    """
+    サークル検索用の関数。受け取った文字列とタグをもとにサークルを検索して返す。
+    """
     conn = sqlite3.connect('project.db')
     cursor = conn.cursor()
     #tmp_dictは検索内容をidに変換して保存する
     tmp_dict = dict()
     tmp_dict["search_term"]  = json_dict["search_term"]
     
+    sql = '''
+    
+
+    '''
     #TagとCircleの間の関係性の名前はどれだ？
-    res = cursor.execute("SELECT c.circle_name, c.circle_iconpath " \
-                        "FROM Circle AS c " \
-                        "JOIN circle_tag_table AS ctt ON c.circle_id = ctt.circle_id " \
-                        "WHERE ")#ここどうしようか考えてる
+    # res = cursor.execute("SELECT c.circle_name, c.circle_iconpath " \
+    #                     "FROM Circle AS c " \
+    #                     "JOIN circle_tag_table AS ctt ON c.circle_id = ctt.circle_id " \
+    #                     "WHERE ")#ここどうしようか考えてる
     res.fetchall()
     cursor.close()
     conn.close()
 
+def get_circle_detail(circle_id):
+    """
+    指定した circle_id の詳細情報を DB から取得して辞書で返す。
+    返却フィールド:
+      - circle_name (str)
+      - circle_description (str)
+      - circle_fee (int or None)
+      - number_of_male (int or None)
+      - number_of_female (int or None)
+      - circle_icon_path (str or None)
 
+    見つからなければ None を返す。
+    """
+    conn = sqlite3.connect('project.db')
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
 
+    sql = '''
+    SELECT circle_name, circle_description, circle_fee, number_of_male, number_of_female, circle_icon_path
+    FROM circles
+    WHERE circle_id = ?
+    LIMIT 1
+    '''
+
+    cur.execute(sql, (circle_id,))
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    if row is None:
+        return None
+
+    def to_int(v):
+        try:
+            return int(v) if v is not None else None
+        except Exception:
+            return None
+
+    return {
+        'circle_name': row['circle_name'],
+        'circle_description': row['circle_description'],
+        'circle_fee': to_int(row['circle_fee']),
+        'number_of_male': to_int(row['number_of_male']),
+        'number_of_female': to_int(row['number_of_female']),
+        'circle_icon_path': row['circle_icon_path']
+    }
+    
 def tmp_registration(mailaddress):
     #database.dbは仮
     conn = sqlite3.connect('project.db')
