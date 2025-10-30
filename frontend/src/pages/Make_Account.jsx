@@ -12,12 +12,13 @@ function Make_Account() {
     };
     const navigate = useNavigate();
     //imput_email.jsxで入力されたメールアドレスを取得
-    const emailaddress = localStorage.getItem('emailaddress');
+    const email_tmp_id = localStorage.getItem('to_Make_Account');
     const [formData, setFormData] = useState({ 
-        emailaddress: emailaddress,
+        emailaddress: email_tmp_id.emailaddress,
         password: '',
         auth_code: '',
         user_name: '',
+        tmp_id: tmp_id
     });
     const [result, setResult] = useState(null);
     const [passwordConfirm, setPasswordConfirm] = useState('');
@@ -47,7 +48,7 @@ function Make_Account() {
                     const data = await response.json();
                     setResult(data);
                     console.log("受信したデータ：",data);
-                    if(data.message === success){
+                    if(data.message == success){
                         localStorage.removeItem('emailaddress');
                         alert("アカウントを作成しました!3秒後にホーム画面に遷移します!");
                         setTimeout(() =>{

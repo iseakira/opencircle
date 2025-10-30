@@ -19,10 +19,17 @@ def create_app():
 
     # CORSを有効にする（これでフロントからの通信が許可される）
     # origins=["http://localhost:3000"] のように限定することも可能
-    CORS(app, 
-     resources={r"/api/*": {"origins": "http://localhost:3000"}},  #変更クッキー関係
-     supports_credentials=True
-)
+    
+    CORS(app,
+         origins=["http://localhost:3000"],  # Reactのオリジンを明示
+         supports_credentials=True,
+         resources={r"/*": {"origins": "http://localhost:3000"}} # すべてのリソース (/*) を許可
+    )
+    
+    #CORS(app, 
+     #resources={r"/api/*": {"origins": "http://localhost:3000"}},  #変更クッキー関係
+     #supports_credentials=True
+
     db.init_app(app)
     return app
 
