@@ -4,6 +4,20 @@ import { useState } from 'react';
 import headImage from '../images/head_image.png';
 
 function Make_Account() {
+    //imput_email.jsxで入力されたメールアドレスとtmp_idを取得
+    let initialEmail = '';
+    let initialTmpId = '';
+    try {
+        const storedString = localStorage.getItem('to_Make_Account');
+        const email_tmp_id = storedString ? JSON.parse(storedString) : null;
+        
+        if (email_tmp_id) {
+            initialEmail = email_tmp_id.emailaddress || '';
+            initialTmpId = email_tmp_id.tmp_id || '';
+        }
+    } catch (e) {
+        console.error("ローカルストレージ読み込みエラー:", e);
+    }
     const handleChange = (e) => {
         setFormData(prev => ({
             ...prev,
@@ -11,23 +25,25 @@ function Make_Account() {
         }));
     };
     const navigate = useNavigate();
-    //imput_email.jsxで入力されたメールアドレスを取得
-    const email_tmp_id = localStorage.getItem('to_Make_Account');
+    //imput_email.jsxで入力されたメールアドレスとtmp_idを取得
+
+
     const [formData, setFormData] = useState({ 
-        emailaddress: email_tmp_id.emailaddress,
+        emailaddress: initialEmail,
         password: '',
         auth_code: '',
         user_name: '',
-        tmp_id: tmp_id
+        tmp_id: initialTmpId
     });
     const [result, setResult] = useState(null);
     const [passwordConfirm, setPasswordConfirm] = useState('');
     const handleCreateAccount = async (e) => {
         e.preventDefault();
-
+        const emailaddress = formData.emailaddress;
         const password = formData.password;
         const user_name = formData.user_name;
         const auth_code = formData.auth_code;
+        const tmp_id =  formData.tmp_id;
 
         if(password !== passwordConfirm){
             alert("パスワードが一致しません");
@@ -38,6 +54,7 @@ function Make_Account() {
             password: password,
             auth_code: auth_code,
             user_name: user_name,
+            tmp_id: tmp_id
         };
         try {
             const response = await fetch("http://localhost:5001/create_account",{
@@ -48,8 +65,8 @@ function Make_Account() {
                     const data = await response.json();
                     setResult(data);
                     console.log("受信したデータ：",data);
-                    if(data.message == success){
-                        localStorage.removeItem('emailaddress');
+                    if(data.message === "success"){
+                        localStorage.removeItem('to_Make_Account');
                         alert("アカウントを作成しました!3秒後にホーム画面に遷移します!");
                         setTimeout(() =>{
                             navigate('/');
@@ -97,18 +114,13 @@ function Make_Account() {
             </form>
             <br />
             <div>
-                {result ? (
+            {result && result.message && ( 
                     <>
-                    {result.map((item, index) => (
-                        <div key={index}>
-                            <p>{item.message}</p>
-                        </div>
-                    ))}
+                        <p>サーバー応答メッセージ: {result.message}</p>
                     </>
-                    ):(<br />
-                    )
-                }
-                </div>
+                )}
+
+            </div>
         </main>
         <footer>
             <p>created by 東京理科大学IS科3年</p>
