@@ -15,7 +15,7 @@ function Mypage() {
       .then((data) => {
         if (data.items) setCircles(data.items);
       })
-      .catch((err) => console.error("データの取得失敗:", err));
+      .catch((err) => console.error("データ取得失敗:", err));
   }, []);
 
   return (
