@@ -19,10 +19,19 @@ def create_app():
 
     # CORSを有効にする（これでフロントからの通信が許可される）
     # origins=["http://localhost:3000"] のように限定することも可能
-    CORS(app, 
-     resources={r"/api/*": {"origins": "http://localhost:3000"}},  #変更クッキー関係
-     supports_credentials=True
-)
+    
+    #CORS(app,
+    #     origins=["http://localhost:3000"],  # Reactのオリジンを明示
+    #     supports_credentials=True,
+    #     resources={r"/*": {"origins": "http://localhost:3000"}} # すべてのリソース (/*) を許可
+    #)
+    
+    CORS(app, origins="http://localhost:3000")
+
+    #CORS(app, 
+     #resources={r"/api/*": {"origins": "http://localhost:3000"}},  #変更クッキー関係
+     #supports_credentials=True
+
     db.init_app(app)
     return app
 
@@ -55,7 +64,7 @@ def search():
     #                 "circle_name": "サークルBの名前",
     #                 "tag_name":"サークルBの分野のタグ"}])
 
-@app.route('/home', methods=['POST'])
+@app.route('/homestart', methods=['POST'])
 def initial_circles():
     # DB から初期表示用のサークル一覧を取得して返す
     try:
@@ -66,7 +75,7 @@ def initial_circles():
         print('get_initial_circles error:', e)
         return jsonify({"error": "サーバーエラー"}), 500
 
-@app.route('/home', methods=['GET'])
+@app.route('/home', methods=['POST'])
 def search_results():
     return jsonify([{"circle_name": "サークルA",
                     "circle_description": "これはサークルAの説明です。"},
@@ -77,9 +86,21 @@ def search_results():
 
 @app.route('/Circle_Page', methods=['POST'])
 def circle_page():
-    json_dict = request.get_json()
-    circle_id = json_dict["circle_id"]
-    return jsonify({"message": f"サークルID {circle_id} の詳細情報の取得成功"})
+    json_dict = request.get_json() or {}
+    circle_id = json_dict.get("circle_id")
+    if circle_id is None:
+        return jsonify({"error": "circle_id is required"}), 400
+
+    try:
+        circle_id = int(circle_id)
+    except ValueError:
+        return jsonify({"error": "invalid circle_id"}), 400
+
+    detail = dbop.get_circle_detail(circle_id)
+    if detail is None:
+        return jsonify({"error": "circle not found"}), 404
+
+    return jsonify(detail)
 
 @app.route('/add_account', methods=['POST'])
 def make_tmp_account():
@@ -90,12 +111,14 @@ def make_tmp_account():
     sm.send_auth_code(emailaddress, data_tuple[0])
     return jsonify({"message": "success", "tmp_id": data_tuple[1]})
 
-"""
 @app.route("/create_account", methods=["POST"])
 def create_account():
     json_dict = request.get_json()
     checked_dict = dbop.check_auth_code(json_dict["auth_code"], json_dict["tmp_id"])
-"""
+    if checked_dict["message"] == "failure":
+        return jsonify(checked_dict)
+    dbop.create_account(json_dict["emailaddress"], json_dict["password"], json_dict["user_name"])
+    return jsonify(checked_dict)
 
 #'/api/circles'というURLにPOSTリクエストが来たら動く関数#
 @app.route('/api/circles', methods=['POST'])

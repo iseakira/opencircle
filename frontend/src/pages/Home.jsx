@@ -1,15 +1,15 @@
 import { Link, useNavigate } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import '../css/App.css';
 import headImage from '../images/head_image.png';
 import Toggle from './Toggle.jsx';
 
 
 function Home() {
-  //初期値となる全サークルデータと絞り込み結果の表示
-  const [all_circles, setAll_circles] = useState(null);
-    //バックエンドからの応答ステート（絞り込み結果を受け取る）
+  const navigate = useNavigate();
+  //バックエンドからの応答ステート（絞り込み結果を受け取る）
   const [response_data, setResponse_data] = useState(null);
+  //const [error, setError] = useState(null);
   const handleResponse = (data) => {
     console.log("絞り込み結果:", data);
     setResponse_data(data);
@@ -17,24 +17,23 @@ function Home() {
 
   const catch_all_circles = async () => {
     try {
-      const initial_response = await fetch("http://localhost:5001/hometeset", {
-        method: "GET",
-        headers: {'Content-Type': 'application/json',
-      },
-    });
-    if(initial_response.ok){
-      const data = await initial_response.json();
-      console.log("初期値として受け取った全サークル情報:", data);
-      setAll_circles(data);
-      setResponse_data(data);
-    };
-
-
+      setError(null);
+      const initial_response = await fetch("http://localhost:5001/homestart", {
+        method: "POST",
+        headers: {'Content-Type': 'application/json'},
+      });
+      if(initial_response.ok){
+        const data = await initial_response.json();
+        console.log("初期値として受け取った全サークル情報:", data);
+        setResponse_data(data);
+      }else{
+        console.log("全サークルデータの取得に失敗:", initial_response.status);
+      }
     }catch(error){
       console.error("エラーが発生しました", error);
-
     }
   }
+  
   useEffect(() => {
     catch_all_circles();
   }, []);
@@ -56,8 +55,8 @@ function Home() {
         },
         body: json_circle_id,
       });
-      console
-      navigate('/Circle_page');
+      console("検索時に",response);
+      navigate('/Circle_Page');
     }catch{
       console.error("サークルページへの遷移に失敗しました")
       alert("サークルページへの遷移に失敗しました");

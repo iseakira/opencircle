@@ -14,8 +14,10 @@ import Image from '../conponents/image'
 import { OPTIONS } from '../conponents/option'
 import CircleMen from '../conponents/CircleMen'
 import CircleFemen from '../conponents/CircleFemen'
+import headImage from '../images/head_image.png';
+import { Link } from 'react-router-dom';
+
 import CircleLogo from '../conponents/CircleLogo'
-import { Link } from 'react-router-dom'
 function CircleAdd() {
   const [circleData,setCircleData]=useState({
     circle_name:"",
@@ -177,26 +179,35 @@ function CircleAdd() {
       setResponse_data(data);
     };
   return (
-    <>
-    {/* <AddCircle></AddCircle> */}
-    <form onSubmit={handleKey}> 
-    <CircleLogo></CircleLogo>
-    <CircleName value={circleData.circle_name} onChange={NameChange} ></CircleName>
-    <CircleDescription value={circleData.circle_description} onChange={DesChange}></CircleDescription>
-    <CircleMen value={circleData.number_of_male} onChange={MemChange}></CircleMen>
-    <CircleFemen value={circleData.number_of_female} onChange={FememChange}></CircleFemen>
-    <CircleFee value={circleData.circle_fee} onChange={FeeChange}></CircleFee>
-    <Image onChange={hadleImageChange} preview={preview} image={image}/>
-    <Tag onChangeBunya={setSelectedBunya} onChangeFee={setSelectedFee} onChangeRatio={setSelectedRatio} onChangePlace={setSelectedPlace} onChangeMood={setSelectedMood} onChangeActive={setSelectedActive} 
-    ></Tag> 
+
+    <div>
+      <header>
+        <h1>
+          <Link to="/">
+            <img className="logo" src={headImage} alt="アイコン" />
+          </Link>
+        </h1>
+      </header>
+      <h1>東京理科大学サークル情報サイト</h1>
+      <h3>追加したいサークルの情報を入力してください</h3>
+      {/* <AddCircle></AddCircle> */}
+      <form onSubmit={handleKey}> 
+        <CircleName value={circleData.circle_name} onChange={NameChange} ></CircleName>
+        <CircleDescription value={circleData.circle_description} onChange={DesChange}></CircleDescription>
+        <CircleMen value={circleData.number_of_male} onChange={MemChange}></CircleMen>
+        <CircleFemen value={circleData.number_of_female} onChange={FememChange}></CircleFemen>
+        <CircleFee value={circleData.circle_fee} onChange={FeeChange}></CircleFee>
+        <Image onChange={hadleImageChange} preview={preview} image={image}/>
+        <Tag onChangeBunya={setSelectedBunya} onChangeFee={setSelectedFee} onChangeRatio={setSelectedRatio} onChangePlace={setSelectedPlace} onChangeMood={setSelectedMood} onChangeActive={setSelectedActive} 
+        ></Tag> 
   
-  {/* <Toggle></Toggle> */}
-    {/* <Button type="submit" onClick={handleKey} ></Button> */}
-    <Button type="submit" onClick={get_jsontags} ></Button>
- <Link to={"/mypage"}>マイページに戻る</Link>
-    </form> 
- 
-    </>
+        {/* <Toggle></Toggle> */}
+        {/* <Button type="submit" onClick={handleKey} ></Button> */}
+        <Button type="submit" onClick={get_jsontags} ></Button>
+        <Link to={"/mypage"}>マイページへ戻る</Link>
+      </form> 
+    </div>
+  
   )
 }
 export default CircleAdd

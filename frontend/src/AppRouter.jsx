@@ -6,6 +6,7 @@ import Mypage from './pages/Mypage.jsx';
 import EditCircle from "./pages/EditCircle";
 import CircleAdd from './pages/CircleAdd.jsx';
 import Make_Account from './pages/Make_Account.jsx';
+import Circle_Page from './pages/Circle_Page.jsx'
 
 function AppRouter() {
   return (
@@ -18,6 +19,7 @@ function AppRouter() {
         <Route path="/mypage" element={<Mypage />} />
         <Route path="/add_circle" element={<CircleAdd/>}/>
         <Route path="/Make_Account" element={<Make_Account/>}/>
+        <Route path="/Circle_Page" element={<Circle_Page />} />
       </Routes>
     </>
   );
