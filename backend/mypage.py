@@ -1,3 +1,5 @@
+""""
+
 from flask import Flask,request,jsonify,session
 from flask_cors import CORS
 from models import db, Circle, User, Session, EditAuthorization
@@ -101,7 +103,7 @@ def prepare_new_circle():
 # セッション確認API
 @app.route("/api/session/debug", methods=["GET"])
 def debug_session():
-    """現在のセッション情報を確認"""
+    #現在のセッション情報を確認
     return jsonify(dict(session))
 
 
@@ -110,7 +112,7 @@ def debug_session():
 # データベース初期化コマンド
 @app.cli.command("initdb")
 def initdb():
-    """データベースを初期化"""
+    #データベースを初期化
     db.drop_all()
     db.create_all()
     print("Database initialized.")
@@ -128,3 +130,4 @@ if __name__ == "__main__":
 #--- ここまでマイページ画面用のコード ---
 
 
+"""

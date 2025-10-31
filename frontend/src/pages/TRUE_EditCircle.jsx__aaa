@@ -1,0 +1,245 @@
+//
+//                       _oo0oo_
+//                      o8888888o
+//                      88" . "88
+//                      (| -_- |)
+//                      0\  =  /0
+//                    ___/`---'\___
+//                  .' \\|     |// '.
+//                 / \\|||  :  |||// \
+//                / _||||| -:- |||||- \
+//               |   | \\\  -  /// |   |
+//               | \_|  ''\---/''  |_/ |
+//               \  .-\__  '-'  ___/-. /
+//             ___'. .'  /--.--\  `. .'___
+//          ."" '<  `.___\_<|>_/___.' >' "".
+//         | | :  `- \`.;`\ _ /`;.`/ - ` : | |
+//         \  \ `_.   \_ __\ /__ _/   .-` /  /
+//     =====`-.____`.___ \_____/___.-`___.-'=====
+//                       `=---='
+//
+//
+//     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//               佛祖保佑         永无BUG
+
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+
+// 友達のコンポーネントを import
+import Button from '../conponents/Button';
+import CircleDescription from '../conponents/CircleDescription';
+import CircleFee from '../conponents/CircleFee';
+import CircleName from '../conponents/CircleName';
+import Tag from '../conponents/Tag';
+import Image from '../conponents/image';
+import { OPTIONS } from '../conponents/option';
+import CircleMen from '../conponents/CircleMen';
+import CircleFemen from '../conponents/CircleFemen';
+
+function CircleEdit() {
+  const { circleId } = useParams(); // URLから :circleId を取得
+  const navigate = useNavigate();
+
+  // フォームのデータを管理する State
+  const [circleData, setCircleData] = useState({
+    circle_name: "",
+    circle_description: "",
+    circle_fee: "",
+    number_of_male: "",
+    number_of_female: "",
+  });
+
+  // タグ選択を管理する State (友達のコード)
+  const [selectedBunya, setSelectedBunya] = useState(null);
+  const [selectedFee, setSelectedFee] = useState(null);
+  const [selectedRatio, setSelectedRatio] = useState(null);
+  const [selectedPlace, setSelectedPlace] = useState(null);
+  const [selectedMood, setSelectedMood] = useState(null);
+  const [selectedActive, setSelectedActive] = useState(null);
+  
+  // 画像を管理する State (友達のコード)
+  const [preview, setPreview] = useState(null);
+  const [image, setImage] = useState(null);
+  
+  // 読み込み状態とエラーメッセージを管理する State
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // 既存データを読み込む useEffect
+  useEffect(() => {
+    setLoading(true); // 読み込み開始
+    setError(null);   // 前回のエラーをリセット
+    
+    fetch(`http://localhost:5001/api/circles/${circleId}`, {
+      credentials: "include",
+    })
+      .then(res => {
+        // ★ここが修正点★
+        // 404 (見つからない) の場合は、エラーメッセージを投げる
+        if (res.status === 404) {
+          throw new Error(`ID: ${circleId} のサークルは見つかりませんでした`);
+        }
+        // その他のサーバーエラー
+        if (!res.ok) {
+          throw new Error("サーバーエラーにより情報の取得に失敗しました");
+        }
+        return res.json();
+      })
+      .then(data => {
+        // 取得したデータを State にセット
+        setCircleData({
+          circle_name: data.circle_name,
+          circle_description: data.circle_description,
+          circle_fee: data.circle_fee || "",
+          number_of_male: data.number_of_male || 0,
+          number_of_female: data.number_of_female || 0,
+        });
+        setPreview(data.circle_icon_path); // アイコンパスをセット
+
+        // タグの State をセット (APIが6要素の配列を返す前提)
+        if (data.tags && data.tags.length === 6) {
+          setSelectedBunya(data.tags[0]);
+          setSelectedFee(data.tags[1]);
+          setSelectedRatio(data.tags[2]);
+          setSelectedPlace(data.tags[3]);
+          setSelectedMood(data.tags[4]);
+          setSelectedActive(data.tags[5]);
+        }
+        setLoading(false); // 読み込み完了
+      })
+      .catch(err => {
+        // ネットワークエラーや、上で投げたエラーをここでキャッチ
+        console.error("Fetch error:", err);
+        setError(err.message); // State にエラーメッセージを保存
+        setLoading(false); // ローディングも完了
+        // (alert や navigate は無限ループになるため削除)
+      });
+  }, [circleId, navigate]); // 依存配列
+
+  // --- onChange ハンドラ (友達のコード) ---
+  const NameChange = (e) => setCircleData({ ...circleData, circle_name: e.target.value });
+  const DesChange = (e) => setCircleData({ ...circleData, circle_description: e.target.value });
+  const MemChange = (e) => setCircleData({ ...circleData, number_of_male: e.target.value });
+  const FememChange = (e) => setCircleData({ ...circleData, number_of_female: e.target.value });
+  const FeeChange = (e) => setCircleData({ ...circleData, circle_fee: e.target.value });
+  const hadleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
+      // (注意: 画像ファイル「本体」をPUTで更新するロジックはここには含まれていません)
+    }
+  };
+
+  // --- 送信ロジック (PUT で更新) ---
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // フォームのデフォルト送信をキャンセル
+
+    // バリデーション
+    if (!circleData.circle_name || !circleData.circle_description) {
+      alert("サークル名とサークル説明は必須です");
+      return;
+    }
+
+    // 確認
+    const result = window.confirm("サークルを更新しますか？");
+    if (!result) return; // キャンセルしたら中断
+
+    // タグのIDを集める
+    const tagList = [
+      selectedBunya,
+      selectedFee,
+      selectedRatio,
+      selectedPlace,
+      selectedMood,
+      selectedActive,
+    ].filter(tagId => tagId != null); // null (未選択) を除外
+
+    // Flask に送信するJSONデータを作成
+    const dataToSend = {
+      circle_name: circleData.circle_name,
+      circle_description: circleData.circle_description,
+      circle_fee: circleData.circle_fee || null,
+      number_of_male: parseInt(circleData.number_of_male) || 0,
+      number_of_female: parseInt(circleData.number_of_female) || 0,
+      tags: tagList,
+      // (注意: circle_icon_path の更新は、画像アップロード処理を実装するまで省略)
+    };
+
+    // サーバーに PUT で送信
+    try {
+      const response = await fetch(`http://localhost:5001/api/circles/${circleId}`, {
+        method: "PUT",
+        headers: { 'Content-Type': 'application/json' },
+        credentials: "include",
+        body: JSON.stringify(dataToSend),
+      });
+
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || "更新に失敗しました");
+      }
+
+      const responseData = await response.json();
+      alert(responseData.message); // "サークルを更新しました"
+      navigate("/mypage"); // 更新成功したらマイページに戻る
+
+    } catch (error) {
+      console.error("通信エラー", error);
+      alert(`通信に失敗しました: ${error.message}`);
+    }
+  };
+
+  // --- JSX (表示) ---
+
+  // 読み込み中の表示
+  if (loading) {
+    return <div className="p-8 text-center">ID: {circleId} のサークル情報を読み込み中...</div>;
+  }
+  
+  // エラー（404など）が発生した場合の表示
+  if (error) {
+    return (
+      <div className="p-8 text-center text-red-500">
+        <h1>エラーが発生しました</h1>
+        <p>{error}</p>
+        <button 
+          onClick={() => navigate("/mypage")} 
+          className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"
+        >
+          マイページに戻る
+        </button>
+      </div>
+    );
+  }
+
+  // 成功（フォームの表示）
+  return (
+    <>
+      <form onSubmit={handleSubmit}>
+        <CircleName value={circleData.circle_name} onChange={NameChange}></CircleName>
+        <CircleDescription value={circleData.circle_description} onChange={DesChange}></CircleDescription>
+        <CircleMen value={circleData.number_of_male} onChange={MemChange}></CircleMen>
+        <CircleFemen value={circleData.number_of_female} onChange={FememChange}></CircleFemen>
+        <CircleFee value={circleData.circle_fee} onChange={FeeChange}></CircleFee>
+        
+        <Image onChange={hadleImageChange} preview={preview} image={image} />
+        
+        {/* (注意: このTagコンポーネントは、読み込んだ既存の値を表示する機能(value)を持っていない可能性があります) */}
+        <Tag
+          onChangeBunya={setSelectedBunya}
+          onChangeFee={setSelectedFee}
+          onChangeRatio={setSelectedRatio}
+          onChangePlace={setSelectedPlace}
+          onChangeMood={setSelectedMood}
+          onChangeActive={setSelectedActive}
+          // valueBunya={selectedBunya} (←もしコンポーネントが対応しているなら、このように渡す)
+        ></Tag>
+
+        <Button type="submit">サークルを更新する</Button>
+      </form>
+    </>
+  );
+}
+
+export default CircleEdit;
