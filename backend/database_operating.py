@@ -5,7 +5,11 @@ import secrets
 import string
 import datetime
 
-
+import sys
+import os
+from sqlalchemy.exc import IntegrityError
+from .app import create_app
+from .models import db, Tag
 
 def get_initial_circles():
     """
@@ -185,3 +189,68 @@ def create_account(emailaddress, password, user_name):
                     "VALUES ({}, {}, {}, {})".format(user_id, user_name, emailaddress, password))
     cursor.close()
     conn.close()
+
+def add_initial_tags():
+    """
+    データベースに初期タグデータを投入する関数
+    """
+    
+    # App.py の create_app() を使って Flask アプリケーションを初期化
+    app = create_app()
+    
+    # 'with app.app_context():' の中でDB操作を行う
+    with app.app_context():
+        print("データベースへの接続を開始します...")
+        
+        # データベースに追加するデータ
+        tags_list = [
+            {"tag_id": 0, "tag_name": "未選択"},
+            {"tag_id": 1, "tag_name": "運動"},
+            {"tag_id": 2, "tag_name": "文化"},
+            {"tag_id": 3, "tag_name": "音楽"},
+            {"tag_id": 4, "tag_name": "学生自治"},
+            {"tag_id": 5, "tag_name": "無料"},
+            {"tag_id": 6, "tag_name": "2000円未満"},
+            {"tag_id": 7, "tag_name": "2000円以上"},
+            {"tag_id": 8, "tag_name": "男性多め"},
+            {"tag_id": 9, "tag_name": "女性多め"},
+            {"tag_id": 10, "tag_name": "男女半々"},
+            {"tag_id": 11, "tag_name": "学内"},
+            {"tag_id": 12, "tag_name": "学外"},
+            {"tag_id": 13, "tag_name": "賑やか"},
+            {"tag_id": 14, "tag_name": "落ち着いている"},
+            {"tag_id": 15, "tag_name": "週3未満"},
+            {"tag_id": 16, "tag_name": "週3以上"},
+            {"tag_id": 17, "tag_name": "不定期"}
+        ]
+        
+        # 既にデータが投入されていないか、ID=0 でチェック
+        existing_tag = db.session.get(Tag, 0)
+        
+        if existing_tag:
+            print(f"ID=0 のタグ '{existing_tag.tag_name}' が既に存在するため、処理をスキップします。")
+            return
+
+        print("初期タグデータを追加します...")
+        
+        tags_to_add = []
+        for tag_data in tags_list:
+            # models.py の Tag クラスのインスタンスを作成
+            new_tag = Tag(tag_id=tag_data["tag_id"], tag_name=tag_data["tag_name"])
+            tags_to_add.append(new_tag)
+
+        try:
+            # データをセッションに追加 (add_all で一括追加)
+            db.session.add_all(tags_to_add)
+            # データベースにコミット（変更を保存）
+            db.session.commit()
+            print(f"正常に {len(tags_to_add)} 件のタグを追加しました。")
+        
+        except IntegrityError:
+            # 主キー(tag_id)が重複した場合など
+            db.session.rollback() # エラーが起きたら変更を元に戻す
+            print("エラー: データの整合性違反。既にデータが存在する可能性があります。")
+        except Exception as e:
+            db.session.rollback()
+            print(f"予期せぬエラーが発生しました: {e}")
+
