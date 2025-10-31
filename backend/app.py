@@ -73,7 +73,7 @@ def initial_circles():
         print('get_initial_circles error:', e)
         return jsonify({"error": "サーバーエラー"}), 500
 
-@app.route('/home', methods=['GET'])
+@app.route('/home', methods=['POST'])
 def search_results():
     return jsonify([{"circle_name": "サークルA",
                     "circle_description": "これはサークルAの説明です。"},
