@@ -62,7 +62,7 @@ def search():
     #                 "circle_name": "サークルBの名前",
     #                 "tag_name":"サークルBの分野のタグ"}])
 
-@app.route('/homestart', methods=['POST'])
+@app.route('/hometest', methods=['POST'])
 def initial_circles():
     # DB から初期表示用のサークル一覧を取得して返す
     try:
