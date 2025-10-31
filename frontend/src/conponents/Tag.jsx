@@ -5,7 +5,8 @@ import { OPTIONS } from './option';
 export default function Tag({onChangeBunya,onChangeFee,onChangeRatio,onChangePlace,onChangeMood,onChangeActive}) {
 
 
-const [selectedBunya, setSelectedBunya] = useState(OPTIONS.BUNYA[0]);
+const [selectedBunya, setSelectedBunya] = useState(OPTIONS.BUNYA[0].value);
+// const [selectedBunya, setSelectedBunya] = useState(0);
 const [selectedFee, setSelectedFee] = useState(OPTIONS.FEE[0]);
 const [selectedRatio, setSelectedRatio] = useState(OPTIONS.RATIO[0]);
 const [selectedPlace, setSelectedPlace] = useState(OPTIONS.PLACE[0]);
@@ -14,32 +15,38 @@ const [selectedActive, setSelectedActive] = useState(OPTIONS.ACTIVE[0]);
 
 
 const handleChangeBunya=(e)=>{
-setSelectedBunya(e.target.value);
-onChangeBunya(e.target.value);
+    const value=Number(e.target.value);
+setSelectedBunya(value);
+onChangeBunya(value);
 }
 const handleChangeFee=(e)=>{
-setSelectedFee(e.target.value);
-onChangeFee(e.target.value);
+    const value=Number(e.target.value);
+setSelectedFee(value);
+onChangeFee(value);
 }
 const handleChangeRatio=(e)=>{
-setSelectedRatio(e.target.value);
-onChangeRatio(e.target.value);
+    const value=Number(e.target.value);
+setSelectedRatio(value);
+onChangeRatio(value);
 }
 const handleChangePlace=(e)=>{
-setSelectedPlace(e.target.value);
-onChangePlace(e.target.value);
+    const value=Number(e.target.value);
+setSelectedPlace(value);
+onChangePlace(value);
 }
 const handleChangeMood=(e)=>{
-setSelectedMood(e.target.value);
-onChangeMood(e.target.value);
+const value=Number(e.target.value);
+    setSelectedMood(value);
+onChangeMood(value);
 }
 const handleChangeActive=(e)=>{
-setSelectedActive(e.target.value);
-onChangeActive(e.target.value);
+    const value=Number(e.target.value);
+setSelectedActive(value);
+onChangeActive(value);
 }
     return (
     <div>
-      <p>タグを選択せい</p>
+      <p>タグを選択してください</p>
       <div className="tag-list">
         <div className='tag-row'>
 <label htmlFor="">分野</label>

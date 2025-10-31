@@ -7,8 +7,7 @@ import os
 from sqlalchemy.exc import IntegrityError
 import database_oparating as dbop
 import send_mail as sm
-from models import db, Circle, User,  EditAuthorization
-
+from models import db, Circle, User, Session, EditAuthorization
 # Flaskアプリケーションのインスタンスを作成
 def create_app():
     app = Flask(__name__)
@@ -21,10 +20,19 @@ def create_app():
 
     # CORSを有効にする（これでフロントからの通信が許可される）
     # origins=["http://localhost:3000"] のように限定することも可能
-    CORS(app, 
-     resources={r"/api/*": {"origins": "http://localhost:3000"}},  #変更クッキー関係
-     supports_credentials=True
-)
+    
+    #CORS(app,
+    #     origins=["http://localhost:3000"],  # Reactのオリジンを明示
+    #     supports_credentials=True,
+    #     resources={r"/*": {"origins": "http://localhost:3000"}} # すべてのリソース (/*) を許可
+    #)
+    
+    CORS(app, origins="http://localhost:3000")
+
+    #CORS(app, 
+     #resources={r"/api/*": {"origins": "http://localhost:3000"}},  #変更クッキー関係
+     #supports_credentials=True
+
     db.init_app(app)
     return app
 
@@ -32,7 +40,6 @@ app = create_app()
 
 # --- ここからテスト用のコード ---
 
-# `/api/hello` というURLにアクセスが来たら動く関数
 @app.route('/api/hello', methods=['GET'])
 def say_hello():
     # JSON形式でメッセージを返す
@@ -46,16 +53,57 @@ def search():
     print(json.dumps(json_dict))
     #f = open("testdata.txt")
     #json_text = f.read()
-    #f.close
+    #f.close()
+    json_text = dbop.search_circles(json_dict)
+    return jsonify(json_text)
 
-    return jsonify([{"circle_icon_path": "/test_image/head_image.png",
-                    "circle_name": "サークルAの名前",
-                    "tag_name":"サークルAの分野のタグ"},
-                    {"circle_icon_path": "サークルBのアイコン",
-                    "circle_name": "サークルBの名前",
-                    "tag_name":"サークルBの分野のタグ"}])
+    # return jsonify([{"circle_icon_path": "/test_image/head_image.png",
+    #                 "circle_name": "サークルAの名前",
+    #                 "tag_name":"サークルAの分野のタグ"},
+    #                 {"circle_icon_path": "サークルBのアイコン",
+    #                 "circle_name": "サークルBの名前",
+    #                 "tag_name":"サークルBの分野のタグ"}])
+
+@app.route('/homestart', methods=['POST'])
+def initial_circles():
+    # DB から初期表示用のサークル一覧を取得して返す
+    try:
+        items = dbop.get_initial_circles()
+        return jsonify({"items": items, "total": len(items)})
+    except Exception as e:
+        # エラー時はログ出力して 500 を返す
+        print('get_initial_circles error:', e)
+        return jsonify({"error": "サーバーエラー"}), 500
 
 @app.route("/add_account", methods=["POST"])
+@app.route('/home', methods=['POST'])
+def search_results():
+    return jsonify([{"circle_name": "サークルA",
+                    "circle_description": "これはサークルAの説明です。"},
+                    {"circle_name": "サークルB",
+                     "circle_description": "これはサークルBの説明です。"},
+                    {"circle_name": "サークルC",
+                     "circle_description": "これはサークルCの説明です。"}])
+
+@app.route('/Circle_Page', methods=['POST'])
+def circle_page():
+    json_dict = request.get_json() or {}
+    circle_id = json_dict.get("circle_id")
+    if circle_id is None:
+        return jsonify({"error": "circle_id is required"}), 400
+
+    try:
+        circle_id = int(circle_id)
+    except ValueError:
+        return jsonify({"error": "invalid circle_id"}), 400
+
+    detail = dbop.get_circle_detail(circle_id)
+    if detail is None:
+        return jsonify({"error": "circle not found"}), 404
+
+    return jsonify(detail)
+
+@app.route('/add_account', methods=['POST'])
 def make_tmp_account():
     json_dict = request.get_json()
     emailaddress = json_dict["emailaddress"]
@@ -64,12 +112,14 @@ def make_tmp_account():
     sm.send_auth_code(emailaddress, data_tuple[0])
     return jsonify({"message": "success", "tmp_id": data_tuple[1]})
 
-"""
 @app.route("/create_account", methods=["POST"])
 def create_account():
     json_dict = request.get_json()
     checked_dict = dbop.check_auth_code(json_dict["auth_code"], json_dict["tmp_id"])
-"""
+    if checked_dict["message"] == "failure":
+        return jsonify(checked_dict)
+    dbop.create_account(json_dict["emailaddress"], json_dict["password"], json_dict["user_name"])
+    return jsonify(checked_dict)
 
 #'/api/circles'というURLにPOSTリクエストが来たら動く関数#
 @app.route('/api/circles', methods=['POST'])
@@ -121,12 +171,12 @@ def add_circle():
 def get_circle(circle_id):
 
     tags_array_for_ui = [
-        circle.bunya_tag_id, # (例)
-        circle.fee_tag_id,   # (例)
-        circle.ratio_tag_id, # (例)
-        circle.place_tag_id, # (例)
-        circle.mood_tag_id,  # (例)
-        circle.active_tag_id # (例)
+        circle.bunya_tag_id, 
+        circle.fee_tag_id,   
+        circle.ratio_tag_id, 
+        circle.place_tag_id, 
+        circle.mood_tag_id,  
+        circle.active_tag_id 
     ]
 
     circle_data = {
@@ -150,8 +200,7 @@ def get_circle(circle_id):
         "number_of_male": circle.number_of_male,
         "number_of_female": circle.number_of_female,
         "circle_icon_path": circle.circle_icon_path,
-        # 現在紐付いているタグのIDリストも渡す
-        "tags": [tag.tag_id for tag in circle.tags]
+        # "tags": [tag.tag_id for tag in circle.tags]
     }
 
     # 辞書をJSONにして返す
@@ -200,7 +249,6 @@ def update_circle(circle_id):
 
 
 #--- ここからマイページ ---
-# 編集権限の付与
 @app.route("/api/edit-authorization", methods=["POST"])
 def add_edit_authorization():
     if "user_id" not in session:
