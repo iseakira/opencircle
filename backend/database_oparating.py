@@ -56,23 +56,26 @@ def get_initial_circles():
 def get_circle_search(json_dict):
     """
     サークル検索用の関数。受け取った文字列とタグをもとにサークルを検索して返す。
+    termは部分一致させる。タグはカテゴリごとに探索するのがよいか、来たタグをまとめて探索するのがよいか...
+    男女比のタグはnumber_of_maleとnumber_of_femaleを参考にする。40%を境にするつもり。
+    {"search_term":"","tags":[]}
     """
     conn = sqlite3.connect('project.db')
     cursor = conn.cursor()
-    #tmp_dictは検索内容をidに変換して保存する
+    # tmp_dictは検索内容をidに変換して保存する
     tmp_dict = dict()
-    tmp_dict["search_term"]  = json_dict["search_term"]
+    tmp_dict["search_term"] = json_dict["search_term"]
     
     sql = '''
     
 
     '''
-    #TagとCircleの間の関係性の名前はどれだ？
+    # TagとCircleの間の関係性の名前はどれだ？
     # res = cursor.execute("SELECT c.circle_name, c.circle_iconpath " \
     #                     "FROM Circle AS c " \
     #                     "JOIN circle_tag_table AS ctt ON c.circle_id = ctt.circle_id " \
     #                     "WHERE ")#ここどうしようか考えてる
-    res.fetchall()
+    # res.fetchall()
     cursor.close()
     conn.close()
 

@@ -48,7 +48,7 @@ def say_hello():
 def search():
     #json_dataのキーは["search_term","field","circle_fee","gender_ration","place","mood","frequency"]
     json_dict = request.get_json()
-    print(json.dumps(json_dict))
+    #print(json.dumps(json_dict))
     #f = open("testdata.txt")
     #json_text = f.read()
     #f.close()
@@ -75,12 +75,24 @@ def initial_circles():
 
 @app.route('/home', methods=['POST'])
 def search_results():
+    #json_dataのキーは["search_term","field","circle_fee","gender_ration","place","mood","frequency"]
+    json_dict = request.get_json()
+    #print(json.dumps(json_dict))
+    #f = open("testdata.txt")
+    #json_text = f.read()
+    #f.close()
+    json_text = dbop.search_circles(json_dict)
+    return jsonify(json_text)
     return jsonify([{"circle_name": "サークルA",
                     "circle_description": "これはサークルAの説明です。"},
                     {"circle_name": "サークルB",
                      "circle_description": "これはサークルBの説明です。"},
                     {"circle_name": "サークルC",
                      "circle_description": "これはサークルCの説明です。"}])
+    # return jsonify([{"circle_id": 1,
+    #                 "circle_name": "サークルA",
+    #                 "circle_description": "これはサークルAの説明です。",
+    #                 "circle_icon_path": "test/test.png"}])
 
 @app.route('/Circle_Page', methods=['POST'])
 def circle_page():
