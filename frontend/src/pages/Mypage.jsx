@@ -6,18 +6,29 @@ import '../css/App.css';
 function Mypage() {
   const navigate = useNavigate();
   const [circles, setCircles] = useState([]);
-
+  const [hasPermission, setHasPermission] = useState(false);
   useEffect(() => {
     fetch("http://localhost:5001/api/mypage", {
       credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => {
-        if (data.items) setCircles(data.items);
+        if (data.items) {
+          setCircles(data.items);
+          if (data.items.length > 0) {//以下お試し
+            const firstCircleId = data.items[0].circle_id;
+            fetch(`http://localhost:5001/api/has-edit-auth?circle_id=${firstCircleId}`, {
+              credentials: "include",
+            })
+              .then((res) => res.json())
+              .then((authData) => {
+                setHasPermission(authData.has_permission);
+              });
+          }
+        }
       })
-      .catch((err) => console.error("データの取得失敗:", err));
+      .catch((err) => console.error("データ取得失敗:", err));
   }, []);
-
   return (
     <div>
       <header className="page-header">
@@ -26,38 +37,25 @@ function Mypage() {
             <img className="logo" src={headImage} alt="アイコン" />
           </Link>
         </h1>
+        {hasPermission && (
+          <button
+            className="sub-button"
+            onClick={() => navigate("/add-authorization")}
+          >
+            権限を付与
+          </button>
+        )}
       </header>
-
       <main>
         <h1>マイページ</h1>
-
         <button onClick={() => navigate('/add_circle')} className="main-button">
           サークルを追加
         </button>
-
         <p>（サークル追加用の画面へ）</p>
-
         <h2>編集できるサークル一覧</h2>
-
-        <button
-          onClick={() => navigate("/edit-circle/1")} // ID:1 に飛ぶテスト
-          className="sub-button"
-        >
-          編集ページ(ID:1)へのテストボタン
-        </button>
-
         <div className="circle-list">
           {circles.length > 0 ? (
             circles.map((c) => (
-               
-              /*テストテスト岸変更ここ
-               <div
-                key={c.circle_id}
-                className="p-3 border rounded-lg bg-white shadow-sm"
-              >
-                {c.circle_name}
-              </div>   */
-              
               <div
                 key={c.circle_id}
                 className="circle-item"
@@ -74,5 +72,4 @@ function Mypage() {
     </div>
   );
 }
-
 export default Mypage;
