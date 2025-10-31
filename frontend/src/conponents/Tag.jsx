@@ -46,7 +46,7 @@ onChangeActive(value);
 }
     return (
     <div>
-      <p>タグを選択せい</p>
+      <p>タグを選択してください</p>
       <div className="tag-list">
         <div className='tag-row'>
 <label htmlFor="">分野</label>

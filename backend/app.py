@@ -20,12 +20,14 @@ def create_app():
     # CORSを有効にする（これでフロントからの通信が許可される）
     # origins=["http://localhost:3000"] のように限定することも可能
     
-    CORS(app,
-         origins=["http://localhost:3000"],  # Reactのオリジンを明示
-         supports_credentials=True,
-         resources={r"/*": {"origins": "http://localhost:3000"}} # すべてのリソース (/*) を許可
-    )
+    #CORS(app,
+    #     origins=["http://localhost:3000"],  # Reactのオリジンを明示
+    #     supports_credentials=True,
+    #     resources={r"/*": {"origins": "http://localhost:3000"}} # すべてのリソース (/*) を許可
+    #)
     
+    CORS(app, origins="http://localhost:3000")
+
     #CORS(app, 
      #resources={r"/api/*": {"origins": "http://localhost:3000"}},  #変更クッキー関係
      #supports_credentials=True
@@ -109,12 +111,14 @@ def make_tmp_account():
     sm.send_auth_code(emailaddress, data_tuple[0])
     return jsonify({"message": "success", "tmp_id": data_tuple[1]})
 
-"""
 @app.route("/create_account", methods=["POST"])
 def create_account():
     json_dict = request.get_json()
     checked_dict = dbop.check_auth_code(json_dict["auth_code"], json_dict["tmp_id"])
-"""
+    if checked_dict["message"] == "failure":
+        return jsonify(checked_dict)
+    dbop.create_account(json_dict["emailaddress"], json_dict["password"], json_dict["user_name"])
+    return jsonify(checked_dict)
 
 #'/api/circles'というURLにPOSTリクエストが来たら動く関数#
 @app.route('/api/circles', methods=['POST'])
@@ -186,7 +190,7 @@ def get_circle(circle_id):
         "number_of_female": circle.number_of_female,
         "circle_icon_path": circle.circle_icon_path,
         # 現在紐付いているタグのIDリストも渡す
-        "tags": [tag.tag_id for tag in circle.tags]
+        # "tags": [tag.tag_id for tag in circle.tags]
     }
 
     # 辞書をJSONにして返す
