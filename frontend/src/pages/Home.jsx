@@ -90,7 +90,7 @@ function Home() {
                 <div key={index} className="circle-info" onClick={() => to_circle_page(circle.circle_id)} style={{cursor: 'pointer'}}>
                   <img src={circle.circle_icon_path} className="circle_icon"/>
                   <p>サークル名: {circle.circle_name}</p>
-                  <p>分野：{circle.tag_name}</p>
+                  <p>分野：{circle.field}</p>
                 </div>
               ))}
               <br />
