@@ -2,10 +2,10 @@ from flask import Flask, jsonify, session,redirect
 from flask_cors import CORS # ◀ flask_corsをインポート
 from flask import request
 import json
-from models import db, Circle, Tag  # models.py に db = SQLAlchemy() とモデル定義がある前提
+from  models import db, Circle, Tag  # models.py に db = SQLAlchemy() とモデル定義がある前提
 import os
 from sqlalchemy.exc import IntegrityError
-import database_oparating as dbop
+import database_operating as dbop
 import send_mail as sm
 from models import db, Circle, User, Session, EditAuthorization
 # Flaskアプリケーションのインスタンスを作成

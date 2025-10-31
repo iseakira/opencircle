@@ -5,8 +5,6 @@ import secrets
 import string
 import datetime
 
-
-
 def get_initial_circles():
     """
     ホーム画面用に全サークルを取得して返す。
@@ -51,7 +49,13 @@ def get_initial_circles():
     cur.close()
     conn.close()
     return items
-
+"""
+import sys
+import os
+from sqlalchemy.exc import IntegrityError
+from backend.app import create_app
+from backend.models import db, Tag
+"""
 
 def get_circle_search(json_dict):
     """
@@ -189,3 +193,4 @@ def create_account(emailaddress, password, user_name):
     conn.commit()
     cursor.close()
     conn.close()
+
