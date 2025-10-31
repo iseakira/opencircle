@@ -131,7 +131,8 @@ def tmp_registration(mailaddress):
     tmp_id = int(''.join(secrets.choice(string.digits) for _ in range(6)))
     #tmp_idが重複した時の処理を後で書く
     cursor.execute("INSERT INTO account_creates (tmp_id, auth_code, account_expire_time, account_create_time, attempt_count) " \
-                    "VALUES ({}, {}, datetime('now','+10 minute'), datetime('now'), 0)".format(tmp_id,auth_code))
+                    "VALUES ({}, {}, datetime('now','+1 minute'), datetime('now'), 0)".format(tmp_id,auth_code))
+    conn.commit()
     cursor.close()
     conn.close()
     return (auth_code,tmp_id)
@@ -148,24 +149,27 @@ def check_auth_code(auth_code, tmp_id):
         conn.close()
         return {"message": "failure", "error_message": "セッション情報がありません。メールアドレスの入力からやり直してください。"}
     #回数制限を超えた場合
-    if tmp_user_db["attempt_count"] > 3:
+    if tmp_user_db[3] > 3:
         cursor.execute("DELETE FROM account_creates WHERE tmp_id = {}".format(tmp_id))
         cursor.close()
         conn.close()
         return {"message": "failure", "error_message": "コードの入力の間違いが一定回数を越えました。メールアドレスの入力からやり直してください。"}
     #期限が切れている場合
-    if tmp_user_db["account_expire_time"] > datetime.datetime.now():
+    if datetime.datetime.strptime(tmp_user_db[1], '%Y-%m-%d %H:%M:%S') > datetime.datetime.now():
         cursor.execute("DELETE FROM account_creates WHERE tmp_id = {}".format(tmp_id))
         cursor.close()
         conn.close()
         return {"message": "failure", "error_message": "認証コードの期限が過ぎています。メールアドレスの入力からやり直してください。"}
     #認証コードが間違っている場合
-    if tmp_user_db["auth_code"] != auth_code:
+    if tmp_user_db[0] != auth_code:
         cursor.execute("UPDATE account_creates SET attempt_count = attmpt_count + 1 WHERE tmp_id = {}".format(tmp_id))
+        conn.commit()
         cursor.close()
         conn.close()
         return {"message": "failure", "error_message": "認証コードが間違っています。もう一度入力してください。"}
     #認証成功
+    cursor.execute("DELETE FROM account_creates WHERE tmp_id = {}".format(tmp_id))
+    conn.commit()
     cursor.close()
     conn.close()
     return {"message": "success"}
@@ -176,6 +180,7 @@ def create_account(emailaddress, password, user_name):
     #ここもuser_id重複時の処理がいる
     user_id = int(''.join(secrets.choice(string.digits) for _ in range(6)))
     cursor.execute("INSERT INTO users (user_id, user_name, mail_adress, password) " \
-                    "VALUES ({}, {}, {}, {})".format(user_id, user_name, emailaddress, password))
+                    "VALUES ({}, '{}', '{}', '{}')".format(user_id, user_name, emailaddress, password))
+    conn.commit()
     cursor.close()
     conn.close()
