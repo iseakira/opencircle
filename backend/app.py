@@ -167,7 +167,7 @@ def get_circle(circle_id):
         "number_of_female": circle.number_of_female,
         "circle_icon_path": circle.circle_icon_path,
         # 現在紐付いているタグのIDリストも渡す
-        "tags": [tag.tag_id for tag in circle.tags]
+        # "tags": [tag.tag_id for tag in circle.tags]
     }
 
     # 辞書をJSONにして返す
