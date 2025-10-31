@@ -13,7 +13,8 @@ def get_initial_circles():
     返すフィールド: circle_id, circle_icon_path, circle_name, field
     field はそのサークルに紐づくタグのうち1つ目の tag_name を返す（存在しなければ None）
     """
-    # 直接 project.db に接続するシンプルな実装
+ 
+    # データベースに接続
     conn = sqlite3.connect('project.db')
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
@@ -26,7 +27,7 @@ def get_initial_circles():
       (
         SELECT t.tag_name
         FROM tags t
-        JOIN circle_tag ct ON t.tag_id = ct.tag_id
+        JOIN circle_tag AS ct ON t.tag_id = ct.tag_id
         WHERE ct.circle_id = c.circle_id
         LIMIT 1
       ) AS field
@@ -36,6 +37,8 @@ def get_initial_circles():
 
     cur.execute(sql)
     rows = cur.fetchall()
+
+    # 結果を辞書のリストに変換
     items = []
     for r in rows:
         items.append({
