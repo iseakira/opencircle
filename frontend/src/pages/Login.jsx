@@ -43,6 +43,7 @@ function Login() {
       const result = await response.json();
       console.log("サーバーからの応答：",result);
       if(result.message === "success"){
+        localStorage.setItem('session_id', result.session_id);
         console("ログイン成功");
         navigate('/mypage')
       }else{
