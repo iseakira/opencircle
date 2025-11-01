@@ -8,6 +8,8 @@ from sqlalchemy.exc import IntegrityError
 import database_operating as dbop
 import send_mail as sm
 from models import db, Circle, User, Session, EditAuthorization
+from datetime import datetime, timedelta 
+
 # Flaskアプリケーションのインスタンスを作成
 def create_app():
     app = Flask(__name__)
@@ -136,6 +138,45 @@ def create_account():
 #'/api/circles'というURLにPOSTリクエストが来たら動く関数#
 @app.route('/api/circles', methods=['POST'])
 def add_circle():
+
+    # --- ▼ 1. DBセッションによるログイン認証チェック ▼ ---
+    
+    # (前提) フロントエンドから 'X-Session-ID' ヘッダーでセッションIDが送られてくる想定
+    session_id_str = request.headers.get('X-Session-ID')
+
+    if not session_id_str:
+        # ヘッダーにセッションIDがない
+        return jsonify({"error": "認証ヘッダー(X-Session-ID)が必要です"}), 401
+
+    try:
+        session_id = int(session_id_str)
+    except ValueError:
+        # IDが数値ではない
+        return jsonify({"error": "不正なセッションID形式です"}), 401
+
+     # データベースでセッションIDを検索
+    # (SQLAlchemy 1.4+ の db.session.get を使用)
+    active_session = db.session.get(Session, session_id)
+
+    if not active_session:
+        # セッションが存在しない（ログアウト済みか不正なID）
+        return jsonify({"error": "セッションが無効です（ログインしていません）"}), 401
+
+    # --- (任意) セッションの有効期限チェック ---
+    # (例: 最終アクセスから24時間で無効化する場合)
+    session_timeout_hours = 24
+    if active_session.session_last_access_time < datetime.utcnow() - timedelta(hours=session_timeout_hours):
+        db.session.delete(active_session) # 期限切れセッションを削除
+        db.session.commit()
+        return jsonify({"error": "セッションが期限切れです。再度ログインしてください"}), 401
+    
+    # 認証成功。セッションに紐づくユーザーIDを取得
+    user_id = active_session.user_id
+    
+    # (任意) 最終アクセス時刻を更新（セッション期限を延長する場合）
+    active_session.session_last_access_time = datetime.utcnow()
+    # --- ▲ 認証チェック完了 ▲ ---
+
     data = request.get_json() or {}
 
     # 必須チェック（circle_name と circle_description が必須）
@@ -165,7 +206,23 @@ def add_circle():
 
     try:
         db.session.add(new_circle)
-        db.session.commit()
+        # 
+        # ▼ 2. サークルを先にコミットし、new_circle.circle_id を確定させる
+        # 
+        db.session.commit() 
+
+        # --- ▼ 3. 作成者をサークルの管理者として権限テーブルに登録 ▼ ---
+        new_authorization = EditAuthorization(
+            user_id=user_id,                # ◀ 認証して取得した user_id を使用
+            circle_id=new_circle.circle_id, # 今作成したサークルのID
+            role="admin"                    # "admin" や "owner" などの役割を付与
+        )
+        db.session.add(new_authorization)
+        
+        # 最終アクセス時刻の更新(active_session)も、ここでまとめてコミット
+        db.session.add(active_session) 
+        db.session.commit() # 権限とセッション更新をコミット
+
     except IntegrityError as e:
         db.session.rollback()
         return jsonify({"error": "データベースエラー（整合性違反など）", "detail": str(e)}), 500
@@ -177,6 +234,8 @@ def add_circle():
         "message": "サークルを追加しました",
         "circle_id": new_circle.circle_id
     }), 201
+
+    
 
 # GET: 1件のサークル情報を取得する
 @app.route('/api/circles/<int:circle_id>', methods=['GET'])
