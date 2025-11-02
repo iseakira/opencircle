@@ -63,7 +63,10 @@ function Home() {
         },
         body: json_circle_id,
       });
-      console.log("検索時に",response);
+      const data = await response.json();
+      console.log("項目をクリックした時：",data);
+      const dataString = JSON.stringify(data);
+      localStorage.setItem('circle_detail', dataString);
       navigate('/Circle_Page');
     }catch{
       console.error("サークルページへの遷移に失敗しました")
