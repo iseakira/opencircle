@@ -146,6 +146,33 @@ function CircleAdd() {
 
   };
   const sendData = async (json_stringdata) => {
+
+    // --- ▼ 1. localStorage からセッションIDを取得 ▼ ---
+    // (前提：ログインページが 'session_id' というキーでIDを保存している)
+    const sessionId = localStorage.getItem('session_id');
+
+     if (!sessionId) {
+        // alert() は使わないほうが良いかもしれませんが、既存コードに合わせています
+        alert("ログインしていません。セッションIDが見つかりません。");
+        console.error("セッションIDがlocalStorageに見つかりません");
+        return; // ログインしていないので送信を中止
+    }
+    // --- ▲ 取得完了 ▲ ---
+
+
+    try {
+      const response = await fetch("http://localhost:5001/api/circles",{
+        method: "POST",
+        headers:{
+          'Content-Type': 'application/json',
+          // --- ▼ 2. 認証ヘッダー(X-Session-ID)を追加 ▼ ---
+          'X-Session-ID': sessionId
+          // --- ▲ ヘッダー追加完了 ▲ ---
+        },
+        body: json_stringdata,   
+      });
+
+/*
     try {
       const response = await fetch("http://localhost:5001/api/circles",{
         method: "POST",
@@ -155,9 +182,26 @@ function CircleAdd() {
         body: json_stringdata,
       });
 
+
       if(!response.ok){
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+*/
+
+      if(!response.ok){
+        // --- ▼ 3. 認証エラー(401)のハンドリングを追加 ▼ ---
+        if (response.status === 401) {
+            // サーバーから '{"error": "..."}' が返ってくる
+            const errorResult = await response.json();
+            alert(`認証エラー: ${errorResult.error || 'ログインセッションが無効です'}`);
+        } else {
+            // その他のHTTPエラー
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return; // エラー時はここで停止
+        // --- ▲ エラーハンドリング完了 ▲ ---
+      }
+
 
       const result = await response.json();
       console.log("サーバーからの応答:", result);

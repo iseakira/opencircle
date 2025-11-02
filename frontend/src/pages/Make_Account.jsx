@@ -9,6 +9,7 @@ function Make_Account() {
     let initialTmpId = '';
     try {
         const storedString = localStorage.getItem('to_Make_Account');
+        localStorage.removeItem('to_Make_Account');
         const email_tmp_id = storedString ? JSON.parse(storedString) : null;
         
         if (email_tmp_id) {
