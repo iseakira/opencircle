@@ -9,7 +9,8 @@ function Home() {
   const navigate = useNavigate();
   //バックエンドからの応答ステート（絞り込み結果を受け取る）
   const [response_data, setResponse_data] = useState(null);
-  //const [error, setError] = useState(null);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const handleResponse = (data) => {
     console.log("絞り込み結果:", data);
     setResponse_data(data);
@@ -17,6 +18,7 @@ function Home() {
 
   const catch_all_circles = async () => {
     try {
+      setIsLoading(true);
       setError(null);
       const initial_response = await fetch("http://localhost:5001/homestart", {
         method: "POST",
@@ -28,10 +30,16 @@ function Home() {
         setResponse_data(data);
       }else{
         console.log("全サークルデータの取得に失敗:", initial_response.status);
+        setError(`データの取得に失敗しました。ステータス:  ${initial_response.status}`);
+        setResponse_data(null);
       }
     }catch(error){
       console.error("エラーが発生しました", error);
-    }
+      setError("ネットワークエラーが発生しました。");
+      setResponse_data(null);
+    }finally {
+    setIsLoading(false); 
+  }
   }
   
   useEffect(() => {
@@ -55,7 +63,7 @@ function Home() {
         },
         body: json_circle_id,
       });
-      console("検索時に",response);
+      console.log("検索時に",response);
       navigate('/Circle_Page');
     }catch{
       console.error("サークルページへの遷移に失敗しました")
@@ -84,17 +92,21 @@ function Home() {
         <h2>サークル一覧</h2>
         <Toggle receivedData_fb={handleResponse} />
         <div>
-          {response_data ? (
-            <>
-              {response_data.map((circle, index) => (
-                <div key={index} className="circle-info" onClick={() => to_circle_page(circle.circle_id)} style={{cursor: 'pointer'}}>
-                  <img src={circle.circle_icon_path} className="circle_icon"/>
-                  <p>サークル名: {circle.circle_name}</p>
-                  <p>分野：{circle.field}</p>
-                </div>
-              ))}
-              <br />
-            </>
+          {isLoading ? (
+            <p>サークル情報を読み込み中です...</p>
+            ) : error ? (
+            <p style={{color: 'red'}}>エラー: {error}</p>
+          ) : response_data && response_data.length > 0 ? (
+          <>
+          {response_data.map((circle, index) => (
+            <div key={index} className="circle-info" onClick={() => to_circle_page(circle.circle_id)} style={{cursor: 'pointer'}}>
+              <img src={circle.circle_icon_path} className="circle_icon"/>
+                <p>サークル名: {circle.circle_name}</p>
+                <p>分野：{circle.field}</p>
+            </div>
+          ))}
+          <br />
+          </>
           ) : (<p>サークル情報の取得に失敗しました</p>)}
         </div>
       </main>
