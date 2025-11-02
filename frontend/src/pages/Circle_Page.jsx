@@ -52,6 +52,11 @@ function Circle_Page(){
                 <p>サークル情報が読み込めませんでした</p>
                 )}
             </div>
+            <h3>
+                <Link to="/">
+                    ホーム画面に戻る
+                </Link>
+            </h3>
         </main>
     </div>
     )
