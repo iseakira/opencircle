@@ -2,12 +2,11 @@ from flask import Flask, jsonify, session,redirect
 from flask_cors import CORS # ◀ flask_corsをインポート
 from flask import request
 import json
-from  models import db, Circle, Tag  # models.py に db = SQLAlchemy() とモデル定義がある前提
+from  .models import db, Circle, Tag, User, Session, EditAuthorization # models.py に db = SQLAlchemy() とモデル定義がある前提
 import os
 from sqlalchemy.exc import IntegrityError
-import database_operating as dbop
-import send_mail as sm
-from models import db, Circle, User, Session, EditAuthorization
+from . import database_operating as dbop
+from . import send_mail as sm
 from datetime import datetime, timedelta 
 
 # Flaskアプリケーションのインスタンスを作成
@@ -163,52 +162,53 @@ def login():
 #'/api/circles'というURLにPOSTリクエストが来たら動く関数#
 @app.route('/api/circles', methods=['POST'])
 def add_circle():
-
-    # --- ▼ 1. DBセッションによるログイン認証チェック ▼ ---
     
-    # (前提) フロントエンドから 'X-Session-ID' ヘッダーでセッションIDが送られてくる想定
-    session_id_str = request.headers.get('X-Session-ID')
-
-    if not session_id_str:
-        # ヘッダーにセッションIDがない
-        return jsonify({"error": "認証ヘッダー(X-Session-ID)が必要です"}), 401
-
-    try:
-        session_id = int(session_id_str)
-    except ValueError:
-        # IDが数値ではない
-        return jsonify({"error": "不正なセッションID形式です"}), 401
-
-     # データベースでセッションIDを検索
-    # (SQLAlchemy 1.4+ の db.session.get を使用)
-    active_session = db.session.get(Session, session_id)
-
-    if not active_session:
-        # セッションが存在しない（ログアウト済みか不正なID）
-        return jsonify({"error": "セッションが無効です（ログインしていません）"}), 401
-
-    # --- (任意) セッションの有効期限チェック ---
-    # (例: 最終アクセスから24時間で無効化する場合)
-    session_timeout_hours = 24
-    if active_session.session_last_access_time < datetime.utcnow() - timedelta(hours=session_timeout_hours):
-        db.session.delete(active_session) # 期限切れセッションを削除
-        db.session.commit()
-        return jsonify({"error": "セッションが期限切れです。再度ログインしてください"}), 401
+    # --- ▼ 1. Cookie からセッションIDを取得 ▼ ---
+    # session_id_str = request.cookies.get("session_id")
     
-    # 認証成功。セッションに紐づくユーザーIDを取得
-    user_id = active_session.user_id
+    # if not session_id_str:
+    #     # Cookieが送られてきていない
+    #     return jsonify({"error": "認証されていません (Cookieが見つかりません)"}), 401
     
-    # (任意) 最終アクセス時刻を更新（セッション期限を延長する場合）
-    active_session.session_last_access_time = datetime.utcnow()
-    # --- ▲ 認証チェック完了 ▲ ---
+    # try:
+    #     session_id = int(session_id_str)
+    # except ValueError:
+    #     # Cookieの値が数値ではない (不正なリクエスト)
+    #     return jsonify({"error": "不正なセッション形式です"}), 401
+    # # --- ▲ 取得完了 ▲ ---
 
+    # # --- ▼ 2. データベースでセッションを検証 ▼ ---
+    # # (この部分は X-Session-ID の時と全く同じです)
+    
+    # active_session = db.session.get(Session, session_id)
+
+    # if not active_session:
+    #     # セッションが存在しない
+    #     return jsonify({"error": "セッションが無効です（ログインしていません）"}), 401
+
+    # # (任意) セッションの有効期限チェック
+    # session_timeout_hours = 24 
+    # if active_session.session_last_access_time < datetime.utcnow() - timedelta(hours=session_timeout_hours):
+    #     db.session.delete(active_session) 
+    #     db.session.commit()
+    #     return jsonify({"error": "セッションが期限切れです。再度ログインしてください"}), 401
+    
+    # # 認証成功。ユーザーIDを取得
+    # user_id = active_session.user_id
+    
+    # # 最終アクセス時刻を更新
+    # active_session.session_last_access_time = datetime.utcnow()
+    # # --- ▲ 認証チェック完了 ▲ ---
+
+
+    # --- 3. サークル追加処理 ---
     data = request.get_json() or {}
 
-    # 必須チェック（circle_name と circle_description が必須）
+    # ( ... 必須チェック ... )
     if not data.get('circle_name') or not data.get('circle_description'):
         return jsonify({"error": "circle_name と circle_description は必須です"}), 400
 
-    # サーバーが自動で発番するので circle_id は無視
+    # ( ... サークルデータ準備 ... )
     circle_data = {
         "circle_name": data.get("circle_name"),
         "circle_description": data.get("circle_description"),
@@ -217,36 +217,32 @@ def add_circle():
         "number_of_female": data.get("number_of_female", 0),
         "circle_icon_path": data.get("circle_icon_path")
     }
-    # None の値は渡さない（DBのデフォルトを使いたい場合）
     circle_data = {k: v for k, v in circle_data.items() if v is not None}
-
     new_circle = Circle(**circle_data)
 
-    # タグ紐付け（任意）
+    # ( ... タグ紐付け ... )
     selected_tag_ids = data.get("tags", [])
     if selected_tag_ids:
         tags = Tag.query.filter(Tag.tag_id.in_(selected_tag_ids)).all()
         for tag in tags:
             new_circle.tags.append(tag)
 
+    # --- 4. データベースへの保存 ---
     try:
         db.session.add(new_circle)
-        # 
-        # ▼ 2. サークルを先にコミットし、new_circle.circle_id を確定させる
-        # 
-        db.session.commit() 
+        db.session.commit() # サークルIDを確定
 
-        # --- ▼ 3. 作成者をサークルの管理者として権限テーブルに登録 ▼ ---
-        new_authorization = EditAuthorization(
-            user_id=user_id,                # ◀ 認証して取得した user_id を使用
-            circle_id=new_circle.circle_id, # 今作成したサークルのID
-            role="admin"                    # "admin" や "owner" などの役割を付与
-        )
-        db.session.add(new_authorization)
+        # # 権限テーブルに登録
+        # new_authorization = EditAuthorization(
+        #     user_id=user_id, 
+        #     circle_id=new_circle.circle_id,
+        #     role="owner" 
+        # )
+        # db.session.add(new_authorization)
         
-        # 最終アクセス時刻の更新(active_session)も、ここでまとめてコミット
-        db.session.add(active_session) 
-        db.session.commit() # 権限とセッション更新をコミット
+        # # セッション更新もコミット
+        # db.session.add(active_session) 
+        # db.session.commit() 
 
     except IntegrityError as e:
         db.session.rollback()
@@ -259,7 +255,6 @@ def add_circle():
         "message": "サークルを追加しました",
         "circle_id": new_circle.circle_id
     }), 201
-
     
 
 # GET: 1件のサークル情報を取得する
