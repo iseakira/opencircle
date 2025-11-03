@@ -2,7 +2,7 @@ from flask import Flask, jsonify, session,redirect
 from flask_cors import CORS # ◀ flask_corsをインポート
 from flask import request
 import json
-from  models import db, Circle, Tag  # models.py に db = SQLAlchemy() とモデル定義がある前提
+from models import db, Circle, Tag, EditAuthorization, User, Session 
 import os
 from sqlalchemy.exc import IntegrityError
 import database_operating as dbop
@@ -225,31 +225,107 @@ def add_circle():
 
     
 
+# @app.route('/api/circles/<int:circle_id>', methods=['PUT'])
+# def edit_circle(circle_id):
+    
+#     # # --- 1. 認証：Cookie からセッションIDを取得 ---
+#     # session_id_str = request.cookies.get("session_id")
+    
+#     # if not session_id_str:
+#     #     return jsonify({"error": "認証されていません (Cookieが見つかりません)"}), 401
+    
+#     # try:
+#     #     session_id = int(session_id_str)
+#     # except ValueError:
+#     #     return jsonify({"error": "不正なセッション形式です"}), 401
+
+#     # # --- 2. 認証：データベースでセッションを検証 ---
+#     # active_session = db.session.get(Session, session_id)
+
+#     # if not active_session:
+#     #     return jsonify({"error": "セッションが無効です（ログインしていません）"}), 401
+
+#     # # --- 3. 認証：セッションの有効期限チェック ---
+#     # session_timeout_hours = 24 
+#     # if active_session.session_last_access_time < datetime.utcnow() - timedelta(hours=session_timeout_hours):
+#     #     db.session.delete(active_session) 
+#     #     db.session.commit()
+#     #     return jsonify({"error": "セッションが期限切れです。再度ログインしてください"}), 401
+    
+#     # # 認証成功。ユーザーIDを取得
+#     # user_id = active_session.user_id
+    
+#     # # --- 4.【重要】認可：編集権限のチェック ---
+#     # # ログインしているユーザー(user_id)が、
+#     # # 編集しようとしているサークル(circle_id)の権限を持っているか確認
+#     # auth = EditAuthorization.query.filter_by(user_id=user_id, circle_id=circle_id).first()
+    
+#     # if not auth:
+#     #     # 権限を持っていない
+#     #     return jsonify({"error": "このサークルの編集権限がありません"}), 403 # 403 Forbidden
+    
+#     # --- 5. 編集対象のサークルを取得 ---
+#     circle_to_edit = db.session.get(Circle, circle_id)
+#     if not circle_to_edit:
+#         return jsonify({"error": "編集対象のサークルが見つかりません"}), 404 # 404 Not Found
+
+#     # --- 6. フロントエンドから送られた新しいデータを取得 ---
+#     data = request.get_json() or {}
+
+#     # (必須項目のチェック)
+#     if not data.get('circle_name') or not data.get('circle_description'):
+#         return jsonify({"error": "circle_name と circle_description は必須です"}), 400
+
+#     # --- 7. データベースの情報を更新 ---
+#     try:
+#         # サークル情報の更新
+#         circle_to_edit.circle_name = data.get("circle_name")
+#         circle_to_edit.circle_description = data.get("circle_description")
+#         circle_to_edit.circle_fee = data.get("circle_fee")
+#         circle_to_edit.number_of_male = data.get("number_of_male", 0)
+#         circle_to_edit.number_of_female = data.get("number_of_female", 0)
+#         circle_to_edit.circle_icon_path = data.get("circle_icon_path")
+
+#         # タグの更新 (一旦すべて削除し、追加し直す)
+#         circle_to_edit.tags.clear()
+#         selected_tag_ids = data.get("tags", [])
+#         if selected_tag_ids:
+#             tags = Tag.query.filter(Tag.tag_id.in_(selected_tag_ids)).all()
+#             for tag in tags:
+#                 circle_to_edit.tags.append(tag)
+        
+#         # # セッションの最終アクセス時刻も更新
+#         # active_session.session_last_access_time = datetime.utcnow()
+
+#         # 変更をまとめてDBに保存
+#         db.session.add(circle_to_edit)
+#         # db.session.add(active_session)
+#         db.session.commit()
+        
+#         return jsonify({
+#             "message": f"サークル (ID: {circle_id}) が正常に更新されました",
+#             "circle_id": circle_id
+#         }), 200 # 200 OK
+
+#     except IntegrityError as e:
+#         db.session.rollback()
+#         return jsonify({"error": "データベースエラー（整合性違反など）", "detail": str(e)}), 500
+#     except Exception as e:
+#         db.session.rollback()
+#         return jsonify({"error": "サーバーエラー", "detail": str(e)}), 500
+
+
+
 # GET: 1件のサークル情報を取得する
 @app.route('/api/circles/<int:circle_id>', methods=['GET'])
 def get_circle(circle_id):
 
-    tags_array_for_ui = [
-        circle.bunya_tag_id, 
-        circle.fee_tag_id,   
-        circle.ratio_tag_id, 
-        circle.place_tag_id, 
-        circle.mood_tag_id,  
-        circle.active_tag_id 
-    ]
-
-    circle_data = {
-        "circle_id": circle.circle_id,
-        "circle_name": circle.circle_name,
-        # ...
-        "tags": tags_array_for_ui # ← この 6要素の配列を返す
-    }
-    return jsonify(circle_data), 200
     circle = Circle.query.get(circle_id)
 
     if not circle:
         return jsonify({"error": "指定されたサークルが見つかりません"}), 404
         
+    tags_id_list = [tag.tag_id for tag in circle.tags]
 
     circle_data = {
         "circle_id": circle.circle_id,
@@ -259,7 +335,7 @@ def get_circle(circle_id):
         "number_of_male": circle.number_of_male,
         "number_of_female": circle.number_of_female,
         "circle_icon_path": circle.circle_icon_path,
-        # "tags": [tag.tag_id for tag in circle.tags]
+        "tags": tags_id_list
     }
 
     # 辞書をJSONにして返す
