@@ -161,6 +161,12 @@ const handleSubmit = async (e) => {
           onChangePlace={setSelectedPlace}
           onChangeMood={setSelectedMood}
           onChangeActive={setSelectedActive}
+          selectedBunya={selectedBunya}
+          selectedFee={selectedFee}
+          selectedRatio={selectedRatio}
+          selectedPlace={selectedPlace}
+          selectedMood={selectedMood}
+          selectedActive={selectedActive}
         ></Tag>
 
         {/* onClick を削除し、テキストを変更 */}
