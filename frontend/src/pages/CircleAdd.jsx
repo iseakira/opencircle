@@ -242,8 +242,22 @@ function CircleAdd() {
         <CircleFemen value={circleData.number_of_female} onChange={FememChange}></CircleFemen>
         <CircleFee value={circleData.circle_fee} onChange={FeeChange}></CircleFee>
         <Image onChange={hadleImageChange} preview={preview} image={image}/>
-        <Tag onChangeBunya={setSelectedBunya} onChangeFee={setSelectedFee} onChangeRatio={setSelectedRatio} onChangePlace={setSelectedPlace} onChangeMood={setSelectedMood} onChangeActive={setSelectedActive} 
-        ></Tag> 
+        <Tag 
+          selectedBunya={selectedBunya} 
+          onChangeBunya={setSelectedBunya} 
+          selectedFee={selectedFee} 
+          onChangeFee={setSelectedFee} 
+          selectedRatio={selectedRatio}
+          onChangeRatio={setSelectedRatio}
+          selectedPlace={selectedPlace}
+          onChangePlace={setSelectedPlace}
+          selectedMood={selectedMood}
+          onChangeMood={setSelectedMood}
+          selectedActive={selectedActive}
+          onChangeActive={setSelectedActive}
+        ></Tag>
+       {/*<Tag onChangeBunya={setSelectedBunya} onChangeFee={setSelectedFee} onChangeRatio={setSelectedRatio} onChangePlace={setSelectedPlace} onChangeMood={setSelectedMood} onChangeActive={setSelectedActive} 
+        //></Tag> 
   
         {/* <Toggle></Toggle> */}
         {/* <Button type="submit" onClick={handleKey} ></Button> */}
