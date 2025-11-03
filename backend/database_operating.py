@@ -4,6 +4,9 @@ import random
 import secrets
 import string
 import datetime
+from .models import db, Circle, EditAuthorization
+from sqlalchemy.exc import IntegrityError
+import logging # printの代わりにloggingを使うことを推奨
 
 def get_initial_circles():
     """
@@ -226,3 +229,59 @@ def make_session(emailaddress):
     cursor.close()
     conn.close()
     return (complete, {"session_id": session_id})
+
+def delete_circle_by_id(circle_id):
+    """
+    指定された circle_id のサークルと関連データを削除するヘルパー関数。
+    
+    前提：この関数はFlaskのアプリケーションコンテキスト内で呼び出される
+          (例: APIルート関数の中から呼び出される)。
+          
+    引数:
+        circle_id (int): 削除対象のサークルID。
+        
+    戻り値:
+        tuple: (success, message_or_error)
+               成功時 (True, "削除しました")
+               失敗時 (False, "エラーメッセージ")
+    """
+    
+    # 1. 削除対象のサークルを取得
+    # (SQLAlchemy 1.4+ の db.session.get を使用)
+    circle_to_delete = db.session.get(Circle, circle_id)
+    
+    if not circle_to_delete:
+        logging.warning(f"削除対象のサークル ID:{circle_id} が見つかりません。")
+        return (False, "指定されたサークルが見つかりません")
+
+    try:
+        # 2. 関連する編集権限(EditAuthorization)をすべて削除
+        #    (models.pyで cascade="all, delete" が設定されていれば
+        #     自動で削除されますが、明示的に行う方が安全です)
+        
+        # 1.x style (Flask-SQLAlchemy default)
+        EditAuthorization.query.filter_by(circle_id=circle_id).delete()
+        
+        # 3. 関連するタグの紐付けを解除
+        #    (circle_tag_table から関連レコードが削除されます)
+        circle_to_delete.tags.clear()
+
+        # 4. サークル本体を削除
+        db.session.delete(circle_to_delete)
+        
+        # 5. 変更をデータベースにコミット（保存）
+        db.session.commit()
+        
+        logging.info(f"サークル ID:{circle_id} が正常に削除されました。")
+        return (True, f"サークル ID:{circle_id} を削除しました")
+
+    except IntegrityError as e:
+        # エラーが発生した場合は変更をロールバック（取り消し）
+        db.session.rollback()
+        logging.error(f"サークル ID:{circle_id} 削除中に整合性エラー: {e}")
+        return (False, f"データベース整合性エラー: {e}")
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"サークル ID:{circle_id} 削除中に予期せぬエラー: {e}")
+        return (False, f"予期せぬエラー: {e}")
+
