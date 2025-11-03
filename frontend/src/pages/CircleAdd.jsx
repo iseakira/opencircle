@@ -165,9 +165,7 @@ function CircleAdd() {
         method: "POST",
         headers:{
           'Content-Type': 'application/json',
-        //   // --- ▼ 2. 認証ヘッダー(X-Session-ID)を追加 ▼ ---
-        //   'X-Session-ID': sessionId
-        //   // --- ▲ ヘッダー追加完了 ▲ ---
+
          },
         body: json_stringdata,   
       });

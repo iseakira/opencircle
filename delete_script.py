@@ -3,7 +3,7 @@ from backend.database_operating import delete_circle_by_id
 from backend.app import create_app
 
 # ▼▼▼ 削除したいサークルのIDをここに指定してください ▼▼▼
-CIRCLE_ID_TO_DELETE = 1
+CIRCLE_ID_TO_DELETE = 5
 # ▲▲▲ ------------------------------------------ ▲▲▲
 
 def run_delete(circle_id):

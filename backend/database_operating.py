@@ -4,7 +4,7 @@ import random
 import secrets
 import string
 import datetime
-from models import db, Circle, EditAuthorization
+from .models import db, Circle, EditAuthorization
 from sqlalchemy.exc import IntegrityError
 import logging # printの代わりにloggingを使うことを推奨
 
