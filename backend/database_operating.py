@@ -150,7 +150,7 @@ def check_auth_code(auth_code, tmp_id):
     conn = sqlite3.connect("project.db")
     cursor = conn.cursor()
     res = cursor.execute("SELECT auth_code, account_expire_time, account_create_time, attempt_count " \
-                        "FROM account_creates WHERE tmp_id = ?", (tmp_id))
+                        "FROM account_creates WHERE tmp_id = ?", (tmp_id,))
     tmp_user_db = res.fetchone()
     #データがない場合
     if tmp_user_db == None:
@@ -159,25 +159,25 @@ def check_auth_code(auth_code, tmp_id):
         return {"message": "failure", "error_message": "セッション情報がありません。メールアドレスの入力からやり直してください。"}
     #回数制限を超えた場合
     if tmp_user_db[3] > 3:
-        cursor.execute("DELETE FROM account_creates WHERE tmp_id = ?", (tmp_id))
+        cursor.execute("DELETE FROM account_creates WHERE tmp_id = ?", (tmp_id,))
         cursor.close()
         conn.close()
         return {"message": "failure", "error_message": "コードの入力の間違いが一定回数を越えました。メールアドレスの入力からやり直してください。"}
     #期限が切れている場合
     if datetime.datetime.strptime(tmp_user_db[1], '%Y-%m-%d %H:%M:%S') > datetime.datetime.now():
-        cursor.execute("DELETE FROM account_creates WHERE tmp_id = ?", (tmp_id))
+        cursor.execute("DELETE FROM account_creates WHERE tmp_id = ?", (tmp_id,))
         cursor.close()
         conn.close()
         return {"message": "failure", "error_message": "認証コードの期限が過ぎています。メールアドレスの入力からやり直してください。"}
     #認証コードが間違っている場合
     if tmp_user_db[0] != auth_code:
-        cursor.execute("UPDATE account_creates SET attempt_count = attmpt_count + 1 WHERE tmp_id = ?", (tmp_id))
+        cursor.execute("UPDATE account_creates SET attempt_count = attmpt_count + 1 WHERE tmp_id = ?", (tmp_id,))
         conn.commit()
         cursor.close()
         conn.close()
         return {"message": "failure", "error_message": "認証コードが間違っています。もう一度入力してください。"}
     #認証成功
-    cursor.execute("DELETE FROM account_creates WHERE tmp_id = ?", (tmp_id))
+    cursor.execute("DELETE FROM account_creates WHERE tmp_id = ?", (tmp_id,))
     conn.commit()
     cursor.close()
     conn.close()
@@ -197,7 +197,7 @@ def create_account(emailaddress, password, user_name):
 def check_login(emailaddress, password):
     conn = sqlite3.connect("project.db")
     cursor = conn.cursor()
-    res = cursor.execute("SELECT password FROM user WHERE mail_adress = ?", (emailaddress))
+    res = cursor.execute("SELECT password FROM user WHERE mail_adress = ?", (emailaddress,))
     user_tuple = res.fetchone()
     cursor.close()
     conn.close()
@@ -209,7 +209,7 @@ def check_login(emailaddress, password):
 def make_session(emailaddress):
     conn = sqlite3.connect("project_db")
     cursor = conn.cursor()
-    res = cursor.execute("SELECT user_id FROM users WHERE maila_adress = ?",(emailaddress))
+    res = cursor.execute("SELECT user_id FROM users WHERE maila_adress = ?",(emailaddress,))
     user_id = int(res[0])
     session_id = int(''.join(secrets.choice(string.digits) for _ in range(16)))
     complete = False
