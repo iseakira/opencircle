@@ -9,32 +9,16 @@ from . import database_operating as dbop
 from . import send_mail as sm
 from datetime import datetime, timedelta 
 
-# Flaskアプリケーションのインスタンスを作成
 def create_app():
     app = Flask(__name__)
-
-    # DB の場所をプロジェクトの backend ディレクトリ内の project.db に設定
     base_dir = os.path.dirname(__file__)
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(base_dir, "project.db")
     
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-    # CORSを有効にする（これでフロントからの通信が許可される）
-    # origins=["http://localhost:3000"] のように限定することも可能
-    
-    #CORS(app,
-    #     origins=["http://localhost:3000"],  # Reactのオリジンを明示
-    #     supports_credentials=True,
-    #     resources={r"/*": {"origins": "http://localhost:3000"}} # すべてのリソース (/*) を許可
-    #)
     
     CORS(app, origins="http://localhost:3000",supports_credentials=True)
-
-    #CORS(app, 
-     #resources={r"/api/*": {"origins": "http://localhost:3000"}},  #変更クッキー関係
-     #supports_credentials=True
-
     db.init_app(app)
+    
     return app
 
 app = create_app()
