@@ -23,14 +23,9 @@ def create_app():
 
 app = create_app()
 
-# --- ここからテスト用のコード ---
 
-@app.route('/api/hello', methods=['GET'])
-def say_hello():
-    # JSON形式でメッセージを返す
-    return jsonify({"message": "バックエンドからの返事です！🎉"})
 
-#'/hometest'というURLにPOSTリクエストが来たら動く関数
+
 @app.route('/hometest', methods=['POST'])
 def search():
     json_dict = request.get_json()
@@ -58,17 +53,6 @@ def search_results():
     #f.close()
     json_text = dbop.search_circles(json_dict)
     return jsonify(json_text)
-    return jsonify([{"circle_name": "サークルA",
-                    "circle_description": "これはサークルAの説明です。"},
-                    {"circle_name": "サークルB",
-                     "circle_description": "これはサークルBの説明です。"},
-                    {"circle_name": "サークルC",
-                     "circle_description": "これはサークルCの説明です。"}])
-    # return jsonify([{"circle_id": 1,
-    #                 "circle_name": "サークルA",
-    #                 "circle_description": "これはサークルAの説明です。",
-    #                 "circle_icon_path": "test/test.png"}])
-
 @app.route('/Circle_Page', methods=['POST'])
 def circle_page():
     json_dict = request.get_json() or {}
