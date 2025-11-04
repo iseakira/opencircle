@@ -26,12 +26,6 @@ app = create_app()
 
 
 
-@app.route('/hometest', methods=['POST'])
-def search():
-    json_dict = request.get_json()
-    json_text = dbop.get_circle_search(json_dict)
-    return jsonify(json_text)
-
 
 @app.route('/homestart', methods=['POST'])
 def initial_circles():
