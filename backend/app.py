@@ -17,61 +17,23 @@ UPLOAD_BASE_URL = "/uploads/"
 # ▼ 許可する画像拡張子
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
-# Flaskアプリケーションのインスタンスを作成
 def create_app():
     app = Flask(__name__)
-
-    # DB の場所をプロジェクトの backend ディレクトリ内の project.db に設定
     base_dir = os.path.dirname(__file__)
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(base_dir, "project.db")
     
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-    # CORSを有効にする（これでフロントからの通信が許可される）
-    # origins=["http://localhost:3000"] のように限定することも可能
-    
-    #CORS(app,
-    #     origins=["http://localhost:3000"],  # Reactのオリジンを明示
-    #     supports_credentials=True,
-    #     resources={r"/*": {"origins": "http://localhost:3000"}} # すべてのリソース (/*) を許可
-    #)
     
     CORS(app, origins="http://localhost:3000",supports_credentials=True)
-
-    #CORS(app, 
-     #resources={r"/api/*": {"origins": "http://localhost:3000"}},  #変更クッキー関係
-     #supports_credentials=True
-
     db.init_app(app)
+    
     return app
 
 app = create_app()
 
-# --- ここからテスト用のコード ---
 
-@app.route('/api/hello', methods=['GET'])
-def say_hello():
-    # JSON形式でメッセージを返す
-    return jsonify({"message": "バックエンドからの返事です！🎉"})
 
-#'/hometest'というURLにPOSTリクエストが来たら動く関数
-@app.route('/hometest', methods=['POST'])
-def search():
-    #json_dataのキーは["search_term","field","circle_fee","gender_ration","place","mood","frequency"]
-    json_dict = request.get_json()
-    #print(json.dumps(json_dict))
-    #f = open("testdata.txt")
-    #json_text = f.read()
-    #f.close()
-    json_text = dbop.search_circles(json_dict)
-    return jsonify(json_text)
 
-    # return jsonify([{"circle_icon_path": "/test_image/head_image.png",
-    #                 "circle_name": "サークルAの名前",
-    #                 "tag_name":"サークルAの分野のタグ"},
-    #                 {"circle_icon_path": "サークルBのアイコン",
-    #                 "circle_name": "サークルBの名前",
-    #                 "tag_name":"サークルBの分野のタグ"}])
 
 @app.route('/homestart', methods=['POST'])
 def initial_circles():
@@ -86,7 +48,6 @@ def initial_circles():
 
 @app.route('/home', methods=['POST'])
 def search_results():
-    #json_dataのキーは["search_term","field","circle_fee","gender_ration","place","mood","frequency"]
     json_dict = request.get_json()
     #print(json.dumps(json_dict))
     #f = open("testdata.txt")
@@ -98,6 +59,7 @@ def search_results():
 def circle_page():
     json_dict = request.get_json() or {}
     circle_id = json_dict.get("circle_id")
+    
     if circle_id is None:
         return jsonify({"error": "circle_id is required"}), 400
 
