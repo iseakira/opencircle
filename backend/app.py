@@ -50,21 +50,10 @@ def say_hello():
 #'/hometest'というURLにPOSTリクエストが来たら動く関数
 @app.route('/hometest', methods=['POST'])
 def search():
-    #json_dataのキーは["search_term","field","circle_fee","gender_ration","place","mood","frequency"]
     json_dict = request.get_json()
-    #print(json.dumps(json_dict))
-    #f = open("testdata.txt")
-    #json_text = f.read()
-    #f.close()
-    json_text = dbop.search_circles(json_dict)
+    json_text = dbop.get_circle_search(json_dict)
     return jsonify(json_text)
 
-    # return jsonify([{"circle_icon_path": "/test_image/head_image.png",
-    #                 "circle_name": "サークルAの名前",
-    #                 "tag_name":"サークルAの分野のタグ"},
-    #                 {"circle_icon_path": "サークルBのアイコン",
-    #                 "circle_name": "サークルBの名前",
-    #                 "tag_name":"サークルBの分野のタグ"}])
 
 @app.route('/homestart', methods=['POST'])
 def initial_circles():
@@ -77,32 +66,21 @@ def initial_circles():
         print('get_initial_circles error:', e)
         return jsonify({"error": "サーバーエラー"}), 500
 
-@app.route("/add_account", methods=["POST"])
 @app.route('/home', methods=['POST'])
 def search_results():
-    #json_dataのキーは["search_term","field","circle_fee","gender_ration","place","mood","frequency"]
     json_dict = request.get_json()
-    #print(json.dumps(json_dict))
-    #f = open("testdata.txt")
-    #json_text = f.read()
-    #f.close()
-    json_text = dbop.search_circles(json_dict)
-    return jsonify(json_text)
     return jsonify([{"circle_name": "サークルA",
                     "circle_description": "これはサークルAの説明です。"},
                     {"circle_name": "サークルB",
                      "circle_description": "これはサークルBの説明です。"},
                     {"circle_name": "サークルC",
                      "circle_description": "これはサークルCの説明です。"}])
-    # return jsonify([{"circle_id": 1,
-    #                 "circle_name": "サークルA",
-    #                 "circle_description": "これはサークルAの説明です。",
-    #                 "circle_icon_path": "test/test.png"}])
-
+    
 @app.route('/Circle_Page', methods=['POST'])
 def circle_page():
     json_dict = request.get_json() or {}
     circle_id = json_dict.get("circle_id")
+    
     if circle_id is None:
         return jsonify({"error": "circle_id is required"}), 400
 
@@ -135,7 +113,7 @@ def create_account():
     dbop.create_account(json_dict["emailaddress"], json_dict["password"], json_dict["user_name"])
     return jsonify(checked_dict)
 
-#'/api/circles'というURLにPOSTリクエストが来たら動く関数#
+
 @app.route('/api/circles', methods=['POST'])
 def add_circle():
 
