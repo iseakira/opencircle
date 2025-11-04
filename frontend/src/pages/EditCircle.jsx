@@ -115,7 +115,6 @@ const handleSubmit = async (e) => {
       body: JSON.stringify(dataToSend),
     });
 
-
     if (response.status === 404) {
       response = await fetch("http://localhost:5001/api/circles", {
         method: "POST",
@@ -131,7 +130,7 @@ const handleSubmit = async (e) => {
     }
 
     const responseData = await response.json();
-    alert(responseData.message || "保存しました！");
+    alert(responseData.message || "サークル情報を更新しました！！");
     navigate("/mypage");
 
   } catch (error) {
@@ -161,6 +160,12 @@ const handleSubmit = async (e) => {
           onChangePlace={setSelectedPlace}
           onChangeMood={setSelectedMood}
           onChangeActive={setSelectedActive}
+          selectedBunya={selectedBunya}
+          selectedFee={selectedFee}
+          selectedRatio={selectedRatio}
+          selectedPlace={selectedPlace}
+          selectedMood={selectedMood}
+          selectedActive={selectedActive}
         ></Tag>
 
         {/* onClick を削除し、テキストを変更 */}
