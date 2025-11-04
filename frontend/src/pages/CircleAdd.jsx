@@ -58,17 +58,10 @@ function CircleAdd() {
      circle_fee:e.target.value, 
     })
   }
-  // const handleClick=()=>{
-    // const {nam,des,member,fee}=circleData;
-    // if(!nam||!des||!member||!fee){
-      // alert("すべての情報を入力してください");
-    // }else{
-    // alert("サークルを追加しました");
-  // }
+
+ 
 
   
-  // }
- 
     
   const [tags,setCircleTags]=useState("");
 
@@ -147,18 +140,6 @@ function CircleAdd() {
   };
   const sendData = async (json_stringdata) => {
 
-    // // --- ▼ 1. localStorage からセッションIDを取得 ▼ ---
-    // // (前提：ログインページが 'session_id' というキーでIDを保存している)
-    // const sessionId = localStorage.getItem('session_id');
-
-    //  if (!sessionId) {
-    //     // alert() は使わないほうが良いかもしれませんが、既存コードに合わせています
-    //     alert("ログインしていません。セッションIDが見つかりません。");
-    //     console.error("セッションIDがlocalStorageに見つかりません");
-    //     return; // ログインしていないので送信を中止
-    // }
-    // // --- ▲ 取得完了 ▲ ---
-
 
     try {
       const response = await fetch("http://localhost:5001/api/circles",{
@@ -170,21 +151,7 @@ function CircleAdd() {
         body: json_stringdata,   
       });
 
-/*
-    try {
-      const response = await fetch("http://localhost:5001/api/circles",{
-        method: "POST",
-        headers:{
-          'Content-Type': 'application/json',
-        },
-        body: json_stringdata,
-      });
 
-
-      if(!response.ok){
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-*/
 
       if(!response.ok){
         // --- ▼ 3. 認証エラー(401)のハンドリングを追加 ▼ ---
