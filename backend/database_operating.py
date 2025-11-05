@@ -57,10 +57,10 @@ import sys
 import os
 from sqlalchemy.exc import IntegrityError
 from backend.app import create_app
-from backend.models import db, Tag
+from backend.models import db, Tagk
 """
 
-def get_circle_search(json_dict):
+def search_circles(json_dict):
     """
     サークル検索用の関数。受け取った文字列とタグをもとにサークルを検索して返す。
     termは部分一致させる。サークルの中でtagsをすべて含むサークルを返す。
