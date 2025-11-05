@@ -4,6 +4,9 @@ import random
 import secrets
 import string
 import datetime
+from models import db, Circle, EditAuthorization
+from sqlalchemy.exc import IntegrityError
+import logging # printの代わりにloggingを使うことを推奨
 
 def get_initial_circles():
     """
@@ -54,10 +57,10 @@ import sys
 import os
 from sqlalchemy.exc import IntegrityError
 from backend.app import create_app
-from backend.models import db, Tag
+from backend.models import db, Tagk
 """
 
-def get_circle_search(json_dict):
+def search_circles(json_dict):
     """
     サークル検索用の関数。受け取った文字列とタグをもとにサークルを検索して返す。
     termは部分一致させる。サークルの中でtagsをすべて含むサークルを返す。
@@ -140,7 +143,7 @@ def tmp_registration(mailaddress):
     tmp_id = int(''.join(secrets.choice(string.digits) for _ in range(6)))
     #tmp_idが重複した時の処理を後で書く
     cursor.execute("INSERT INTO account_creates (tmp_id, auth_code, account_expire_time, account_create_time, attempt_count) " \
-                    "VALUES ({}, {}, datetime('now','+1 minute'), datetime('now'), 0)".format(tmp_id,auth_code))
+                    "VALUES (?, ?, datetime('now','+1 minute'), datetime('now'), 0)", (tmp_id,auth_code))
     conn.commit()
     cursor.close()
     conn.close()
@@ -150,7 +153,7 @@ def check_auth_code(auth_code, tmp_id):
     conn = sqlite3.connect("project.db")
     cursor = conn.cursor()
     res = cursor.execute("SELECT auth_code, account_expire_time, account_create_time, attempt_count " \
-                        "FROM account_creates WHERE tmp_id = {}".format(tmp_id))
+                        "FROM account_creates WHERE tmp_id = ?", (tmp_id,))
     tmp_user_db = res.fetchone()
     #データがない場合
     if tmp_user_db == None:
@@ -159,25 +162,25 @@ def check_auth_code(auth_code, tmp_id):
         return {"message": "failure", "error_message": "セッション情報がありません。メールアドレスの入力からやり直してください。"}
     #回数制限を超えた場合
     if tmp_user_db[3] > 3:
-        cursor.execute("DELETE FROM account_creates WHERE tmp_id = {}".format(tmp_id))
+        cursor.execute("DELETE FROM account_creates WHERE tmp_id = ?", (tmp_id,))
         cursor.close()
         conn.close()
         return {"message": "failure", "error_message": "コードの入力の間違いが一定回数を越えました。メールアドレスの入力からやり直してください。"}
     #期限が切れている場合
     if datetime.datetime.strptime(tmp_user_db[1], '%Y-%m-%d %H:%M:%S') > datetime.datetime.now():
-        cursor.execute("DELETE FROM account_creates WHERE tmp_id = {}".format(tmp_id))
+        cursor.execute("DELETE FROM account_creates WHERE tmp_id = ?", (tmp_id,))
         cursor.close()
         conn.close()
         return {"message": "failure", "error_message": "認証コードの期限が過ぎています。メールアドレスの入力からやり直してください。"}
     #認証コードが間違っている場合
     if tmp_user_db[0] != auth_code:
-        cursor.execute("UPDATE account_creates SET attempt_count = attmpt_count + 1 WHERE tmp_id = {}".format(tmp_id))
+        cursor.execute("UPDATE account_creates SET attempt_count = attmpt_count + 1 WHERE tmp_id = ?", (tmp_id,))
         conn.commit()
         cursor.close()
         conn.close()
         return {"message": "failure", "error_message": "認証コードが間違っています。もう一度入力してください。"}
     #認証成功
-    cursor.execute("DELETE FROM account_creates WHERE tmp_id = {}".format(tmp_id))
+    cursor.execute("DELETE FROM account_creates WHERE tmp_id = ?", (tmp_id,))
     conn.commit()
     cursor.close()
     conn.close()
@@ -189,8 +192,96 @@ def create_account(emailaddress, password, user_name):
     #ここもuser_id重複時の処理がいる
     user_id = int(''.join(secrets.choice(string.digits) for _ in range(6)))
     cursor.execute("INSERT INTO users (user_id, user_name, mail_adress, password) " \
-                    "VALUES ({}, '{}', '{}', '{}')".format(user_id, user_name, emailaddress, password))
+                    "VALUES (?, ?, ?, ?)", (user_id, user_name, emailaddress, password))
     conn.commit()
     cursor.close()
     conn.close()
+
+def check_login(emailaddress, password):
+    conn = sqlite3.connect("project.db")
+    cursor = conn.cursor()
+    res = cursor.execute("SELECT password FROM user WHERE mail_adress = ?", (emailaddress,))
+    user_tuple = res.fetchone()
+    cursor.close()
+    conn.close()
+    if password != user_tuple[0]:
+        return {"message": "failure"}
+    else:
+        return {"message": "success"}
+    
+def make_session(emailaddress):
+    conn = sqlite3.connect("project_db")
+    cursor = conn.cursor()
+    res = cursor.execute("SELECT user_id FROM users WHERE maila_adress = ?",(emailaddress,))
+    user_id = int(res[0])
+    session_id = int(''.join(secrets.choice(string.digits) for _ in range(16)))
+    complete = False
+    for i in range(5):
+        try:
+            cursor.execute("INSERT INTO sessions (session_id, user_id, session_create_time, session_last_access_time) " \
+                            "VALUES (?, ?, datetime('now'), datetime('now'))",(session_id, user_id))
+            conn.commit()
+        except sqlite3.IntegrityError:
+            session_id = int(''.join(secrets.choice(string.digits) for _ in range(16)))
+        else:
+            complete = True
+            break
+    cursor.close()
+    conn.close()
+    return (complete, {"session_id": session_id})
+
+def delete_circle_by_id(circle_id):
+    """
+    指定された circle_id のサークルと関連データを削除するヘルパー関数。
+    
+    前提：この関数はFlaskのアプリケーションコンテキスト内で呼び出される
+          (例: APIルート関数の中から呼び出される)。
+          
+    引数:
+        circle_id (int): 削除対象のサークルID。
+        
+    戻り値:
+        tuple: (success, message_or_error)
+               成功時 (True, "削除しました")
+               失敗時 (False, "エラーメッセージ")
+    """
+    
+    # 1. 削除対象のサークルを取得
+    # (SQLAlchemy 1.4+ の db.session.get を使用)
+    circle_to_delete = db.session.get(Circle, circle_id)
+    
+    if not circle_to_delete:
+        logging.warning(f"削除対象のサークル ID:{circle_id} が見つかりません。")
+        return (False, "指定されたサークルが見つかりません")
+
+    try:
+        # 2. 関連する編集権限(EditAuthorization)をすべて削除
+        #    (models.pyで cascade="all, delete" が設定されていれば
+        #     自動で削除されますが、明示的に行う方が安全です)
+        
+        # 1.x style (Flask-SQLAlchemy default)
+        EditAuthorization.query.filter_by(circle_id=circle_id).delete()
+        
+        # 3. 関連するタグの紐付けを解除
+        #    (circle_tag_table から関連レコードが削除されます)
+        circle_to_delete.tags.clear()
+
+        # 4. サークル本体を削除
+        db.session.delete(circle_to_delete)
+        
+        # 5. 変更をデータベースにコミット（保存）
+        db.session.commit()
+        
+        logging.info(f"サークル ID:{circle_id} が正常に削除されました。")
+        return (True, f"サークル ID:{circle_id} を削除しました")
+
+    except IntegrityError as e:
+        # エラーが発生した場合は変更をロールバック（取り消し）
+        db.session.rollback()
+        logging.error(f"サークル ID:{circle_id} 削除中に整合性エラー: {e}")
+        return (False, f"データベース整合性エラー: {e}")
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"サークル ID:{circle_id} 削除中に予期せぬエラー: {e}")
+        return (False, f"予期せぬエラー: {e}")
 

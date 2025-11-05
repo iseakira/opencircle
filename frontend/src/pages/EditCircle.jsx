@@ -104,36 +104,10 @@ function CircleEdit() {
   const handleSubmit = async (e) => {
     e.preventDefault(); 
 
-    if (!circleData.circle_name || !circleData.circle_description) {
-      alert("サークル名とサークル説明は必須です");
-      return;
-    }
-
-    const result = window.confirm("サークルを更新しますか？");
-    if (!result) return;
-
-    const tagList = [
-      selectedBunya,
-      selectedFee,
-      selectedRatio,
-      selectedPlace,
-      selectedMood,
-      selectedActive,
-    ].filter(tagId => tagId != null); 
-
-    const dataToSend = {
-      circle_name: circleData.circle_name,
-      circle_description: circleData.circle_description,
-      circle_fee: circleData.circle_fee || null,
-      number_of_male: parseInt(circleData.number_of_male) || 0,
-      number_of_female: parseInt(circleData.number_of_female) || 0,
-      tags: tagList,
-    };
-
-    try {
-      const response = await fetch(`http://localhost:5001/api/circles/${circleId}`, {
-        method: "PUT",
-        headers: { 'Content-Type': 'application/json' },
+    if (response.status === 404) {
+      response = await fetch("http://localhost:5001/api/circles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(dataToSend),
       });
@@ -154,23 +128,13 @@ function CircleEdit() {
   };
 
 
-  if (loading) {
-    return <div className="p-8 text-center">ID: {circleId} のサークル情報を読み込み中...</div>;
-  }
-  
-  if (error) {
-    return (
-      <div className="p-8 text-center text-red-500">
-        <h1>エラーが発生しました</h1>
-        <p>{error}</p>
-        <button 
-          onClick={() => navigate("/mypage")} 
-          className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"
-        >
-          マイページに戻る
-        </button>
-      </div>
-    );
+    const responseData = await response.json();
+    alert(responseData.message || "サークル情報を更新しました！！");
+    navigate("/mypage");
+
+  } catch (error) {
+    console.error("通信エラー", error);
+    alert(`通信に失敗しました: ${error.message}`);
   }
 
   return (
@@ -192,7 +156,12 @@ function CircleEdit() {
           onChangePlace={setSelectedPlace}
           onChangeMood={setSelectedMood}
           onChangeActive={setSelectedActive}
-          // valueBunya={selectedBunya} (←もしコンポーネントが対応しているなら、このように渡す)
+          selectedBunya={selectedBunya}
+          selectedFee={selectedFee}
+          selectedRatio={selectedRatio}
+          selectedPlace={selectedPlace}
+          selectedMood={selectedMood}
+          selectedActive={selectedActive}
         ></Tag>
 
         <Button type="submit">サークルを更新する</Button>
