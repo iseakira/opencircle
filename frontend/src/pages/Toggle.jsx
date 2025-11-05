@@ -37,10 +37,9 @@ function Toggle({receivedData_fb}) {
   };
   const change_frequency =(e) =>{
     setFrequency(e.target.value);
-  };
+  };  
   //jsonデータ取得
   const get_jsontags = () => {
-
     const dataTosend = {
       search_term: search_term,
       tags: [field, circle_fee, gender_ratio, place, mood, frequency]
@@ -49,12 +48,10 @@ function Toggle({receivedData_fb}) {
     const json_stringdata = JSON.stringify(dataTosend);
     console.log('タグのjsonデータ:', json_stringdata);
     sendData(json_stringdata);
-    return json_stringdata;
-
   };
   const sendData = async (json_stringdata) => {
     try {
-      const response = await fetch("http://localhost:5001/hometest",{
+      const response = await fetch("http://localhost:5001/home",{
         method: "POST",
         headers:{
           'Content-Type': 'application/json',
@@ -71,11 +68,12 @@ function Toggle({receivedData_fb}) {
       if (receivedData_fb) {
         receivedData_fb(result);
       }
-      alert("データを送信しました")
-
     }catch (error) {
       console.error("通信エラー", error);
       alert("通信に失敗しました");
+      if(receivedData_fb){
+        receivedData_fb([]);
+      }
     }
   };
 
