@@ -22,12 +22,12 @@ function CircleAdd() {
   const [circleData,setCircleData]=useState({
     circle_name:"",
     circle_description:"",
-    //circle_fee:"",
-    circle_fee:0,
+    circle_fee:"",
+    // circle_fee:0,
     number_of_male:"",
-    number_of_male:0,
-    // number_of_female:"",
-    number_of_female:0,
+    // number_of_male:0,
+    number_of_female:"",
+    // number_of_female:0,
     //circle_icon_path:"",
     //tags:[],
   });
@@ -156,7 +156,8 @@ function CircleAdd() {
       //  Number(selectedActive),
       // ]
      if(image){   
- formData.append("circle_icon",circleData.circle_icon);
+//  formData.append("circle_icon",circleData.circle_icon);
+ formData.append("circle_icon_file",image);
  }  
    console.log("送信データ (FormData):");
   for (const [key, value] of formData.entries()) {

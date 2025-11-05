@@ -46,6 +46,8 @@ function Make_Account() {
         const auth_code = formData.auth_code;
         const tmp_id =  formData.tmp_id;
 
+        console.log(formData);
+
         if(password !== passwordConfirm){
             alert("パスワードが一致しません");
             return;

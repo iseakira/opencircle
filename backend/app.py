@@ -1,15 +1,26 @@
 from flask import Flask, jsonify, redirect
 from flask_cors import CORS # ◀ flask_corsをインポート
-from flask import request
+from flask import request, send_from_directory
 import json
-from models import db, Circle, Tag , User, Session, EditAuthorization # models.py に db = SQLAlchemy() とモデル定義がある前提
+from  models import db, Circle, Tag, EditAuthorization, User, Session 
 import os
 from sqlalchemy.exc import IntegrityError
 import database_operating as dbop
 import send_mail as sm
+from datetime import datetime, timedelta, timezone
+import uuid
+from werkzeug.utils import secure_filename
 
+# --- ▼ 1. 画像アップロード設定 ▼ ---
+# 許可する拡張子
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+# 画像を保存するサーバー上のフォルダパス
+# (app.py と同じ階層に 'uploads' フォルダが作成されます)
+UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
+# フロントエンドが画像にアクセスするためのURLプレフィックス
+UPLOAD_BASE_URL = "/api/uploads"
+# --- ▲ 画像アップロード設定 ▲ ---
 
-# Flaskアプリケーションのインスタンスを作成
 def create_app():
     app = Flask(__name__)
 
@@ -19,11 +30,16 @@ def create_app():
     
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+    upload_dir = os.path.join(base_dir, "uploads")
+    os.makedirs(upload_dir, exist_ok=True)
+    app.config["UPLOAD_FOLDER"] = upload_dir
+    print("UPLOAD_FOLDER 設定:", app.config["UPLOAD_FOLDER"]) 
     # CORSを有効にする（これでフロントからの通信が許可される）
     # origins=["http://localhost:3000"] のように限定することも可能
     CORS(app, 
      resources={r"/api/*": {"origins": "http://localhost:3000"}},  #変更クッキー関係
      supports_credentials=True
+
 )
     db.init_app(app)
     return app
@@ -92,17 +108,62 @@ def make_tmp_account():
     sm.send_auth_code(emailaddress, data_tuple[0])
     return jsonify({"message": "success", "tmp_id": data_tuple[1]})
 
-"""
+
 @app.route("/create_account", methods=["POST"])
 def create_account():
     json_dict = request.get_json()
     checked_dict = dbop.check_auth_code(json_dict["auth_code"], json_dict["tmp_id"])
-"""
+    if checked_dict["message"] == "failure":
+        return jsonify(checked_dict)
+    dbop.create_account(json_dict["emailaddress"], json_dict["password"], json_dict["user_name"])
+    return jsonify(checked_dict)
+
+# --- ▼ 2. 画像保存ヘルパー関数 ▼ ---
+
+def allowed_file(filename):
+    """許可された拡張子かチェック"""
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def save_image_file(file_storage):
+    """
+    request.files から取得した FileStorage オブジェクトを
+    安全なファイル名で保存し、アクセス用URLを返す。
+    """
+    if not file_storage or not allowed_file(file_storage.filename):
+        return None, "許可されていないファイル形式です"
+
+    try:
+        # ファイル名を安全なものに変更 (例: image.png -> <uuid>.png)
+        ext = file_storage.filename.rsplit('.', 1)[1].lower()
+        filename = f"{uuid.uuid4()}.{ext}"
+        
+        # 保存先のフルパス
+        save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        
+        # ファイルを保存
+        file_storage.save(save_path)
+        
+        # フロントエンドがアクセスするためのURLパスを返す
+        file_url = f"{UPLOAD_BASE_URL}/{filename}"
+        return file_url, None
+
+    except Exception as e:
+        print(f"ファイル保存エラー: {e}")
+        return None, str(e)
+
+# --- ▼ 3. 画像配信用API ▼ ---
+# /api/uploads/xxxx.png のようなURLでアクセスされたら、
+# UPLOAD_FOLDER からファイルを配信する
+@app.route(f'{UPLOAD_BASE_URL}/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+# --- (他のAPI ... /api/hello, /hometest など) ---
 
 #'/api/circles'というURLにPOSTリクエストが来たら動く関数#
 @app.route('/api/circles', methods=['POST'])
 def add_circle():
-    data = request.get_json() or {}
 
     # # --- ▼ 1. Cookieによるログイン認証チェック ▼ ---
     # session_id_str = request.cookies.get("session_id")
@@ -148,27 +209,40 @@ def add_circle():
     file = request.files.get("circle_icon_file")
     # --- ▲ データ取得完了 ▲ ---
     
+    print("FORM:", request.form)
+    print("FILES:", request.files)
+
     
     # 必須チェック
     if not data_name or not data_description:
         return jsonify({"error": "circle_name と circle_description は必須です"}), 400
 
-    # サーバーが自動で発番するので circle_id は無視
+    # --- 3. 画像ファイルの保存 ---
+    icon_path = None # デフォルトはパスなし
+    if file:
+        saved_path, error = save_image_file(file)
+        if error:
+            return jsonify({"error": f"画像保存エラー: {error}"}), 400
+        icon_path = saved_path # DBに保存するパス (例: /api/uploads/uuid.png)
+    
+    # サークルデータを作成
     circle_data = {
-        "circle_name": data.get("circle_name"),
-        "circle_description": data.get("circle_description"),
-        "circle_fee": data.get("circle_fee"),
-        "number_of_male": data.get("number_of_male", 0),
-        "number_of_female": data.get("number_of_female", 0),
-        "circle_icon_path": data.get("circle_icon_path")
+        "circle_name": data_name,
+        "circle_description": data_description,
+        "circle_fee": int(data_fee) if data_fee else None,
+        "number_of_male": int(data_male),
+        "number_of_female": int(data_female),
+        "circle_icon_path": icon_path # DBに保存するパス
     }
-    # None の値は渡さない（DBのデフォルトを使いたい場合）
-    circle_data = {k: v for k, v in circle_data.items() if v is not None}
 
     new_circle = Circle(**circle_data)
 
-    # タグ紐付け（任意）
-    selected_tag_ids = data.get("tags", [])
+    # タグ紐付け
+    try:
+        selected_tag_ids = json.loads(tags_json_str) # JSON文字列をリストに変換
+    except json.JSONDecodeError:
+        return jsonify({"error": "タグの形式が不正です"}), 400
+        
     if selected_tag_ids:
         tags = Tag.query.filter(Tag.tag_id.in_(selected_tag_ids)).all()
         for tag in tags:
@@ -182,7 +256,7 @@ def add_circle():
         # new_authorization = EditAuthorization(
         #     user_id=user_id,
         #     circle_id=new_circle.circle_id,
-        #     role="owner"
+        #     role="admin"
         # )
         # db.session.add(new_authorization)
         
@@ -198,8 +272,11 @@ def add_circle():
 
     return jsonify({
         "message": "サークルを追加しました",
-        "circle_id": new_circle.circle_id
+        "circle_id": new_circle.circle_id,
+        "circle_icon_path": icon_path # 保存した画像のパスを返す
     }), 201
+
+
 
 # GET: 1件のサークル情報を取得する
 @app.route('/api/circles/<int:circle_id>', methods=['GET'])
