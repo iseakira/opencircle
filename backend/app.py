@@ -24,9 +24,6 @@ def create_app():
 app = create_app()
 
 
-
-
-
 @app.route('/homestart', methods=['POST'])
 def initial_circles():
     # DB から初期表示用のサークル一覧を取得して返す
