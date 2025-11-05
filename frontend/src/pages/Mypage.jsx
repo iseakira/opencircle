@@ -53,6 +53,15 @@ function Mypage() {
         </button>
         <p>（サークル追加用の画面へ）</p>
         <h2>編集できるサークル一覧</h2>
+        
+        // ここ岸追加消していいよ
+        
+        <button
+          onClick={() => navigate('/edit-circle/1')}
+          style={{ backgroundColor: '#f0ad4e', margin: '10px 0', padding: '8px' }}
+        >
+          (テスト用) ID:1の編集ページへ
+        </button>
         <div className="circle-list">
           {circles.length > 0 ? (
             circles.map((c) => (

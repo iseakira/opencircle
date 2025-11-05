@@ -61,17 +61,10 @@ function CircleAdd() {
      circle_fee:e.target.value, 
     })
   }
-  // const handleClick=()=>{
-    // const {nam,des,member,fee}=circleData;
-    // if(!nam||!des||!member||!fee){
-      // alert("すべての情報を入力してください");
-    // }else{
-    // alert("サークルを追加しました");
-  // }
+
+ 
 
   
-  // }
- 
     
   const [tags,setCircleTags]=useState("");
 
@@ -170,6 +163,7 @@ function CircleAdd() {
     console.log(key, value);
   }
 
+<<<<<<< HEAD
   await sendData(formData);
     };
 
@@ -199,11 +193,38 @@ function CircleAdd() {
         // },
         // body: json_stringdata,
         credentials:"include",
+=======
+  };
+  const sendData = async (json_stringdata) => {
+
+
+    try {
+      const response = await fetch("http://localhost:5001/api/circles",{
+        method: "POST",
+        headers:{
+          'Content-Type': 'application/json',
+
+         },
+        body: json_stringdata,   
+>>>>>>> b6f19307f90866cfc7298659e398e4a2696eba74
       });
 
+
+
       if(!response.ok){
-        throw new Error(`HTTP error! status: ${response.status}`);
+        // --- ▼ 3. 認証エラー(401)のハンドリングを追加 ▼ ---
+        if (response.status === 401) {
+            // サーバーから '{"error": "..."}' が返ってくる
+            const errorResult = await response.json();
+            alert(`認証エラー: ${errorResult.error || 'ログインセッションが無効です'}`);
+        } else {
+            // その他のHTTPエラー
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return; // エラー時はここで停止
+        // --- ▲ エラーハンドリング完了 ▲ ---
       }
+
 
       const result = await response.json();
       console.log("サーバーからの応答:", result);
@@ -244,8 +265,22 @@ function CircleAdd() {
         <CircleFemen value={circleData.number_of_female} onChange={FememChange}></CircleFemen>
         <CircleFee value={circleData.circle_fee} onChange={FeeChange}></CircleFee>
         <Image onChange={hadleImageChange} preview={preview} image={image}/>
-        <Tag onChangeBunya={setSelectedBunya} onChangeFee={setSelectedFee} onChangeRatio={setSelectedRatio} onChangePlace={setSelectedPlace} onChangeMood={setSelectedMood} onChangeActive={setSelectedActive} 
-        ></Tag> 
+        <Tag 
+          selectedBunya={selectedBunya} 
+          onChangeBunya={setSelectedBunya} 
+          selectedFee={selectedFee} 
+          onChangeFee={setSelectedFee} 
+          selectedRatio={selectedRatio}
+          onChangeRatio={setSelectedRatio}
+          selectedPlace={selectedPlace}
+          onChangePlace={setSelectedPlace}
+          selectedMood={selectedMood}
+          onChangeMood={setSelectedMood}
+          selectedActive={selectedActive}
+          onChangeActive={setSelectedActive}
+        ></Tag>
+       {/*<Tag onChangeBunya={setSelectedBunya} onChangeFee={setSelectedFee} onChangeRatio={setSelectedRatio} onChangePlace={setSelectedPlace} onChangeMood={setSelectedMood} onChangeActive={setSelectedActive} 
+        //></Tag> 
   
         {/* <Toggle></Toggle> */}
         {/* <Button type="submit" onClick={handleKey} ></Button> */}
