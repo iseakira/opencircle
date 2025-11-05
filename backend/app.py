@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, session,redirect
+from flask import Flask, jsonify, redirect
 from flask_cors import CORS # ◀ flask_corsをインポート
 from flask import request, send_from_directory
 import json
@@ -23,23 +23,53 @@ UPLOAD_BASE_URL = "/api/uploads"
 
 def create_app():
     app = Flask(__name__)
+
+    # DB の場所をプロジェクトの backend ディレクトリ内の project.db に設定
     base_dir = os.path.dirname(__file__)
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(base_dir, "project.db")
     
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    
-    CORS(app, origins="http://localhost:3000",supports_credentials=True)
+
+    # CORSを有効にする（これでフロントからの通信が許可される）
+    # origins=["http://localhost:3000"] のように限定することも可能
+    CORS(app, 
+     resources={r"/api/*": {"origins": "http://localhost:3000"}},  #変更クッキー関係
+     supports_credentials=True
+
+)
     db.init_app(app)
-    
     return app
 
 app = create_app()
 
+# --- ここからテスト用のコード ---
 
+# `/api/hello` というURLにアクセスが来たら動く関数
+@app.route('/api/hello', methods=['GET'])
+def say_hello():
+    # JSON形式でメッセージを返す
+    return jsonify({"message": "バックエンドからの返事です！🎉"})
 
+#'/hometest'というURLにPOSTリクエストが来たら動く関数
+@app.route('/hometest', methods=['POST'])
+def search():
+    #json_dataのキーは["search_term","field","circle_fee","gender_ration","place","mood","frequency"]
+    json_dict = request.get_json()
+    print(json.dumps(json_dict))
+    #f = open("testdata.txt")
+    #json_text = f.read()
+    #f.close()
+    json_text = dbop.search_circles(json_dict)
+    return jsonify(json_text)
 
+    # return jsonify([{"circle_icon_path": "/test_image/head_image.png",
+    #                 "circle_name": "サークルAの名前",
+    #                 "tag_name":"サークルAの分野のタグ"},
+    #                 {"circle_icon_path": "サークルBのアイコン",
+    #                 "circle_name": "サークルBの名前",
+    #                 "tag_name":"サークルBの分野のタグ"}])
 
-@app.route('/homestart', methods=['POST'])
+@app.route('/home', methods=['POST'])
 def initial_circles():
     # DB から初期表示用のサークル一覧を取得して返す
     try:
@@ -50,33 +80,20 @@ def initial_circles():
         print('get_initial_circles error:', e)
         return jsonify({"error": "サーバーエラー"}), 500
 
-@app.route('/home', methods=['POST'])
+@app.route('/home', methods=['GET'])
 def search_results():
-    json_dict = request.get_json()
-    #print(json.dumps(json_dict))
-    #f = open("testdata.txt")
-    #json_text = f.read()
-    #f.close()
-    json_text = dbop.search_circles(json_dict)
-    return jsonify(json_text)
+    return jsonify([{"circle_name": "サークルA",
+                    "circle_description": "これはサークルAの説明です。"},
+                    {"circle_name": "サークルB",
+                     "circle_description": "これはサークルBの説明です。"},
+                    {"circle_name": "サークルC",
+                     "circle_description": "これはサークルCの説明です。"}])
+
 @app.route('/Circle_Page', methods=['POST'])
 def circle_page():
-    json_dict = request.get_json() or {}
-    circle_id = json_dict.get("circle_id")
-    
-    if circle_id is None:
-        return jsonify({"error": "circle_id is required"}), 400
-
-    try:
-        circle_id = int(circle_id)
-    except ValueError:
-        return jsonify({"error": "invalid circle_id"}), 400
-
-    detail = dbop.get_circle_detail(circle_id)
-    if detail is None:
-        return jsonify({"error": "circle not found"}), 404
-
-    return jsonify(detail)
+    json_dict = request.get_json()
+    circle_id = json_dict["circle_id"]
+    return jsonify({"message": f"サークルID {circle_id} の詳細情報の取得成功"})
 
 @app.route('/add_account', methods=['POST'])
 def make_tmp_account():
@@ -86,6 +103,7 @@ def make_tmp_account():
     data_tuple = dbop.tmp_registration(emailaddress)
     sm.send_auth_code(emailaddress, data_tuple[0])
     return jsonify({"message": "success", "tmp_id": data_tuple[1]})
+
 
 @app.route("/create_account", methods=["POST"])
 def create_account():
@@ -139,6 +157,7 @@ def uploaded_file(filename):
 
 # --- (他のAPI ... /api/hello, /hometest など) ---
 
+#'/api/circles'というURLにPOSTリクエストが来たら動く関数#
 @app.route('/api/circles', methods=['POST'])
 def add_circle():
 
@@ -255,14 +274,19 @@ def add_circle():
 # GET: 1件のサークル情報を取得する
 @app.route('/api/circles/<int:circle_id>', methods=['GET'])
 def get_circle(circle_id):
-
+    # まず、指定されたIDのサークルを探す
     circle = Circle.query.get(circle_id)
 
+    # サークルが見つからなかった場合
     if not circle:
         return jsonify({"error": "指定されたサークルが見つかりません"}), 404
         
-    tags_id_list = [tag.tag_id for tag in circle.tags]
+    # TODO: 認証チェック
+    # 必要であれば、ここで「ログイン中のユーザーがこのサークルを
+    # 閲覧/編集する権限があるか」をチェックする
+    # (例: if circle.owner_id != session.get('user_id'): return 403)
 
+    # フロントエンド（React）が使いやすい形（辞書）に変換
     circle_data = {
         "circle_id": circle.circle_id,
         "circle_name": circle.circle_name,
@@ -271,7 +295,8 @@ def get_circle(circle_id):
         "number_of_male": circle.number_of_male,
         "number_of_female": circle.number_of_female,
         "circle_icon_path": circle.circle_icon_path,
-        "tags": tags_id_list
+        # 現在紐付いているタグのIDリストも渡す
+        "tags": [tag.tag_id for tag in circle.tags]
     }
 
     # 辞書をJSONにして返す
@@ -280,17 +305,27 @@ def get_circle(circle_id):
 # PUT: 1件のサークル情報を更新する
 @app.route('/api/circles/<int:circle_id>', methods=['PUT'])
 def update_circle(circle_id):
+    # まず、更新対象のサークルを探す
     circle_to_update = Circle.query.get(circle_id)
 
     # サークルが見つからなかった場合
     if not circle_to_update:
         return jsonify({"error": "指定されたサークルが見つかりません"}), 404
 
+    # TODO: 重要な認証チェック！
+    # ここで「ログイン中のユーザーがこのサークルを
+    # 編集する権限があるか」を必ずチェックしてください。
+    # (例: if circle_to_update.owner_id != session.get('user_id'): 
+    #          return jsonify({"error": "編集権限がありません"}), 403)
+
+    # Reactから送られてきた新しいデータを取得
     data = request.get_json() or {}
 
+    # 必須チェック（add_circle と同様）
     if not data.get('circle_name') or not data.get('circle_description'):
         return jsonify({"error": "circle_name と circle_description は必須です"}), 400
 
+    # データベースのオブジェクトの値を新しいデータで上書き
     circle_to_update.circle_name = data.get("circle_name")
     circle_to_update.circle_description = data.get("circle_description")
     circle_to_update.circle_fee = data.get("circle_fee")
@@ -298,83 +333,131 @@ def update_circle(circle_id):
     circle_to_update.number_of_female = data.get("number_of_female", 0)
     circle_to_update.circle_icon_path = data.get("circle_icon_path")
 
+    # タグの更新 (少し面倒)
+    # 1. いったん既存のタグ紐付けを全部クリア
     circle_to_update.tags.clear() 
-
+    # 2. 送られてきたタグIDリストで新しく紐付け
     selected_tag_ids = data.get("tags", [])
     if selected_tag_ids:
         tags = Tag.query.filter(Tag.tag_id.in_(selected_tag_ids)).all()
         for tag in tags:
             circle_to_update.tags.append(tag)
             
+    # データベースに保存（コミット）
     try:
+        # db.session.add() は不要（すでに対象はセッションが追跡しているため）
         db.session.commit()
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": "サーバーエラー", "detail": str(e)}), 500
 
+    # 成功メッセージを返す
     return jsonify({
         "message": "サークルを更新しました",
         "circle_id": circle_to_update.circle_id
     }), 200
-# --- ここまでサークル編集ページ---
+# --- ここまでテスト用のコード ---
 
 
-#--- ここからマイページ ---
-@app.route("/api/edit-authorization", methods=["POST"])
-def add_edit_authorization():
+@app.route("/api/mypage", methods=["GET"])
+def get_editable_circles():
+   
+    #　ログインチェック
     if "user_id" not in session:
         return jsonify({"error": "ログインが必要です"}), 401
-    data = request.get_json() or {}
-    circle_id = data.get("circle_id")
-    target_user_id = data.get("target_user_id")
-    if not circle_id or not target_user_id:
-        return jsonify({"error": "circle_id と target_user_id が必要です"}), 400
-    owner_auth = EditAuthorization.query.filter_by(
-        user_id=session["user_id"], circle_id=circle_id
-    ).first()
-    if not owner_auth:
-        return jsonify({"error": "このサークルに権限を付与する権限がありません"}), 403
-    exists = EditAuthorization.query.filter_by(
-        user_id=target_user_id, circle_id=circle_id
-    ).first()
-    if exists:
-        return jsonify({"error": "このユーザーは既に権限を持っています"}), 400
-    new_auth = EditAuthorization(user_id=target_user_id, circle_id=circle_id)
-    db.session.add(new_auth)
-    db.session.commit()
-    return jsonify({
-        "message": "編集権限を付与しました",
-        "circle_id": circle_id,
-        "target_user_id": target_user_id
-    }), 201
 
-@app.route("/api/transfer-ownership", methods=["POST"])
-def transfer_ownership():
-    data = request.get_json() or {}
-    circle_id = data.get("circle_id")
-    new_owner_id = data.get("new_owner_id")
+
+    user_id = session["user_id"]
+
+
+
+
+    # 編集権限を取得
+    auths = EditAuthorization.query.filter_by(user_id=user_id).all()
+    circle_ids = [a.circle_id for a in auths]
+
+
+
+
+    # 編集できるサークルがない場合
+    if not circle_ids:
+        return jsonify({"items": [], "total": 0})
+
+
+
+
+    # 対応するサークル情報を取得
+    circles = Circle.query.filter(Circle.circle_id.in_(circle_ids)).all()
+
+
+    # 取得したサークル情報をJSON化
+    result = [
+        {
+            "circle_id": c.circle_id,
+            "circle_name": c.circle_name,
+            "circle_description": c.circle_description,
+        }
+        for c in circles
+    ]
+
+
+    return jsonify({"items": result, "total": len(result)})
+
+
+   
+
+
+
+
+# 新しいサークル追加ボタン押下時
+@app.route("/api/mypage/circle/new", methods=["POST"])
+def prepare_new_circle():
+   
+    # ログインチェック
     if "user_id" not in session:
         return jsonify({"error": "ログインが必要です"}), 401
-    current_owner = EditAuthorization.query.filter_by(
-        user_id=session["user_id"], circle_id=circle_id, role="owner"
-    ).first()
-    if not current_owner:
-        return jsonify({"error": "オーナーのみが譲渡できます"}), 403
-    candidate = EditAuthorization.query.filter_by(
-        user_id=new_owner_id, circle_id=circle_id
-    ).first()
-    if not candidate:
-        return jsonify({"error": "譲渡先のユーザーが見つかりません"}), 400
-    candidate.role = "owner"   # 新オーナー昇格
-    db.session.delete(current_owner)  # 元オーナーは削除（退部扱い）
-    db.session.commit()
+
+
+
+
+    # DB処理は不要（画面遷移のみ）
     return jsonify({
-        "message": "オーナー権限を譲渡し、元オーナーは退部しました",
-        "circle_id": circle_id,
-        "new_owner_id": new_owner_id
+        "message": "新しいサークル作成ページへ移動します。",
+        "next": "/create-circle"
     }), 200
 
-#--- ここまでマイページ ---
+
+
+
+# セッション確認API
+@app.route("/api/session/debug", methods=["GET"])
+def debug_session():
+    """現在のセッション情報を確認"""
+    return jsonify(dict(session))
+
+
+
+
+# データベース初期化コマンド
+@app.cli.command("initdb")
+def initdb():
+    """データベースを初期化"""
+    db.drop_all()
+    db.create_all()
+    print("Database initialized.")
+
+
+
+
+# アプリ起動設定
+if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
+    app.run(host="0.0.0.0", port=5001, debug=True)
+
+
+#--- ここまでマイページ画面用のコード ---
+
 
 if __name__ == '__main__':
     # ポート5001でサーバーを起動
