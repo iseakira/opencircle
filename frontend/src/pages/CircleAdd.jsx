@@ -179,7 +179,7 @@ function CircleAdd() {
     // return json_stringdata;
 // console.log("送信データ内容",dataTosend);
 // await sendData(formData);
-  // };
+//   };
   // const sendData = async (json_stringdata) => {
   const sendData = async (formData) => {
     // const sendData = async (formData) => {
