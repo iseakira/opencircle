@@ -1,13 +1,25 @@
 from flask import Flask, jsonify, session,redirect
 from flask_cors import CORS # ◀ flask_corsをインポート
-from flask import request
+from flask import request, send_from_directory
 import json
-from . models import db, Circle, Tag, EditAuthorization, User, Session 
+from  models import db, Circle, Tag, EditAuthorization, User, Session 
 import os
 from sqlalchemy.exc import IntegrityError
-from . import database_operating as dbop
-from . import send_mail as sm
-from datetime import datetime, timedelta 
+import database_operating as dbop
+import send_mail as sm
+from datetime import datetime, timedelta, timezone
+import uuid
+from werkzeug.utils import secure_filename
+
+# --- ▼ 1. 画像アップロード設定 ▼ ---
+# 許可する拡張子
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+# 画像を保存するサーバー上のフォルダパス
+# (app.py と同じ階層に 'uploads' フォルダが作成されます)
+UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
+# フロントエンドが画像にアクセスするためのURLプレフィックス
+UPLOAD_BASE_URL = "/api/uploads"
+# --- ▲ 画像アップロード設定 ▲ ---
 
 def create_app():
     app = Flask(__name__)
@@ -22,6 +34,9 @@ def create_app():
     return app
 
 app = create_app()
+
+
+
 
 
 @app.route('/homestart', methods=['POST'])
@@ -81,70 +96,127 @@ def create_account():
     dbop.create_account(json_dict["emailaddress"], json_dict["password"], json_dict["user_name"])
     return jsonify(checked_dict)
 
+# --- ▼ 2. 画像保存ヘルパー関数 ▼ ---
+
+def allowed_file(filename):
+    """許可された拡張子かチェック"""
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def save_image_file(file_storage):
+    """
+    request.files から取得した FileStorage オブジェクトを
+    安全なファイル名で保存し、アクセス用URLを返す。
+    """
+    if not file_storage or not allowed_file(file_storage.filename):
+        return None, "許可されていないファイル形式です"
+
+    try:
+        # ファイル名を安全なものに変更 (例: image.png -> <uuid>.png)
+        ext = file_storage.filename.rsplit('.', 1)[1].lower()
+        filename = f"{uuid.uuid4()}.{ext}"
+        
+        # 保存先のフルパス
+        save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        
+        # ファイルを保存
+        file_storage.save(save_path)
+        
+        # フロントエンドがアクセスするためのURLパスを返す
+        file_url = f"{UPLOAD_BASE_URL}/{filename}"
+        return file_url, None
+
+    except Exception as e:
+        print(f"ファイル保存エラー: {e}")
+        return None, str(e)
+
+# --- ▼ 3. 画像配信用API ▼ ---
+# /api/uploads/xxxx.png のようなURLでアクセスされたら、
+# UPLOAD_FOLDER からファイルを配信する
+@app.route(f'{UPLOAD_BASE_URL}/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+# --- (他のAPI ... /api/hello, /hometest など) ---
 
 @app.route('/api/circles', methods=['POST'])
 def add_circle():
 
-    # --- ▼ 1. DBセッションによるログイン認証チェック ▼ ---
+    # --- ▼ 1. Cookieによるログイン認証チェック ▼ ---
+    session_id_str = request.cookies.get("session_id")
+
+    if not session_id_str:
+        return jsonify({"error": "認証されていません (Cookieが見つかりません)"}), 401
     
-    # (前提) フロントエンドから 'X-Session-ID' ヘッダーでセッションIDが送られてくる想定
-    # session_id_str = request.headers.get('X-Session-ID')
+    try:
+        session_id = int(session_id_str)
+    except ValueError:
+        return jsonify({"error": "不正なセッション形式です"}), 401
 
-    # if not session_id_str:
-    #     # ヘッダーにセッションIDがない
-    #     return jsonify({"error": "認証ヘッダー(X-Session-ID)が必要です"}), 401
+    active_session = db.session.get(Session, session_id)
 
-    # try:
-    #     session_id = int(session_id_str)
-    # except ValueError:
-    #     # IDが数値ではない
-    #     return jsonify({"error": "不正なセッションID形式です"}), 401
+    if not active_session:
+        return jsonify({"error": "セッションが無効です（ログインしていません）"}), 401
 
-    #  # データベースでセッションIDを検索
-    # # (SQLAlchemy 1.4+ の db.session.get を使用)
-    # active_session = db.session.get(Session, session_id)
-
-    # if not active_session:
-    #     # セッションが存在しない（ログアウト済みか不正なID）
-    #     return jsonify({"error": "セッションが無効です（ログインしていません）"}), 401
-
-    # # --- (任意) セッションの有効期限チェック ---
-    # # (例: 最終アクセスから24時間で無効化する場合)
-    # session_timeout_hours = 24
-    # if active_session.session_last_access_time < datetime.utcnow() - timedelta(hours=session_timeout_hours):
-    #     db.session.delete(active_session) # 期限切れセッションを削除
-    #     db.session.commit()
-    #     return jsonify({"error": "セッションが期限切れです。再度ログインしてください"}), 401
+    session_timeout_hours = 24
+    if active_session.session_last_access_time < datetime.utcnow() - timedelta(hours=session_timeout_hours):
+        db.session.delete(active_session) 
+        db.session.commit()
+        return jsonify({"error": "セッションが期限切れです。再度ログインしてください"}), 401
     
-    # # 認証成功。セッションに紐づくユーザーIDを取得
-    # user_id = active_session.user_id
+    user_id = active_session.user_id
+    active_session.session_last_access_time = datetime.utcnow()
+    # --- ▲ 認証チェック完了 ▲ ---
+
+
+    # --- ▼ 2. FormData からデータを取得 ▼ ---
+    # (request.get_json() は使わない)
     
-    # # (任意) 最終アクセス時刻を更新（セッション期限を延長する場合）
-    # active_session.session_last_access_time = datetime.utcnow()
-    # # --- ▲ 認証チェック完了 ▲ ---
-
-    data = request.get_json() or {}
-
-    # 必須チェック（circle_name と circle_description が必須）
-    if not data.get('circle_name') or not data.get('circle_description'):
+    # テキストデータを request.form から取得
+    data_name = request.form.get("circle_name")
+    data_description = request.form.get("circle_description")
+    data_fee = request.form.get("circle_fee")
+    data_male = request.form.get("number_of_male", 0)
+    data_female = request.form.get("number_of_female", 0)
+    
+    # タグリスト (JSON文字列として送られてくると想定)
+    tags_json_str = request.form.get("tags", "[]")
+    
+    # 画像ファイルを request.files から取得
+    file = request.files.get("circle_icon_file")
+    # --- ▲ データ取得完了 ▲ ---
+    
+    
+    # 必須チェック
+    if not data_name or not data_description:
         return jsonify({"error": "circle_name と circle_description は必須です"}), 400
 
-    # サーバーが自動で発番するので circle_id は無視
+    # --- 3. 画像ファイルの保存 ---
+    icon_path = None # デフォルトはパスなし
+    if file:
+        saved_path, error = save_image_file(file)
+        if error:
+            return jsonify({"error": f"画像保存エラー: {error}"}), 400
+        icon_path = saved_path # DBに保存するパス (例: /api/uploads/uuid.png)
+    
+    # サークルデータを作成
     circle_data = {
-        "circle_name": data.get("circle_name"),
-        "circle_description": data.get("circle_description"),
-        "circle_fee": data.get("circle_fee"),
-        "number_of_male": data.get("number_of_male", 0),
-        "number_of_female": data.get("number_of_female", 0),
-        "circle_icon_path": data.get("circle_icon_path")
+        "circle_name": data_name,
+        "circle_description": data_description,
+        "circle_fee": int(data_fee) if data_fee else None,
+        "number_of_male": int(data_male),
+        "number_of_female": int(data_female),
+        "circle_icon_path": icon_path # DBに保存するパス
     }
-    # None の値は渡さない（DBのデフォルトを使いたい場合）
-    circle_data = {k: v for k, v in circle_data.items() if v is not None}
 
     new_circle = Circle(**circle_data)
 
-    # タグ紐付け（任意）
-    selected_tag_ids = data.get("tags", [])
+    # タグ紐付け
+    try:
+        selected_tag_ids = json.loads(tags_json_str) # JSON文字列をリストに変換
+    except json.JSONDecodeError:
+        return jsonify({"error": "タグの形式が不正です"}), 400
+        
     if selected_tag_ids:
         tags = Tag.query.filter(Tag.tag_id.in_(selected_tag_ids)).all()
         for tag in tags:
@@ -152,22 +224,18 @@ def add_circle():
 
     try:
         db.session.add(new_circle)
-        # 
-        # ▼ 2. サークルを先にコミットし、new_circle.circle_id を確定させる
-        # 
-        db.session.commit() 
+        db.session.commit() # circle_id を確定
 
-        # # --- ▼ 3. 作成者をサークルの管理者として権限テーブルに登録 ▼ ---
-        # new_authorization = EditAuthorization(
-        #     user_id=user_id,                # ◀ 認証して取得した user_id を使用
-        #     circle_id=new_circle.circle_id, # 今作成したサークルのID
-        #     role="admin"                    # "admin" や "owner" などの役割を付与
-        # )
-        # db.session.add(new_authorization)
+        # --- 3. 作成者を管理者として登録 ---
+        new_authorization = EditAuthorization(
+            user_id=user_id,
+            circle_id=new_circle.circle_id,
+            role="admin"
+        )
+        db.session.add(new_authorization)
         
-        # # 最終アクセス時刻の更新(active_session)も、ここでまとめてコミット
-        # db.session.add(active_session) 
-        # db.session.commit() # 権限とセッション更新をコミット
+        db.session.add(active_session) # セッション時刻更新
+        db.session.commit() # 権限とセッション更新をコミット
 
     except IntegrityError as e:
         db.session.rollback()
@@ -178,99 +246,9 @@ def add_circle():
 
     return jsonify({
         "message": "サークルを追加しました",
-        "circle_id": new_circle.circle_id
+        "circle_id": new_circle.circle_id,
+        "circle_icon_path": icon_path # 保存した画像のパスを返す
     }), 201
-
-    
-
-# @app.route('/api/circles/<int:circle_id>', methods=['PUT'])
-# def edit_circle(circle_id):
-    
-#     # # --- 1. 認証：Cookie からセッションIDを取得 ---
-#     # session_id_str = request.cookies.get("session_id")
-    
-#     # if not session_id_str:
-#     #     return jsonify({"error": "認証されていません (Cookieが見つかりません)"}), 401
-    
-#     # try:
-#     #     session_id = int(session_id_str)
-#     # except ValueError:
-#     #     return jsonify({"error": "不正なセッション形式です"}), 401
-
-#     # # --- 2. 認証：データベースでセッションを検証 ---
-#     # active_session = db.session.get(Session, session_id)
-
-#     # if not active_session:
-#     #     return jsonify({"error": "セッションが無効です（ログインしていません）"}), 401
-
-#     # # --- 3. 認証：セッションの有効期限チェック ---
-#     # session_timeout_hours = 24 
-#     # if active_session.session_last_access_time < datetime.utcnow() - timedelta(hours=session_timeout_hours):
-#     #     db.session.delete(active_session) 
-#     #     db.session.commit()
-#     #     return jsonify({"error": "セッションが期限切れです。再度ログインしてください"}), 401
-    
-#     # # 認証成功。ユーザーIDを取得
-#     # user_id = active_session.user_id
-    
-#     # # --- 4.【重要】認可：編集権限のチェック ---
-#     # # ログインしているユーザー(user_id)が、
-#     # # 編集しようとしているサークル(circle_id)の権限を持っているか確認
-#     # auth = EditAuthorization.query.filter_by(user_id=user_id, circle_id=circle_id).first()
-    
-#     # if not auth:
-#     #     # 権限を持っていない
-#     #     return jsonify({"error": "このサークルの編集権限がありません"}), 403 # 403 Forbidden
-    
-#     # --- 5. 編集対象のサークルを取得 ---
-#     circle_to_edit = db.session.get(Circle, circle_id)
-#     if not circle_to_edit:
-#         return jsonify({"error": "編集対象のサークルが見つかりません"}), 404 # 404 Not Found
-
-#     # --- 6. フロントエンドから送られた新しいデータを取得 ---
-#     data = request.get_json() or {}
-
-#     # (必須項目のチェック)
-#     if not data.get('circle_name') or not data.get('circle_description'):
-#         return jsonify({"error": "circle_name と circle_description は必須です"}), 400
-
-#     # --- 7. データベースの情報を更新 ---
-#     try:
-#         # サークル情報の更新
-#         circle_to_edit.circle_name = data.get("circle_name")
-#         circle_to_edit.circle_description = data.get("circle_description")
-#         circle_to_edit.circle_fee = data.get("circle_fee")
-#         circle_to_edit.number_of_male = data.get("number_of_male", 0)
-#         circle_to_edit.number_of_female = data.get("number_of_female", 0)
-#         circle_to_edit.circle_icon_path = data.get("circle_icon_path")
-
-#         # タグの更新 (一旦すべて削除し、追加し直す)
-#         circle_to_edit.tags.clear()
-#         selected_tag_ids = data.get("tags", [])
-#         if selected_tag_ids:
-#             tags = Tag.query.filter(Tag.tag_id.in_(selected_tag_ids)).all()
-#             for tag in tags:
-#                 circle_to_edit.tags.append(tag)
-        
-#         # # セッションの最終アクセス時刻も更新
-#         # active_session.session_last_access_time = datetime.utcnow()
-
-#         # 変更をまとめてDBに保存
-#         db.session.add(circle_to_edit)
-#         # db.session.add(active_session)
-#         db.session.commit()
-        
-#         return jsonify({
-#             "message": f"サークル (ID: {circle_id}) が正常に更新されました",
-#             "circle_id": circle_id
-#         }), 200 # 200 OK
-
-#     except IntegrityError as e:
-#         db.session.rollback()
-#         return jsonify({"error": "データベースエラー（整合性違反など）", "detail": str(e)}), 500
-#     except Exception as e:
-#         db.session.rollback()
-#         return jsonify({"error": "サーバーエラー", "detail": str(e)}), 500
 
 
 
