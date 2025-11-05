@@ -22,11 +22,14 @@ function CircleAdd() {
   const [circleData,setCircleData]=useState({
     circle_name:"",
     circle_description:"",
-    circle_fee:"",
+    //circle_fee:"",
+    circle_fee:0,
     number_of_male:"",
-    number_of_female:"",
-    circle_icon_path:"",
-    tags:[],
+    number_of_male:0,
+    // number_of_female:"",
+    number_of_female:0,
+    //circle_icon_path:"",
+    //tags:[],
   });
     const NameChange=(e)=>{
     setCircleData({
@@ -58,17 +61,10 @@ function CircleAdd() {
      circle_fee:e.target.value, 
     })
   }
-  // const handleClick=()=>{
-    // const {nam,des,member,fee}=circleData;
-    // if(!nam||!des||!member||!fee){
-      // alert("すべての情報を入力してください");
-    // }else{
-    // alert("サークルを追加しました");
-  // }
+
+ 
 
   
-  // }
- 
     
   const [tags,setCircleTags]=useState("");
 
@@ -110,7 +106,9 @@ function CircleAdd() {
   const [selectedActive,setSelectedActive]=useState(0);
  
 
-  const [preview,setPreview]=useState("");
+  // const [preview,setPreview]=useState("");
+  const [preview,setPreview]=useState(null);
+
   const [image,setImage]=useState(null);
   
   const hadleImageChange=(e)=>{
@@ -118,73 +116,85 @@ function CircleAdd() {
     if(file){
         setImage(file);
         setPreview(URL.createObjectURL(file));
-    }
+  // const reader = new FileReader();
+  // reader.onloadend = () => {
+    // const
+  // }
+      }
   }
   
-  const get_jsontags = () => {
-    const dataTosend = {
-      circle_name:circleData.circle_name,
-      circle_description:circleData.circle_description,
-      circle_fee:Number(circleData.circle_fee),
-      number_of_male:Number(circleData.number_of_male),
-      number_of_female:Number(circleData.number_of_female),
-      circle_icon_path:preview,
+  const get_jsontags = async() => {
+    // const dataTosend = {
+      // circle_name:circleData.circle_name,
+      // circle_description:circleData.circle_description,
+      // circle_fee:Number(circleData.circle_fee),
+      // number_of_male:Number(circleData.number_of_male),
+      // number_of_female:Number(circleData.number_of_female),
+      // circle_icon_path:preview,
       // tags:circleData.selectedValues,
-      tags:[
-        Number(selectedBunya),
-       Number(selectedFee),
-       Number(selectedRatio),
-       Number(selectedPlace),
-       Number(selectedMood),
-       Number(selectedActive),
-      ]
-    }
-    const json_stringdata = JSON.stringify(dataTosend);
-    console.log('タグのjsonデータ:', json_stringdata);
-    sendData(json_stringdata);
-    return json_stringdata;
+     const tagList = [
+    Number(selectedBunya),
+    Number(selectedFee),
+    Number(selectedRatio),
+    Number(selectedPlace),
+    Number(selectedMood),
+    Number(selectedActive),
+  ];
+    const formData = new FormData();
+  formData.append("circle_name", circleData.circle_name);
+  formData.append("circle_description", circleData.circle_description);
+  formData.append("circle_fee", circleData.circle_fee || "0");
+  formData.append("number_of_male", circleData.number_of_male || "0");
+  formData.append("number_of_female", circleData.number_of_female || "0");
+ formData.append("tags", JSON.stringify(tagList));
+  // tags:[
+        // Number(selectedBunya),
+      //  Number(selectedFee),
+      //  Number(selectedRatio),
+      //  Number(selectedPlace),
+      //  Number(selectedMood),
+      //  Number(selectedActive),
+      // ]
+     if(image){   
+ formData.append("circle_icon",circleData.circle_icon);
+ }  
+   console.log("送信データ (FormData):");
+  for (const [key, value] of formData.entries()) {
+    console.log(key, value);
+  }
 
-  };
-  const sendData = async (json_stringdata) => {
-
-    // // --- ▼ 1. localStorage からセッションIDを取得 ▼ ---
-    // // (前提：ログインページが 'session_id' というキーでIDを保存している)
-    // const sessionId = localStorage.getItem('session_id');
-
-    //  if (!sessionId) {
-    //     // alert() は使わないほうが良いかもしれませんが、既存コードに合わせています
-    //     alert("ログインしていません。セッションIDが見つかりません。");
-    //     console.error("セッションIDがlocalStorageに見つかりません");
-    //     return; // ログインしていないので送信を中止
-    // }
-    // // --- ▲ 取得完了 ▲ ---
+  await sendData(formData);
+    };
 
 
+    // const formData = new FormData();
+    // formData.append("json_data",JSON.stringify(dataTosend));
+
+ //   const json_stringdata = JSON.stringify(dataTosend);
+//  if(image){   
+//  formData.append("circle_icon",circleData.circle_icon);
+//  }  
+//  console.log('タグのjsonデータ:', json_stringdata);
+    // sendData(json_stringdata);
+    // return json_stringdata;
+// console.log("送信データ内容",dataTosend);
+// await sendData(formData);
+//   };
+  // const sendData = async (json_stringdata) => {
+  const sendData = async (formData) => {
+    // const sendData = async (formData) => {
     try {
       const response = await fetch("http://localhost:5001/api/circles",{
         method: "POST",
-        headers:{
-          'Content-Type': 'application/json',
-
-         },
-        body: json_stringdata,   
-      });
-
-/*
-    try {
-      const response = await fetch("http://localhost:5001/api/circles",{
-        method: "POST",
-        headers:{
-          'Content-Type': 'application/json',
-        },
-        body: json_stringdata,
+        body:formData,
+        // headers:{
+          // 'Content-Type': 'application/json',
+        // },
+        // body: json_stringdata,
+        credentials:"include",
       });
 
 
-      if(!response.ok){
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-*/
 
       if(!response.ok){
         // --- ▼ 3. 認証エラー(401)のハンドリングを追加 ▼ ---
@@ -210,7 +220,7 @@ function CircleAdd() {
 
     }catch (error) {
       console.error("通信エラー", error);
-    //alert("通信に失敗しました");
+    alert("通信に失敗しました");
     }
   };
 

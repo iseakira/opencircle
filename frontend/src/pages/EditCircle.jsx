@@ -22,6 +22,7 @@ function CircleEdit() {
     number_of_male: "",
     number_of_female: "",
   });
+
   const [selectedBunya, setSelectedBunya] = useState(null);
   const [selectedFee, setSelectedFee] = useState(null);
   const [selectedRatio, setSelectedRatio] = useState(null);
@@ -31,128 +32,135 @@ function CircleEdit() {
   
   const [preview, setPreview] = useState(null);
   const [image, setImage] = useState(null);
+  
+  // 読み込み状態とエラーメッセージを管理する State
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-useEffect(() => {
-  fetch(`http://localhost:5001/api/circles/${circleId}`, {
-    credentials: "include",
-  })
-    .then(res => {
-      if (!res.ok) {
+  // 既存データを読み込む
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    
+    fetch(`http://localhost:5001/api/circles/${circleId}`, {
+      credentials: "include",
+    })
+      .then(res => {
+        // 404 (見つからない) の場合は、エラーメッセージを投げる
         if (res.status === 404) {
-          console.warn("サークル情報が見つかりませんでした（新規作成扱い）");
-          return null;
+          throw new Error(`ID: ${circleId} のサークルは見つかりませんでした`);
         }
-        throw new Error("サークル情報の取得に失敗しました");
-      }
-      return res.json();
-    })
-    .then(data => {
-      if (!data) return;
-
+        // その他のサーバーエラー
+        if (!res.ok) {
+          throw new Error("サーバーエラーにより情報の取得に失敗しました");
+        }
+        return res.json();
+      })
+      .then(data => {
+        // 取得したデータを State にセット
         setCircleData({
-        circle_name: data.circle_name,
-        circle_description: data.circle_description,
-        circle_fee: data.circle_fee || "",
-        number_of_male: data.number_of_male || 0,
-        number_of_female: data.number_of_female || 0,
+          circle_name: data.circle_name,
+          circle_description: data.circle_description,
+          circle_fee: data.circle_fee || "",
+          number_of_male: data.number_of_male || 0,
+          number_of_female: data.number_of_female || 0,
+        });
+        setPreview(data.circle_icon_path); // アイコンパスをセット
+
+        // タグの State をセット (APIが6要素の配列を返す前提)
+        if (data.tags && data.tags.length === 6) {
+          setSelectedBunya(data.tags[0]);
+          setSelectedFee(data.tags[1]);
+          setSelectedRatio(data.tags[2]);
+          setSelectedPlace(data.tags[3]);
+          setSelectedMood(data.tags[4]);
+          setSelectedActive(data.tags[5]);
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        // ネットワークエラーや、上で投げたエラーをここでキャッチ
+        console.error("Fetch error:", err);
+        setError(err.message); // State にエラーメッセージを保存
+        setLoading(false); // ローディングも完了
+        // (alert や navigate は無限ループになるため削除)
       });
-      setPreview(data.circle_icon_path);
+  }, [circleId, navigate]); // 依存配列
 
-      if (data.tags && data.tags.length === 6) {
-        setSelectedBunya(data.tags[0]);
-        setSelectedFee(data.tags[1]);
-        setSelectedRatio(data.tags[2]);
-        setSelectedPlace(data.tags[3]);
-        setSelectedMood(data.tags[4]);
-        setSelectedActive(data.tags[5]);
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      alert("サークル情報の取得に失敗しました（通信エラー）");
-    });
-}, [circleId]);
-
-
+  // --- onChange ハンドラ (友達のコード) ---
   const NameChange = (e) => setCircleData({ ...circleData, circle_name: e.target.value });
   const DesChange = (e) => setCircleData({ ...circleData, circle_description: e.target.value });
   const MemChange = (e) => setCircleData({ ...circleData, number_of_male: e.target.value });
   const FememChange = (e) => setCircleData({ ...circleData, number_of_female: e.target.value });
   const FeeChange = (e) => setCircleData({ ...circleData, circle_fee: e.target.value });
-  const hadleImageChange = (e) => { /* (画像更新は省略) */ };
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  if (!circleData.circle_name || !circleData.circle_description) {
-    alert("サークル名とサークル説明は必須です");
-    return;
-  }
-
-  const tagList = [
-    selectedBunya,
-    selectedFee,
-    selectedRatio,
-    selectedPlace,
-    selectedMood,
-    selectedActive,
-  ].filter(tagId => tagId != null);
-
-  const dataToSend = {
-    circle_name: circleData.circle_name,
-    circle_description: circleData.circle_description,
-    circle_fee: circleData.circle_fee || null,
-    number_of_male: parseInt(circleData.number_of_male) || 0,
-    number_of_female: parseInt(circleData.number_of_female) || 0,
-    tags: tagList,
+  const hadleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
+    }
   };
 
-  try {
-    let response = await fetch(`http://localhost:5001/api/circles/${circleId}`, {
-      method: "PUT",
+  const handleSubmit = async (e) => {
+    e.preventDefault(); 
+
+     try {
+      if (response.status === 404) {   
+    let response = await fetch("http://localhost:5001/api/circles", {
+      method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify(dataToSend),
     });
 
-    if (response.status === 404) {
-      response = await fetch("http://localhost:5001/api/circles", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(dataToSend),
-      });
+    // if (response.status === 404) {
+      // response = await fetch("http://localhost:5001/api/circles", {
+        // method: "POST",
+        // headers: { "Content-Type": "application/json" },
+        // credentials: "include",
+        // body: JSON.stringify(dataToSend),
+      // });
+
+      //  if (response.status === 404) {
+      // throw new Error("対象のサークルが見つかりません。");
+    // }
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || "更新に失敗しました");
+      }
+
+      const responseData = await response.json();
+      alert(responseData.message);
+      navigate("/mypage");
     }
-
-    if (!response.ok) {
-      const errData = await response.json();
-      throw new Error(errData.error || "保存に失敗しました");
+    } catch (error) {
+      console.error("通信エラー", error);
+      alert(`通信に失敗しました: ${error.message}`);
     }
+  };
 
-    const responseData = await response.json();
-    alert(responseData.message || "サークル情報を更新しました！！");
-    navigate("/mypage");
 
-  } catch (error) {
-    console.error("通信エラー", error);
-    alert(`通信に失敗しました: ${error.message}`);
-  }
-};
+    // const responseData = await response.json();
+    // alert(responseData.message || "サークル情報を更新しました！！");
+    // navigate("/mypage");
 
+  // } catch (error) {
+    // console.error("通信エラー", error);
+    // alert(`通信に失敗しました: ${error.message}`);
+  // }
 
   return (
     <>
-      <form onSubmit={handleSubmit}> {/*onSubmit を設定*/}
+      <form onSubmit={handleSubmit}>
         <CircleName value={circleData.circle_name} onChange={NameChange}></CircleName>
         <CircleDescription value={circleData.circle_description} onChange={DesChange}></CircleDescription>
         <CircleMen value={circleData.number_of_male} onChange={MemChange}></CircleMen>
         <CircleFemen value={circleData.number_of_female} onChange={FememChange}></CircleFemen>
         <CircleFee value={circleData.circle_fee} onChange={FeeChange}></CircleFee>
         
-        {/* 画像 */}
         <Image onChange={hadleImageChange} preview={preview} image={image} />
         
-        {/* タグ (注意: このままでは古い値が表示されません) */}
+        {/* (注意: このTagコンポーネントは、読み込んだ既存の値を表示する機能(value)を持っていない可能性があります) */}
         <Tag
           onChangeBunya={setSelectedBunya}
           onChangeFee={setSelectedFee}
@@ -168,7 +176,6 @@ const handleSubmit = async (e) => {
           selectedActive={selectedActive}
         ></Tag>
 
-        {/* onClick を削除し、テキストを変更 */}
         <Button type="submit">サークルを更新する</Button>
       </form>
     </>
