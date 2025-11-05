@@ -183,17 +183,17 @@ def add_circle():
 def get_circle(circle_id):
 
     tags_array_for_ui = [
-        circle.bunya_tag_id, 
-        circle.fee_tag_id,   
-        circle.ratio_tag_id, 
-        circle.place_tag_id, 
-        circle.mood_tag_id,  
-        circle.active_tag_id 
+        Circle.bunya_tag_id, 
+        Circle.fee_tag_id,   
+        Circle.ratio_tag_id, 
+        Circle.place_tag_id, 
+        Circle.mood_tag_id,  
+        Circle.active_tag_id 
     ]
 
     circle_data = {
-        "circle_id": circle.circle_id,
-        "circle_name": circle.circle_name,
+        "circle_id": Circle.circle_id,
+        "circle_name": Circle.circle_name,
         # ...
         "tags": tags_array_for_ui # ← この 6要素の配列を返す
     }
