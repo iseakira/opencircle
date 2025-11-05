@@ -163,7 +163,6 @@ function CircleAdd() {
     console.log(key, value);
   }
 
-<<<<<<< HEAD
   await sendData(formData);
     };
 
@@ -193,20 +192,6 @@ function CircleAdd() {
         // },
         // body: json_stringdata,
         credentials:"include",
-=======
-  };
-  const sendData = async (json_stringdata) => {
-
-
-    try {
-      const response = await fetch("http://localhost:5001/api/circles",{
-        method: "POST",
-        headers:{
-          'Content-Type': 'application/json',
-
-         },
-        body: json_stringdata,   
->>>>>>> b6f19307f90866cfc7298659e398e4a2696eba74
       });
 
 
