@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, session,redirect
 from flask_cors import CORS # ◀ flask_corsをインポート
-from flask import request
+from flask import request, send_from_directory
 import json
 from  models import db, Circle, Tag, EditAuthorization, User, Session 
 import os
@@ -8,14 +8,18 @@ from sqlalchemy.exc import IntegrityError
 import database_operating as dbop
 import send_mail as sm
 from datetime import datetime, timedelta, timezone
-import base64
 import uuid
-import re
+from werkzeug.utils import secure_filename
 
-# ▼ 画像アップロード先フォルダの *Web URL* プレフィックス
-UPLOAD_BASE_URL = "/uploads/" 
-# ▼ 許可する画像拡張子
+# --- ▼ 1. 画像アップロード設定 ▼ ---
+# 許可する拡張子
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+# 画像を保存するサーバー上のフォルダパス
+# (app.py と同じ階層に 'uploads' フォルダが作成されます)
+UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
+# フロントエンドが画像にアクセスするためのURLプレフィックス
+UPLOAD_BASE_URL = "/api/uploads"
+# --- ▲ 画像アップロード設定 ▲ ---
 
 def create_app():
     app = Flask(__name__)
@@ -92,142 +96,128 @@ def create_account():
     dbop.create_account(json_dict["emailaddress"], json_dict["password"], json_dict["user_name"])
     return jsonify(checked_dict)
 
-# ▼▼▼ Base64デコード・保存用ヘルパー関数 ▼▼▼
-def save_base64_image(base64_string):
+# --- ▼ 2. 画像保存ヘルパー関数 ▼ ---
+
+def allowed_file(filename):
+    """許可された拡張子かチェック"""
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def save_image_file(file_storage):
     """
-    Base64エンコードされた画像文字列をデコードし、ファイルに保存する。
-    "data:image/png;base64,..." のようなヘッダーに対応。
-    保存したファイルのWebパス (例: /uploads/xxxxx.png) を返す。
+    request.files から取得した FileStorage オブジェクトを
+    安全なファイル名で保存し、アクセス用URLを返す。
     """
-    
-    # "data:image/png;base64,..." のヘッダー部分を正規表現で分離
-    match = re.match(r'data:image/(?P<ext>.*?);base64,(?P<data>.*)', base64_string)
-    
-    if match:
-        image_ext = match.group('ext').lower() # 'png' や 'jpeg' など
-        base64_data = match.group('data')
-        
-        # 許可された拡張子かチェック (ALLOWED_EXTENSIONS がグローバルにある前提)
-        if image_ext not in ALLOWED_EXTENSIONS:
-            print(f"許可されていない拡張子です: {image_ext}")
-            return None
-    else:
-        # ヘッダーがない場合、純粋なBase64データとみなし、拡張子をpngにフォールバック
-        # (ただし、セキュリティ的には非推奨)
-        print("Base64ヘッダーが見つかりません。pngとして扱います。")
-        image_ext = "png"
-        base64_data = base64_string
+    if not file_storage or not allowed_file(file_storage.filename):
+        return None, "許可されていないファイル形式です"
 
     try:
-        # Base64データをデコード
-        decoded_data = base64.b64decode(base64_data)
+        # ファイル名を安全なものに変更 (例: image.png -> <uuid>.png)
+        ext = file_storage.filename.rsplit('.', 1)[1].lower()
+        filename = f"{uuid.uuid4()}.{ext}"
         
-        # 重複しないファイル名を生成
-        filename = f"{uuid.uuid4()}.{image_ext}"
+        # 保存先のフルパス
+        save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         
-        # サーバー上の保存先フルパス
-        # (app は Flask アプリケーションインスタンス)
-        save_location = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        # ファイルを保存
+        file_storage.save(save_path)
+        
+        # フロントエンドがアクセスするためのURLパスを返す
+        file_url = f"{UPLOAD_BASE_URL}/{filename}"
+        return file_url, None
 
-        # デコードしたバイナリデータをファイルに書き込む
-        with open(save_location, "wb") as f:
-            f.write(decoded_data)
-            
-        # DBに保存するパスは、Webからアクセス可能なURLパス
-        saved_db_path = f"{UPLOAD_BASE_URL}{filename}" # (例: /uploads/uuid.png)
-        print(f"Base64画像ファイル {filename} を保存しました。")
-        return saved_db_path
-
-    except (base64.binascii.Error, IOError) as e:
-        print(f"Base64画像のデコードまたは保存に失敗: {e}")
-        return None
     except Exception as e:
-        print(f"予期せぬエラー (Base64保存): {e}")
-        return None
-# ▲▲▲ ヘルパー関数ここまで ▲▲▲
+        print(f"ファイル保存エラー: {e}")
+        return None, str(e)
 
+# --- ▼ 3. 画像配信用API ▼ ---
+# /api/uploads/xxxx.png のようなURLでアクセスされたら、
+# UPLOAD_FOLDER からファイルを配信する
+@app.route(f'{UPLOAD_BASE_URL}/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+# --- (他のAPI ... /api/hello, /hometest など) ---
 
 #'/api/circles'というURLにPOSTリクエストが来たら動く関数#
 @app.route('/api/circles', methods=['POST'])
 def add_circle():
 
-    # # --- ▼ 1. Cookie からセッションIDを取得 ▼ ---
-    # session_id_str = request.cookies.get("session_id")
+    # --- ▼ 1. Cookieによるログイン認証チェック ▼ ---
+    session_id_str = request.cookies.get("session_id")
 
-    # if not session_id_str:
-    #     # ヘッダーにセッションIDがない
-    #     return jsonify({"error": "認証されていません (Cookieが見つかりません)"}), 401
-
-    # try:
-    #     session_id = int(session_id_str)
-    # except ValueError:
-    #     # IDが数値ではない
-    #     return jsonify({"error": "不正なセッションID形式です"}), 401
-
-    # # データベースでセッションIDを検索
-    # active_session = db.session.get(Session, session_id)
-
-    # if not active_session:
-    #     # セッションが存在しない（ログアウト済みか不正なID）
-    #     return jsonify({"error": "セッションが無効です（ログインしていません）"}), 401
-
-    # # --- 2. セッションの有効期限チェック ---
-    # session_timeout_hours = 24
-    # utc_now = datetime.now(timezone.utc) # タイムゾーン対応の現在時刻
-
-    # session_last_access = active_session.session_last_access_time
-    # if not session_last_access.tzinfo:
-    #      session_last_access = session_last_access.replace(tzinfo=timezone.utc)
-         
-    # if session_last_access < utc_now - timedelta(hours=session_timeout_hours):
-    #     db.session.delete(active_session) # 期限切れセッションを削除
-    #     db.session.commit()
-    #     return jsonify({"error": "セッションが期限切れです。再度ログインしてください"}), 401
+    if not session_id_str:
+        return jsonify({"error": "認証されていません (Cookieが見つかりません)"}), 401
     
-    # # 認証成功。セッションに紐づくユーザーIDを取得
-    # user_id = active_session.user_id
+    try:
+        session_id = int(session_id_str)
+    except ValueError:
+        return jsonify({"error": "不正なセッション形式です"}), 401
+
+    active_session = db.session.get(Session, session_id)
+
+    if not active_session:
+        return jsonify({"error": "セッションが無効です（ログインしていません）"}), 401
+
+    session_timeout_hours = 24
+    if active_session.session_last_access_time < datetime.utcnow() - timedelta(hours=session_timeout_hours):
+        db.session.delete(active_session) 
+        db.session.commit()
+        return jsonify({"error": "セッションが期限切れです。再度ログインしてください"}), 401
     
-    # # (任意) 最終アクセス時刻を更新（セッション期限を延長する場合）
-    # active_session.session_last_access_time = utc_now
-    # # --- ▲ 認証チェック完了 ▲ ---
+    user_id = active_session.user_id
+    active_session.session_last_access_time = datetime.utcnow()
+    # --- ▲ 認証チェック完了 ▲ ---
 
-    # --- 3. JSONでデータを受け取る ---
-    data = request.get_json() or {}
 
-    # 必須チェック（circle_name と circle_description が必須）
-    if not data.get('circle_name') or not data.get('circle_description'):
+    # --- ▼ 2. FormData からデータを取得 ▼ ---
+    # (request.get_json() は使わない)
+    
+    # テキストデータを request.form から取得
+    data_name = request.form.get("circle_name")
+    data_description = request.form.get("circle_description")
+    data_fee = request.form.get("circle_fee")
+    data_male = request.form.get("number_of_male", 0)
+    data_female = request.form.get("number_of_female", 0)
+    
+    # タグリスト (JSON文字列として送られてくると想定)
+    tags_json_str = request.form.get("tags", "[]")
+    
+    # 画像ファイルを request.files から取得
+    file = request.files.get("circle_icon_file")
+    # --- ▲ データ取得完了 ▲ ---
+    
+    
+    # 必須チェック
+    if not data_name or not data_description:
         return jsonify({"error": "circle_name と circle_description は必須です"}), 400
 
-    # --- ▼ 4. Base64画像の処理 ▼ ---
-    # (注) フロントエンドは "circle_icon_path" ではなく
-    # "circle_icon_base64" のようなキーでBase64文字列を送る想定
+    # --- 3. 画像ファイルの保存 ---
+    icon_path = None # デフォルトはパスなし
+    if file:
+        saved_path, error = save_image_file(file)
+        if error:
+            return jsonify({"error": f"画像保存エラー: {error}"}), 400
+        icon_path = saved_path # DBに保存するパス (例: /api/uploads/uuid.png)
     
-    base64_image_string = data.get("circle_icon_base64") # Base64文字列を取得
-    saved_db_path = None # DBに保存するパス
-
-    if base64_image_string:
-        # ヘルパー関数を呼び出して画像を保存し、DB用のパスを取得
-        saved_db_path = save_base64_image(base64_image_string)
-    # --- ▲ Base64画像の処理完了 ▲ ---
-
-
-    # サーバーが自動で発番するので circle_id は無視
+    # サークルデータを作成
     circle_data = {
-        "circle_name": data.get("circle_name"),
-        "circle_description": data.get("circle_description"),
-        "circle_fee": data.get("circle_fee"),
-        "number_of_male": data.get("number_of_male", 0),
-        "number_of_female": data.get("number_of_female", 0),
-        # ▼ Base64から変換・保存したサーバー上のパスをDBに登録
-        "circle_icon_path": saved_db_path 
+        "circle_name": data_name,
+        "circle_description": data_description,
+        "circle_fee": int(data_fee) if data_fee else None,
+        "number_of_male": int(data_male),
+        "number_of_female": int(data_female),
+        "circle_icon_path": icon_path # DBに保存するパス
     }
-    # None の値は渡さない（DBのデフォルトを使いたい場合）
-    circle_data = {k: v for k, v in circle_data.items() if v is not None}
 
     new_circle = Circle(**circle_data)
 
-    # タグ紐付け（任意）
-    selected_tag_ids = data.get("tags", [])
+    # タグ紐付け
+    try:
+        selected_tag_ids = json.loads(tags_json_str) # JSON文字列をリストに変換
+    except json.JSONDecodeError:
+        return jsonify({"error": "タグの形式が不正です"}), 400
+        
     if selected_tag_ids:
         tags = Tag.query.filter(Tag.tag_id.in_(selected_tag_ids)).all()
         for tag in tags:
@@ -235,23 +225,18 @@ def add_circle():
 
     try:
         db.session.add(new_circle)
-        # 
-        # ▼ 2. サークルを先にコミットし、new_circle.circle_id を確定させる
-        # 
-        db.session.commit() 
+        db.session.commit() # circle_id を確定
 
-        # # --- ▼ 3. 作成者をサークルの管理者として権限テーブルに登録 ▼ ---
-        # # (認証を有効にしたため、こちらも有効化)
-        # new_authorization = EditAuthorization(
-        #     user_id=user_id,                # ◀ 認証して取得した user_id を使用
-        #     circle_id=new_circle.circle_id, # 今作成したサークルのID
-        #     role="admin"                    # "admin" や "owner" などの役割を付与
-        # )
-        # db.session.add(new_authorization)
+        # --- 3. 作成者を管理者として登録 ---
+        new_authorization = EditAuthorization(
+            user_id=user_id,
+            circle_id=new_circle.circle_id,
+            role="admin"
+        )
+        db.session.add(new_authorization)
         
-        # # 最終アクセス時刻の更新(active_session)も、ここでまとめてコミット
-        # db.session.add(active_session) 
-        # db.session.commit() # 権限とセッション更新をコミット
+        db.session.add(active_session) # セッション時刻更新
+        db.session.commit() # 権限とセッション更新をコミット
 
     except IntegrityError as e:
         db.session.rollback()
@@ -262,7 +247,8 @@ def add_circle():
 
     return jsonify({
         "message": "サークルを追加しました",
-        "circle_id": new_circle.circle_id
+        "circle_id": new_circle.circle_id,
+        "circle_icon_path": icon_path # 保存した画像のパスを返す
     }), 201
 
 
