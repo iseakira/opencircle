@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import {useNavigate} from "react-router-dom";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import headImage from '../images/head_image.png';
 
 function Make_Account() {
@@ -9,9 +9,9 @@ function Make_Account() {
     let initialTmpId = '';
     try {
         const storedString = localStorage.getItem('to_Make_Account');
-        localStorage.removeItem('to_Make_Account');
-        const email_tmp_id = storedString ? JSON.parse(storedString) : null;
         
+        const email_tmp_id = storedString ? JSON.parse(storedString) : null;
+        console.log("取得したメールアドレスとtmp_id:", email_tmp_id);
         if (email_tmp_id) {
             initialEmail = email_tmp_id.emailaddress || '';
             initialTmpId = email_tmp_id.tmp_id || '';
@@ -36,10 +36,16 @@ function Make_Account() {
         user_name: '',
         tmp_id: initialTmpId
     });
+    useEffect(() => {
+        localStorage.removeItem('to_Make_Account');
+        console.log('localStorageを削除しました');
+        }, []);
+
     const [result, setResult] = useState(null);
     const [passwordConfirm, setPasswordConfirm] = useState('');
     const handleCreateAccount = async (e) => {
         e.preventDefault();
+
         const emailaddress = formData.emailaddress;
         const password = formData.password;
         const user_name = formData.user_name;
