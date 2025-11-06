@@ -57,7 +57,7 @@ import sys
 import os
 from sqlalchemy.exc import IntegrityError
 from backend.app import create_app
-from backend.models import db, Tagk
+from backend.models import db, Tag
 """
 
 def search_circles(json_dict):
@@ -73,9 +73,13 @@ def search_circles(json_dict):
     tmp_dict["search_term"] = json_dict["search_term"]
     
     sql = '''
-    SELECT c.circle_name, c.circle_iconpath
-    FROM Circle AS c
-    WHERE c.circle_name LIKE ?
+    SELECT t.circle_name, t.circle_icon_path
+    FROM (
+        SELECT c.circle_name, c.circle_icon_path
+        FROM circles AS c
+        WHERE c.circle_name LIKE ?
+    ) AS t
+    JOIN 
     '''
 
     cursor.execute(sql, ('%' + tmp_dict["search_term"] + '%',))
@@ -200,7 +204,7 @@ def create_account(emailaddress, password, user_name):
 def check_login(emailaddress, password):
     conn = sqlite3.connect("project.db")
     cursor = conn.cursor()
-    res = cursor.execute("SELECT password FROM user WHERE mail_adress = ?", (emailaddress,))
+    res = cursor.execute("SELECT password FROM users WHERE mail_adress = ?", (emailaddress,))
     user_tuple = res.fetchone()
     cursor.close()
     conn.close()
@@ -210,10 +214,10 @@ def check_login(emailaddress, password):
         return {"message": "success"}
     
 def make_session(emailaddress):
-    conn = sqlite3.connect("project_db")
+    conn = sqlite3.connect("project.db")
     cursor = conn.cursor()
-    res = cursor.execute("SELECT user_id FROM users WHERE maila_adress = ?",(emailaddress,))
-    user_id = int(res[0])
+    res = cursor.execute("SELECT user_id FROM users WHERE mail_adress = ?",(emailaddress,))
+    user_id = int(res.fetchone()[0])
     session_id = int(''.join(secrets.choice(string.digits) for _ in range(16)))
     complete = False
     for i in range(5):
@@ -228,7 +232,7 @@ def make_session(emailaddress):
             break
     cursor.close()
     conn.close()
-    return (complete, {"session_id": session_id})
+    return (complete, session_id)
 
 def delete_circle_by_id(circle_id):
     """

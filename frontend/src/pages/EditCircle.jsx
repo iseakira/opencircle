@@ -7,7 +7,6 @@ import CircleFee from '../conponents/CircleFee';
 import CircleName from '../conponents/CircleName';
 import Tag from '../conponents/Tag';
 import Image from '../conponents/image';
-import { OPTIONS } from '../conponents/option';
 import CircleMen from '../conponents/CircleMen';
 import CircleFemen from '../conponents/CircleFemen';
 
@@ -31,9 +30,8 @@ function CircleEdit() {
   const [selectedActive, setSelectedActive] = useState(null);
   
   const [preview, setPreview] = useState(null);
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState(null); // (File オブジェクトがここに入る)
   
-  // 読み込み状態とエラーメッセージを管理する State
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -46,18 +44,18 @@ function CircleEdit() {
       credentials: "include",
     })
       .then(res => {
-        // 404 (見つからない) の場合は、エラーメッセージを投げる
+        if (res.status === 401 || res.status === 403) {
+            throw new Error("このサークルを編集する権限がありません。");
+        }
         if (res.status === 404) {
           throw new Error(`ID: ${circleId} のサークルは見つかりませんでした`);
         }
-        // その他のサーバーエラー
         if (!res.ok) {
           throw new Error("サーバーエラーにより情報の取得に失敗しました");
         }
         return res.json();
       })
       .then(data => {
-        // 取得したデータを State にセット
         setCircleData({
           circle_name: data.circle_name,
           circle_description: data.circle_description,
@@ -65,9 +63,9 @@ function CircleEdit() {
           number_of_male: data.number_of_male || 0,
           number_of_female: data.number_of_female || 0,
         });
-        setPreview(data.circle_icon_path); // アイコンパスをセット
+        
+        setPreview(data.circle_icon_path); 
 
-        // タグの State をセット (APIが6要素の配列を返す前提)
         if (data.tags && data.tags.length === 6) {
           setSelectedBunya(data.tags[0]);
           setSelectedFee(data.tags[1]);
@@ -79,15 +77,13 @@ function CircleEdit() {
         setLoading(false);
       })
       .catch(err => {
-        // ネットワークエラーや、上で投げたエラーをここでキャッチ
         console.error("Fetch error:", err);
-        setError(err.message); // State にエラーメッセージを保存
-        setLoading(false); // ローディングも完了
-        // (alert や navigate は無限ループになるため削除)
+        setError(err.message); 
+        setLoading(false); 
       });
-  }, [circleId, navigate]); // 依存配列
+  }, [circleId]);
 
-  // --- onChange ハンドラ  ---
+  // --- onChange ハンドラ ---
   const NameChange = (e) => setCircleData({ ...circleData, circle_name: e.target.value });
   const DesChange = (e) => setCircleData({ ...circleData, circle_description: e.target.value });
   const MemChange = (e) => setCircleData({ ...circleData, number_of_male: e.target.value });
@@ -96,14 +92,15 @@ function CircleEdit() {
   const hadleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(file);
-      setPreview(URL.createObjectURL(file));
+      setImage(file); // (File オブジェクトを state に保存)
+      setPreview(URL.createObjectURL(file)); // (プレビューを更新)
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault(); 
 
+    // 1. 必須項目チェック (if が抜けていたのを修正)
     if (!circleData.circle_name || !circleData.circle_description) {
       alert("サークル名とサークル説明は必須です");
       return;
@@ -112,6 +109,17 @@ function CircleEdit() {
     const result = window.confirm("サークルを更新しますか？");
     if (!result) return;
 
+    // 2. FormData オブジェクトを作成
+    const formData = new FormData();
+
+    // 3. テキストデータを FormData に追加
+    formData.append("circle_name", circleData.circle_name);
+    formData.append("circle_description", circleData.circle_description);
+    formData.append("circle_fee", circleData.circle_fee || "0"); 
+    formData.append("number_of_male", circleData.number_of_male || "0");
+    formData.append("number_of_female", circleData.number_of_female || "0");
+
+    // 4. タグリストを「JSON文字列」として FormData に追加
     const tagList = [
       selectedBunya,
       selectedFee,
@@ -119,23 +127,20 @@ function CircleEdit() {
       selectedPlace,
       selectedMood,
       selectedActive,
-    ].filter(tagId => tagId != null); 
+    ];
+    formData.append("tags", JSON.stringify(tagList)); 
 
-    const dataToSend = {
-      circle_name: circleData.circle_name,
-      circle_description: circleData.circle_description,
-      circle_fee: circleData.circle_fee || null,
-      number_of_male: parseInt(circleData.number_of_male) || 0,
-      number_of_female: parseInt(circleData.number_of_female) || 0,
-      tags: tagList,
-    };
+    // 5. 画像ファイルを追加 (image state に File があれば)
+    if (image) { 
+      formData.append("circle_icon_file", image);
+    }
 
+    // 6. サーバーへ送信 (try...catch が抜けていたのを修正)
     try {
       const response = await fetch(`http://localhost:5001/api/circles/${circleId}`, {
         method: "PUT",
-        headers: { 'Content-Type': 'application/json' },
         credentials: "include",
-        body: JSON.stringify(dataToSend),
+        body: formData,
       });
 
       if (!response.ok) {
@@ -144,7 +149,7 @@ function CircleEdit() {
       }
 
       const responseData = await response.json();
-      alert(responseData.message);
+      alert(responseData.message || "サークル情報を更新しました！");
       navigate("/mypage");
 
     } catch (error) {
@@ -175,7 +180,7 @@ function CircleEdit() {
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}> 
         <CircleName value={circleData.circle_name} onChange={NameChange}></CircleName>
         <CircleDescription value={circleData.circle_description} onChange={DesChange}></CircleDescription>
         <CircleMen value={circleData.number_of_male} onChange={MemChange}></CircleMen>
@@ -184,7 +189,6 @@ function CircleEdit() {
         
         <Image onChange={hadleImageChange} preview={preview} image={image} />
         
-        {/* (注意: このTagコンポーネントは、読み込んだ既存の値を表示する機能(value)を持っていない可能性があります) */}
         <Tag
           onChangeBunya={setSelectedBunya}
           onChangeFee={setSelectedFee}
@@ -192,7 +196,14 @@ function CircleEdit() {
           onChangePlace={setSelectedPlace}
           onChangeMood={setSelectedMood}
           onChangeActive={setSelectedActive}
-          // valueBunya={selectedBunya} (←もしコンポーネントが対応しているなら、このように渡す)
+          
+          // (Tag コンポーネント側が value プロパティに対応している必要があります)
+          selectedBunya={selectedBunya}
+          selectedFee={selectedFee}
+          selectedRatio={selectedRatio}
+          selectedPlace={selectedPlace}
+          selectedMood={selectedMood}
+          selectedActive={selectedActive}
         ></Tag>
 
         <Button type="submit">サークルを更新する</Button>
