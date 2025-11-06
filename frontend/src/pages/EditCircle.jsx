@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 
 import Button from '../conponents/Button';
 import CircleDescription from '../conponents/CircleDescription';
@@ -10,6 +10,7 @@ import Image from '../conponents/image';
 import { OPTIONS } from '../conponents/option';
 import CircleMen from '../conponents/CircleMen';
 import CircleFemen from '../conponents/CircleFemen';
+import headImage from '../images/head_image.png';
 
 function CircleEdit() {
   const { circleId } = useParams();
@@ -151,6 +152,13 @@ function CircleEdit() {
 
   return (
     <>
+        <header className="page-header">
+            <h1>
+          <Link to="/">
+            <img className="logo" src={headImage} alt="アイコン" />
+          </Link>
+        </h1>
+      </header>
       <form onSubmit={handleSubmit}>
         <CircleName value={circleData.circle_name} onChange={NameChange}></CircleName>
         <CircleDescription value={circleData.circle_description} onChange={DesChange}></CircleDescription>
