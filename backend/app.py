@@ -37,7 +37,7 @@ def create_app():
     # CORSを有効にする（これでフロントからの通信が許可される）
     # origins=["http://localhost:3000"] のように限定することも可能
     CORS(app, 
-     resources={r"/api/*": {"origins": "http://localhost:3000"}},  #変更クッキー関係
+     resources={r"/*": {"origins": "http://localhost:3000"}},  #変更クッキー関係
      supports_credentials=True
 
 )
