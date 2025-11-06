@@ -91,7 +91,7 @@ function CircleAdd() {
       ...circleData,
       tags:selectedValues,
      })
-    alert(`${selectedValues}サークルを追加しました`);
+    alert(`サークルを追加しました`);
   }else{
    // alert("キャンセルしました");
   }
@@ -217,7 +217,7 @@ function CircleAdd() {
       // if (receivedData_fb) {
        // receivedData_fb(result);
       //}
-      alert("データを送信しました")
+     // alert("データを送信しました")
 
     }catch (error) {
       console.error("通信エラー", error);
