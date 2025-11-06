@@ -71,8 +71,8 @@ function CircleAdd() {
   const handleKey=(e)=>{
        e.preventDefault(); 
    const {circle_name,circle_description,circle_fee,number_of_male,number_of_female,circle_icon_path,tags}=circleData;
-    if(!circle_name){
-      alert("サークル名を入力してください");
+    if(!circle_name||!circle_description){
+      alert("*は必須項目です");
     }else{
     // alert(`サークルを追加しました`);
      const result = window.confirm("サークルを追加しますか？");
@@ -91,7 +91,7 @@ function CircleAdd() {
       ...circleData,
       tags:selectedValues,
      })
-    alert(`${selectedValues}サークルを追加しました`);
+    alert(`サークルを追加しました`);
   }else{
    // alert("キャンセルしました");
   }
@@ -217,7 +217,7 @@ function CircleAdd() {
       // if (receivedData_fb) {
        // receivedData_fb(result);
       //}
-      alert("データを送信しました")
+     // alert("データを送信しました")
 
     }catch (error) {
       console.error("通信エラー", error);
@@ -243,6 +243,7 @@ function CircleAdd() {
       </header>
       <h1>東京理科大学サークル情報サイト</h1>
       <h3>追加したいサークルの情報を入力してください</h3>
+      <p>※「*」の項目は必須</p>
       {/* <AddCircle></AddCircle> */}
       <form onSubmit={handleKey}> 
         <CircleName value={circleData.circle_name} onChange={NameChange} ></CircleName>

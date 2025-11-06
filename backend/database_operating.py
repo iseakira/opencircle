@@ -57,7 +57,7 @@ import sys
 import os
 from sqlalchemy.exc import IntegrityError
 from backend.app import create_app
-from backend.models import db, Tagk
+from backend.models import db, Tag
 """
 
 def search_circles(json_dict):
@@ -73,9 +73,13 @@ def search_circles(json_dict):
     tmp_dict["search_term"] = json_dict["search_term"]
     
     sql = '''
-    SELECT c.circle_name, c.circle_iconpath
-    FROM Circle AS c
-    WHERE c.circle_name LIKE ?
+    SELECT t.circle_name, t.circle_icon_path
+    FROM (
+        SELECT c.circle_name, c.circle_icon_path
+        FROM circles AS c
+        WHERE c.circle_name LIKE ?
+    ) AS t
+    JOIN 
     '''
 
     cursor.execute(sql, ('%' + tmp_dict["search_term"] + '%',))
