@@ -55,7 +55,7 @@ def say_hello():
     return jsonify({"message": "バックエンドからの返事です！🎉"})
 
 #'/hometest'というURLにPOSTリクエストが来たら動く関数
-@app.route('/hometest', methods=['POST'])
+@app.route('/home', methods=['POST'])
 def search():
     #json_dataのキーは["search_term","field","circle_fee","gender_ration","place","mood","frequency"]
     json_dict = request.get_json()
@@ -64,16 +64,16 @@ def search():
     #json_text = f.read()
     #f.close()
     json_text = dbop.search_circles(json_dict)
-    return jsonify(json_text)
+    # return jsonify(json_text)
 
-    # return jsonify([{"circle_icon_path": "/test_image/head_image.png",
-    #                 "circle_name": "サークルAの名前",
-    #                 "tag_name":"サークルAの分野のタグ"},
-    #                 {"circle_icon_path": "サークルBのアイコン",
-    #                 "circle_name": "サークルBの名前",
-    #                 "tag_name":"サークルBの分野のタグ"}])
+    return jsonify([{"circle_icon_path": "/test_image/head_image.png",
+                    "circle_name": "サークルAの名前",
+                    "tag_name":"サークルAの分野のタグ"},
+                    {"circle_icon_path": "サークルBのアイコン",
+                    "circle_name": "サークルBの名前",
+                    "tag_name":"サークルBの分野のタグ"}])
 
-@app.route('/home', methods=['POST'])
+@app.route('/homestart', methods=['POST'])
 def initial_circles():
     # DB から初期表示用のサークル一覧を取得して返す
     try:
@@ -84,14 +84,15 @@ def initial_circles():
         print('get_initial_circles error:', e)
         return jsonify({"error": "サーバーエラー"}), 500
 
-@app.route('/home', methods=['GET'])
-def search_results():
-    return jsonify([{"circle_name": "サークルA",
-                    "circle_description": "これはサークルAの説明です。"},
-                    {"circle_name": "サークルB",
-                     "circle_description": "これはサークルBの説明です。"},
-                    {"circle_name": "サークルC",
-                     "circle_description": "これはサークルCの説明です。"}])
+# 未使用関数
+# @app.route('/home', methods=['POST'])
+# def search_results():
+#     return jsonify([{"circle_name": "サークルA",
+#                     "circle_description": "これはサークルAの説明です。"},
+#                     {"circle_name": "サークルB",
+#                      "circle_description": "これはサークルBの説明です。"},
+#                     {"circle_name": "サークルC",
+#                      "circle_description": "これはサークルCの説明です。"}])
 
 @app.route('/Circle_Page', methods=['POST'])
 def circle_page():
