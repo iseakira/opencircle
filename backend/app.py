@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, redirect
+from flask import Flask, jsonify, make_response
 from flask_cors import CORS # ◀ flask_corsをインポート
 from flask import request, send_from_directory
 import json
@@ -127,18 +127,22 @@ def create_account():
 def login():
     #json_dict のキーは {"emailaddress", "password"}
     json_dict = request.get_json()
+    print(json_dict)
+    print("nuhahahaha")
 
     checked_dict = dbop.check_login(json_dict["emailaddress"], json_dict["password"])
     if checked_dict["message"] == "failure":
         return jsonify(checked_dict)
     
     result_tuple = dbop.make_session(json_dict["emailaddress"])
-    if result_tuple[0]:
+    if not result_tuple[0]:
         checked_dict["message"] = "failure"
         return jsonify(checked_dict)
     else:
-        response = Flask.make_response(jsonify(checked_dict))
-        response.set_cookie("session_id", result_tuple[1])
+        response = make_response(jsonify(checked_dict))
+        session_id = str(result_tuple[1])
+        print(session_id)
+        response.set_cookie("session_id", session_id)
         return response
 
 # --- ここまでログイン ---

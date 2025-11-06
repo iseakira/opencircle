@@ -200,7 +200,7 @@ def create_account(emailaddress, password, user_name):
 def check_login(emailaddress, password):
     conn = sqlite3.connect("project.db")
     cursor = conn.cursor()
-    res = cursor.execute("SELECT password FROM user WHERE mail_adress = ?", (emailaddress,))
+    res = cursor.execute("SELECT password FROM users WHERE mail_adress = ?", (emailaddress,))
     user_tuple = res.fetchone()
     cursor.close()
     conn.close()
@@ -210,10 +210,10 @@ def check_login(emailaddress, password):
         return {"message": "success"}
     
 def make_session(emailaddress):
-    conn = sqlite3.connect("project_db")
+    conn = sqlite3.connect("project.db")
     cursor = conn.cursor()
-    res = cursor.execute("SELECT user_id FROM users WHERE maila_adress = ?",(emailaddress,))
-    user_id = int(res[0])
+    res = cursor.execute("SELECT user_id FROM users WHERE mail_adress = ?",(emailaddress,))
+    user_id = int(res.fetchone()[0])
     session_id = int(''.join(secrets.choice(string.digits) for _ in range(16)))
     complete = False
     for i in range(5):
@@ -228,7 +228,7 @@ def make_session(emailaddress):
             break
     cursor.close()
     conn.close()
-    return (complete, {"session_id": session_id})
+    return (complete, session_id)
 
 def delete_circle_by_id(circle_id):
     """

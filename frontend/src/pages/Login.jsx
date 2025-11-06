@@ -32,7 +32,7 @@ function Login() {
     try{
       const response = await fetch("http://localhost:5001/login",{
         method: "POST",
-        header:{
+        headers:{
           'Content-Type': 'application/json',
         },
         body: json_email_pass,
@@ -43,7 +43,7 @@ function Login() {
       const result = await response.json();
       console.log("サーバーからの応答：",result);
       if(result.message === "success"){
-        console("ログイン成功");
+        console.log("ログイン成功");
         navigate('/mypage')
       }else{
         alert("もう一度入力してください");
