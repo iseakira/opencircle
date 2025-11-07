@@ -76,17 +76,13 @@ def say_hello():
     # JSON形式でメッセージを返す
     return jsonify({"message": "バックエンドからの返事です！🎉"})
 
-#'/hometest'というURLにPOSTリクエストが来たら動く関数
+
 @app.route('/home', methods=['POST'])
 def search():
     #json_dataのキーは["search_term","field","circle_fee","gender_ration","place","mood","frequency"]
     json_dict = request.get_json()
     print(json.dumps(json_dict))
-    #f = open("testdata.txt")
-    #json_text = f.read()
-    #f.close()
     json_text = dbop.search_circles(json_dict)
-    # return jsonify(json_text)
 
     return jsonify([{"circle_icon_path": "/test_image/head_image.png",
                     "circle_name": "サークルAの名前",
@@ -106,21 +102,14 @@ def initial_circles():
         print('get_initial_circles error:', e)
         return jsonify({"error": "サーバーエラー"}), 500
 
-# 未使用関数
-# @app.route('/home', methods=['POST'])
-# def search_results():
-#     return jsonify([{"circle_name": "サークルA",
-#                     "circle_description": "これはサークルAの説明です。"},
-#                     {"circle_name": "サークルB",
-#                      "circle_description": "これはサークルBの説明です。"},
-#                     {"circle_name": "サークルC",
-#                      "circle_description": "これはサークルCの説明です。"}])
-
 @app.route('/Circle_Page', methods=['POST'])
 def circle_page():
     json_dict = request.get_json()
     circle_id = json_dict["circle_id"]
-    return jsonify({"message": f"サークルID {circle_id} の詳細情報の取得成功"})
+    circle_detail = dbop.get_circle_detail(circle_id)
+    if circle_detail is None:
+        return jsonify({"message": f"サークルID {circle_id} の詳細情報の取得失敗"}), 404
+    return jsonify(circle_detail)
 
 #--- ここからアカウント作成 ---
 @app.route('/add_account', methods=['POST'])
