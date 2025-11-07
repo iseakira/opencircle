@@ -36,6 +36,7 @@ function Login() {
           'Content-Type': 'application/json',
         },
         body: json_email_pass,
+        credentials: "include"
       });
       if(!response.ok){
         throw new Error(`HTTP error! status: ${response.status}`);

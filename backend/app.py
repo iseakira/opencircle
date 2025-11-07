@@ -219,7 +219,7 @@ def add_circle():
 
     # --- ▼ 1. Cookieによるログイン認証チェック ▼ ---
     session_id_str = request.cookies.get("session_id")
-
+    print(session_id_str)
     if not session_id_str:
         return jsonify({"error": "認証されていません (Cookieが見つかりません)"}), 401
     
