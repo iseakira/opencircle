@@ -54,7 +54,7 @@ function Mypage() {
         <p>（サークル追加用の画面へ）</p>
         <h2>編集できるサークル一覧</h2>
         
-        // ここ岸追加消していいよ
+       
         
         <button
           onClick={() => navigate('/edit-circle/1')}
