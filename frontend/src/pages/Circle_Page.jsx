@@ -41,7 +41,7 @@ function Circle_Page(){
                     <p>サークル情報を読み込み中です...</p>
                 ) : response_data && typeof response_data === "object" ? (
                 <div>
-                    <img src={response_data.circle_icon_path} alt="サークルアイコン" className="circle_icon" />
+                    <img src={response_data.circle_icon_path} alt="サークルアイコン" className="circle_icon_page" />
                     <p>サークル名：{response_data.circle_name}</p>
                     <p>サークル説明：{response_data.circle_description}</p>
                     <p>費用：{response_data.circle_fee}円</p>

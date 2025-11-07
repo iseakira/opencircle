@@ -58,8 +58,16 @@
 }
 
 .circle_icon {
-  height: 5em;
+  height: 2em;
   width: auto;
+  border-radius: 50%;
+}
+
+.circle_icon_page {
+  height: 6em;
+  width: auto;
+  border-radius: 50%;
+  margin-bottom: 1rem;
 }
 
 .circle-info:hover {
