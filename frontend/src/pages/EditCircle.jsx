@@ -6,7 +6,7 @@ import CircleDescription from '../conponents/CircleDescription';
 import CircleFee from '../conponents/CircleFee';
 import CircleName from '../conponents/CircleName';
 import Tag from '../conponents/Tag';
-import Image from '../conponents/image';
+import Image from '../conponents/Image';
 import CircleMen from '../conponents/CircleMen';
 import CircleFemen from '../conponents/CircleFemen';
 

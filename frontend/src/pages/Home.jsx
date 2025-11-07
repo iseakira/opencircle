@@ -87,6 +87,11 @@ function Home() {
             ログイン
           </Link>
         </h3>
+         <h3>
+          <Link to="Mypage" className="mypage">
+            マイページ
+          </Link>
+        </h3>
       </header>
 
       <main>

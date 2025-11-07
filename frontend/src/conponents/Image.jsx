@@ -14,10 +14,16 @@ export default function Image({onChange ,preview,image}) {
  onChange={onChange}
  />     
  {preview&&(
-    <div>
-        <p>プレビュー:</p>
-        <img src={preview} alt="" />
-    </div>
+     <div> 
+       <p>プレビュ-:</p>
+         <img src={preview} 
+         alt="" 
+         style={{
+          maxWidth:"300px",
+          maxHeight:"300px",
+         }}
+         />
+     </div>
  )}
     </div>
   )

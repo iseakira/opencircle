@@ -10,7 +10,7 @@ import React,{ useState } from 'react'
 // import Toggle from './Toggle'
 import Tag from '../conponents/Tag'
 // import { OPTIONS } from './conponents/option'
-import Image from '../conponents/image'
+import Image from '../conponents/Image'
 import { OPTIONS } from '../conponents/option'
 import CircleMen from '../conponents/CircleMen'
 import CircleFemen from '../conponents/CircleFemen'
@@ -251,7 +251,7 @@ function CircleAdd() {
         <CircleMen value={circleData.number_of_male} onChange={MemChange}></CircleMen>
         <CircleFemen value={circleData.number_of_female} onChange={FememChange}></CircleFemen>
         <CircleFee value={circleData.circle_fee} onChange={FeeChange}></CircleFee>
-        <Image onChange={hadleImageChange} preview={preview} image={image}/>
+        <Image onChange={hadleImageChange} preview={preview} image={image}/> 
         <Tag 
           selectedBunya={selectedBunya} 
           onChangeBunya={setSelectedBunya} 
