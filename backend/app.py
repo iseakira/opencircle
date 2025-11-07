@@ -217,31 +217,31 @@ def uploaded_file(filename):
 @app.route('/api/circles', methods=['POST'])
 def add_circle():
 
-    # # --- ▼ 1. Cookieによるログイン認証チェック ▼ ---
-    # session_id_str = request.cookies.get("session_id")
+    # --- ▼ 1. Cookieによるログイン認証チェック ▼ ---
+    session_id_str = request.cookies.get("session_id")
 
-    # if not session_id_str:
-    #     return jsonify({"error": "認証されていません (Cookieが見つかりません)"}), 401
+    if not session_id_str:
+        return jsonify({"error": "認証されていません (Cookieが見つかりません)"}), 401
     
-    # try:
-    #     session_id = int(session_id_str)
-    # except ValueError:
-    #     return jsonify({"error": "不正なセッション形式です"}), 401
+    try:
+        session_id = int(session_id_str)
+    except ValueError:
+        return jsonify({"error": "不正なセッション形式です"}), 401
 
-    # active_session = db.session.get(Session, session_id)
+    active_session = db.session.get(Session, session_id)
 
-    # if not active_session:
-    #     return jsonify({"error": "セッションが無効です（ログインしていません）"}), 401
+    if not active_session:
+        return jsonify({"error": "セッションが無効です（ログインしていません）"}), 401
 
-    # session_timeout_hours = 24
-    # if active_session.session_last_access_time < datetime.utcnow() - timedelta(hours=session_timeout_hours):
-    #     db.session.delete(active_session) 
-    #     db.session.commit()
-    #     return jsonify({"error": "セッションが期限切れです。再度ログインしてください"}), 401
+    session_timeout_hours = 24
+    if active_session.session_last_access_time < datetime.utcnow() - timedelta(hours=session_timeout_hours):
+        db.session.delete(active_session) 
+        db.session.commit()
+        return jsonify({"error": "セッションが期限切れです。再度ログインしてください"}), 401
     
-    # user_id = active_session.user_id
-    # active_session.session_last_access_time = datetime.utcnow()
-    # # --- ▲ 認証チェック完了 ▲ ---
+    user_id = active_session.user_id
+    active_session.session_last_access_time = datetime.utcnow()
+    # --- ▲ 認証チェック完了 ▲ ---
 
 
     # --- ▼ 2. FormData からデータを取得 ▼ ---
