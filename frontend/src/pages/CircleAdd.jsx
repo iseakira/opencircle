@@ -66,7 +66,7 @@ function CircleAdd() {
 
   
     
-  const [tags,setCircleTags]=useState("");
+  const [tags,setCircleTags]=useState([]);
 
   const handleKey=(e)=>{
        e.preventDefault(); 

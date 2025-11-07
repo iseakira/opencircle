@@ -15,7 +15,7 @@ export default function Image({onChange ,preview,image}) {
  />     
  {preview&&(
      <div> 
-       <p>プレビュ-:</p>
+       <p>プレビュー</p>
          <img src={preview} 
          alt="" 
          style={{

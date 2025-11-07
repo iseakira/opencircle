@@ -206,7 +206,7 @@ function CircleEdit() {
           selectedActive={selectedActive}
         ></Tag>
 
-        <Button type="submit">サークルを更新する</Button>
+        <button type="submit">更新</button>
       </form>
     </>
   );

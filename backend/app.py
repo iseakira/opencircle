@@ -384,10 +384,10 @@ def update_circle(circle_id):
     
     # --- ▼ 1. Cookieによるログイン認証チェック (コメントアウト中) ▼ ---
     # (注: 本番運用時はここの認証を有効化する必要があります)
-    # session_id_str = request.cookies.get("session_id")
+     #session_id_str = request.cookies.get("session_id")
     # ... (認証ロジック) ...
-    # user_id = active_session.user_id
-    # active_session.session_last_access_time = datetime.utcnow()
+     #user_id = active_session.user_id
+     #active_session.session_last_access_time = datetime.utcnow()
     # --- ▲ 認証チェック完了 ▲ ---
 
     # --- ▼ 2. 編集対象のサークルを取得 ▼ ---
