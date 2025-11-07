@@ -125,6 +125,38 @@ def add_edit_authorization():
         "target_user_id": target_user_id
     }), 201
 
+# サークル削除API
+@app.route("/api/circle/<int:circle_id>", methods=["DELETE"])
+def delete_circle(circle_id):
+    # ログイン確認
+    user_id, err, code = verify_login()
+    if err:
+        return err, code
+
+    # サークルの存在確認
+    circle = Circle.query.get(circle_id)
+    if not circle:
+        return jsonify({"error": "指定されたサークルが存在しません"}), 404
+
+    # 権限確認
+    owner_auth = EditAuthorization.query.filter_by(
+        user_id=user_id, circle_id=circle_id, role="owner"
+    ).first()
+    if not owner_auth:
+        return jsonify({"error": "削除権限がありません（オーナーではありません）"}), 403
+
+    # 関連する編集権限をすべて削除
+    EditAuthorization.query.filter_by(circle_id=circle_id).delete()
+
+    # サークル自体を削除
+    db.session.delete(circle)
+    db.session.commit()
+
+    return jsonify({
+        "message": f"サークル '{circle.circle_name}' を削除しました。",
+        "deleted_circle_id": circle_id
+    }), 200
+
 
 # データベース初期化コマンド
 @app.cli.command("initdb")
