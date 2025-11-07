@@ -1,7 +1,6 @@
-""""
-
-from flask import Flask,request,jsonify,session
+from flask import Flask,request,jsonify
 from flask_cors import CORS
+from datetime import datetime, timedelta
 from models import db, Circle, User, Session, EditAuthorization
 
 app = Flask(__name__)
@@ -11,22 +10,43 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
-app = Flask(__name__)
-CORS(app, supports_credentials=True)
-app.secret_key = "supersecretkey-for-session"
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-db.init_app(app)
+def verify_login():
+    """Cookieからセッションを確認し、user_idを返す"""
+    session_id_str = request.cookies.get("session_id")
+    if not session_id_str:
+        return None, jsonify({"error": "認証されていません (Cookieが見つかりません)"}), 401
+
+    try:
+        session_id = int(session_id_str)
+    except ValueError:
+        return None, jsonify({"error": "不正なセッション形式です"}), 401
+
+    active_session = db.session.get(Session, session_id)
+    if not active_session:
+        return None, jsonify({"error": "セッションが無効です（ログインしていません）"}), 401
+
+    # 有効期限チェック（24時間）
+    session_timeout_hours = 24
+    if active_session.session_last_access_time < datetime.utcnow() - timedelta(hours=session_timeout_hours):
+        db.session.delete(active_session)
+        db.session.commit()
+        return None, jsonify({"error": "セッションが期限切れです。再度ログインしてください"}), 401
+
+    # 最終アクセス時刻を更新
+    active_session.session_last_access_time = datetime.utcnow()
+    db.session.add(active_session)
+    db.session.commit()
+
+    return active_session.user_id, None, None
 
 
 # 編集可能サークル一覧取得
 @app.route("/api/mypage", methods=["GET"])
 def get_editable_circles():
     #ログインチェック
-    if "user_id" not in session:
-        return jsonify({"error": "ログインが必要です"}), 401
-
-    user_id = session["user_id"]
+    user_id, err, code = verify_login()
+    if err:
+        return err, code
 
     # 編集権限を取得
     auths = EditAuthorization.query.filter_by(user_id=user_id).all()
@@ -56,8 +76,9 @@ def get_editable_circles():
 def prepare_new_circle():
    
     # ログインチェック
-    if "user_id" not in session:
-        return jsonify({"error": "ログインが必要です"}), 401
+    user_id, err, code = verify_login()
+    if err:
+        return err, code
 
     # DB処理は不要（画面遷移のみ）
     return jsonify({
@@ -70,8 +91,10 @@ def prepare_new_circle():
 @app.route("/api/edit-authorization", methods=["POST"])
 def add_edit_authorization():
    
-    if "user_id" not in session:
-        return jsonify({"error": "ログインが必要です"}), 401
+     # ログインチェック
+    user_id, err, code = verify_login()
+    if err:
+        return err, code
 
     data = request.get_json() or {}
     circle_id = data.get("circle_id")
@@ -81,7 +104,7 @@ def add_edit_authorization():
         return jsonify({"error": "circle_id と target_user_id が必要です"}), 400
 
     owner_auth = EditAuthorization.query.filter_by(
-        user_id=session["user_id"], circle_id=circle_id
+        user_id=user_id, circle_id=circle_id
     ).first()
     if not owner_auth:
         return jsonify({"error": "このサークルに権限を付与する権限がありません"}), 403
@@ -103,12 +126,6 @@ def add_edit_authorization():
     }), 201
 
 
-# セッション確認API
-@app.route("/api/session/debug", methods=["GET"])
-def debug_session():
-    #現在のセッション情報を確認
-    return jsonify(dict(session))
-
 # データベース初期化コマンド
 @app.cli.command("initdb")
 def initdb():
@@ -122,9 +139,3 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
     app.run(host="0.0.0.0", port=5001, debug=True)
-
-
-#--- ここまでマイページ画面用のコード ---
-
-
-"""
