@@ -87,6 +87,7 @@ function Home() {
             ログイン
           </Link>
         </h3>
+        
       </header>
 
       <main>

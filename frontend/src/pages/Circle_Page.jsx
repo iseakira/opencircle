@@ -8,15 +8,22 @@ function Circle_Page(){
 
     const [response_data, setResponse_data] = useState(null);
     const handleResponse = () => {
-        const circle_detail = localStorage.getItem('circle_detail');
-        const json_circle_detail = JSON.parse(circle_detail);
+        const raw_circle_detail = localStorage.getItem('circle_detail');
+        if (!raw_circle_detail) {
+            console.log("LocalStorageにデータがありません。");
+            setResponse_data(null);
+            return;
+        }
+        const json_circle_detail = JSON.parse(raw_circle_detail);
+        const circle_detail = json_circle_detail.data;
         //localStorage.removeItem('circle_detail');
-        console.log("受信したデータ:", json_circle_detail);
-        setResponse_data(json_circle_detail);
+        console.log("受信したデータ:", circle_detail);
+        setResponse_data(circle_detail);
     };
     useEffect(() => {
-        handleResponse();},[]
-    );
+        handleResponse();
+    },[]);
+
     return (
     <div>
         <header className="page-header">
@@ -32,9 +39,9 @@ function Circle_Page(){
             <div>
                 {response_data === null ? (
                     <p>サークル情報を読み込み中です...</p>
-                ) : response_data.circle_name ? (
+                ) : response_data && typeof response_data === "object" ? (
                 <div>
-                    <img src={response_data.circle_icon} alt="サークルアイコン" />
+                    <img src={response_data.circle_icon_path} alt="サークルアイコン" />
                     <p>サークル名：{response_data.circle_name}</p>
                     <p>サークル説明：{response_data.circle_description}</p>
                     <p>費用：{response_data.circle_fee}円</p>

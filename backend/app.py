@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, make_response
 from flask_cors import CORS # ◀ flask_corsをインポート
-from flask import request, send_from_directory
+from flask import Flask, jsonify, make_response, request, send_from_directory, session
 import json
 from  models import db, Circle, Tag, EditAuthorization, User, Session 
 import os
@@ -20,6 +20,28 @@ UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'upload
 # フロントエンドが画像にアクセスするためのURLプレフィックス
 UPLOAD_BASE_URL = "/api/uploads"
 # --- ▲ 画像アップロード設定 ▲ ---
+
+TAG_CATEGORY_ORDER = [
+    "bunya", "fee", "ratio", "place", "mood", "active"
+]
+
+# --- ▼▼▼ この「ID→カテゴリ対応表」を追加 ▼▼▼ ---
+TAG_ID_TO_CATEGORY = {
+    # "bunya" (分野)
+    1: "bunya", 2: "bunya", 3: "bunya", 4: "bunya",
+    # "fee" (費用)
+    5: "fee", 6: "fee", 7: "fee",
+    # "ratio" (男女比)
+    8: "ratio", 9: "ratio", 10: "ratio",
+    # "place" (活動場所)
+    11: "place", 12: "place",
+    # "mood" (雰囲気)
+    13: "mood", 14: "mood",
+    # "active" (活動頻度)
+    15: "active", 16: "active", 17: "active",
+    # (ID: 0 の "未選択" はカテゴリがないのでここでは無視)
+}
+# --- ▲▲▲ 対応表の追加完了 ▲▲▲ ---
 
 def create_app():
     app = Flask(__name__)
@@ -54,17 +76,13 @@ def say_hello():
     # JSON形式でメッセージを返す
     return jsonify({"message": "バックエンドからの返事です！🎉"})
 
-#'/hometest'というURLにPOSTリクエストが来たら動く関数
+
 @app.route('/home', methods=['POST'])
 def search():
     #json_dataのキーは["search_term","field","circle_fee","gender_ration","place","mood","frequency"]
     json_dict = request.get_json()
     print(json.dumps(json_dict))
-    #f = open("testdata.txt")
-    #json_text = f.read()
-    #f.close()
     json_text = dbop.search_circles(json_dict)
-    # return jsonify(json_text)
 
     return jsonify([{"circle_icon_path": "/test_image/head_image.png",
                     "circle_name": "サークルAの名前",
@@ -84,21 +102,14 @@ def initial_circles():
         print('get_initial_circles error:', e)
         return jsonify({"error": "サーバーエラー"}), 500
 
-# 未使用関数
-# @app.route('/home', methods=['POST'])
-# def search_results():
-#     return jsonify([{"circle_name": "サークルA",
-#                     "circle_description": "これはサークルAの説明です。"},
-#                     {"circle_name": "サークルB",
-#                      "circle_description": "これはサークルBの説明です。"},
-#                     {"circle_name": "サークルC",
-#                      "circle_description": "これはサークルCの説明です。"}])
-
 @app.route('/Circle_Page', methods=['POST'])
 def circle_page():
     json_dict = request.get_json()
     circle_id = json_dict["circle_id"]
-    return jsonify({"message": f"サークルID {circle_id} の詳細情報の取得成功"})
+    circle_detail = dbop.get_circle_detail(circle_id)
+    if circle_detail is None:
+        return jsonify({"message": f"サークルID {circle_id} の詳細情報の取得失敗"}), 404
+    return jsonify(circle_detail)
 
 #--- ここからアカウント作成 ---
 @app.route('/add_account', methods=['POST'])
@@ -195,31 +206,31 @@ def uploaded_file(filename):
 @app.route('/api/circles', methods=['POST'])
 def add_circle():
 
-    # # --- ▼ 1. Cookieによるログイン認証チェック ▼ ---
-    # session_id_str = request.cookies.get("session_id")
-
-    # if not session_id_str:
-    #     return jsonify({"error": "認証されていません (Cookieが見つかりません)"}), 401
+    # --- ▼ 1. Cookieによるログイン認証チェック ▼ ---
+    session_id_str = request.cookies.get("session_id")
+    print(session_id_str)
+    if not session_id_str:
+        return jsonify({"error": "認証されていません (Cookieが見つかりません)"}), 401
     
-    # try:
-    #     session_id = int(session_id_str)
-    # except ValueError:
-    #     return jsonify({"error": "不正なセッション形式です"}), 401
+    try:
+        session_id = int(session_id_str)
+    except ValueError:
+        return jsonify({"error": "不正なセッション形式です"}), 401
 
-    # active_session = db.session.get(Session, session_id)
+    active_session = db.session.get(Session, session_id)
 
-    # if not active_session:
-    #     return jsonify({"error": "セッションが無効です（ログインしていません）"}), 401
+    if not active_session:
+        return jsonify({"error": "セッションが無効です（ログインしていません）"}), 401
 
-    # session_timeout_hours = 24
-    # if active_session.session_last_access_time < datetime.utcnow() - timedelta(hours=session_timeout_hours):
-    #     db.session.delete(active_session) 
-    #     db.session.commit()
-    #     return jsonify({"error": "セッションが期限切れです。再度ログインしてください"}), 401
+    session_timeout_hours = 24
+    if active_session.session_last_access_time < datetime.utcnow() - timedelta(hours=session_timeout_hours):
+        db.session.delete(active_session) 
+        db.session.commit()
+        return jsonify({"error": "セッションが期限切れです。再度ログインしてください"}), 401
     
-    # user_id = active_session.user_id
-    # active_session.session_last_access_time = datetime.utcnow()
-    # # --- ▲ 認証チェック完了 ▲ ---
+    user_id = active_session.user_id
+    active_session.session_last_access_time = datetime.utcnow()
+    # --- ▲ 認証チェック完了 ▲ ---
 
 
     # --- ▼ 2. FormData からデータを取得 ▼ ---
@@ -311,19 +322,37 @@ def add_circle():
 # GET: 1件のサークル情報を取得する
 @app.route('/api/circles/<int:circle_id>', methods=['GET'])
 def get_circle(circle_id):
-    # まず、指定されたIDのサークルを探す
+
     circle = Circle.query.get(circle_id)
 
-    # サークルが見つからなかった場合
     if not circle:
         return jsonify({"error": "指定されたサークルが見つかりません"}), 404
         
-    # TODO: 認証チェック
-    # 必要であれば、ここで「ログイン中のユーザーがこのサークルを
-    # 閲覧/編集する権限があるか」をチェックする
-    # (例: if circle.owner_id != session.get('user_id'): return 403)
+    # --- ▼ タグの処理を修正 ▼ ---
+    
+    # 1. 紐付いているタグを「カテゴリ名」と「ID」の辞書(Map)に変換
+    
+    # (クラッシュする古いコード)
+    # tag_map = {tag.tag_category: tag.tag_id for tag in circle.tags}
 
-    # フロントエンド（React）が使いやすい形（辞書）に変換
+    # (新しいコード: IDからカテゴリを逆引きする)
+    tag_map = {}
+    for tag in circle.tags:
+        # tag.tag_category を読みに行く代わりに、tag.tag_id を使う
+        category = TAG_ID_TO_CATEGORY.get(tag.tag_id)
+        
+        # もしカテゴリが見つかれば (bunya, fee など)
+        if category:
+            tag_map[category] = tag.tag_id
+            
+    # これで tag_map は (例: {'bunya': 1, 'ratio': 8, 'active': 15}) となる
+
+    # 2. フロントが期待する6カテゴリの順番でIDを並び替える
+    # (この処理は TAG_CATEGORY_ORDER が必須)
+    tags_id_list = [tag_map.get(category) for category in TAG_CATEGORY_ORDER]
+    
+    # --- ▲ タグの処理▲ ---
+
     circle_data = {
         "circle_id": circle.circle_id,
         "circle_name": circle.circle_name,
@@ -332,68 +361,95 @@ def get_circle(circle_id):
         "number_of_male": circle.number_of_male,
         "number_of_female": circle.number_of_female,
         "circle_icon_path": circle.circle_icon_path,
-        # 現在紐付いているタグのIDリストも渡す
-        "tags": [tag.tag_id for tag in circle.tags]
+        "tags": tags_id_list  # ◀ 修正済みの [1, null, 8, null, null, 15] などを渡す
     }
 
     # 辞書をJSONにして返す
     return jsonify(circle_data), 200
-
 # PUT: 1件のサークル情報を更新する
+
 @app.route('/api/circles/<int:circle_id>', methods=['PUT'])
 def update_circle(circle_id):
-    # まず、更新対象のサークルを探す
-    circle_to_update = Circle.query.get(circle_id)
+    
+    # --- ▼ 1. Cookieによるログイン認証チェック (コメントアウト中) ▼ ---
+    # (注: 本番運用時はここの認証を有効化する必要があります)
+    # session_id_str = request.cookies.get("session_id")
+    # ... (認証ロジック) ...
+    # user_id = active_session.user_id
+    # active_session.session_last_access_time = datetime.utcnow()
+    # --- ▲ 認証チェック完了 ▲ ---
 
-    # サークルが見つからなかった場合
+    # --- ▼ 2. 編集対象のサークルを取得 ▼ ---
+    circle_to_update = Circle.query.get(circle_id)
     if not circle_to_update:
         return jsonify({"error": "指定されたサークルが見つかりません"}), 404
+        
+    # (注: ここで user_id と circle_to_update の作成者を比較する
+    #  「編集権限チェック」を入れるのが望ましい)
 
-    # TODO: 重要な認証チェック！
-    # ここで「ログイン中のユーザーがこのサークルを
-    # 編集する権限があるか」を必ずチェックしてください。
-    # (例: if circle_to_update.owner_id != session.get('user_id'): 
-    #          return jsonify({"error": "編集権限がありません"}), 403)
+    # --- ▼ 3. FormData からデータを取得 (add_circle と同じ) ▼ ---
+    data_name = request.form.get("circle_name")
+    data_description = request.form.get("circle_description")
+    data_fee = request.form.get("circle_fee")
+    data_male = request.form.get("number_of_male", circle_to_update.number_of_male) # デフォルトは既存の値
+    data_female = request.form.get("number_of_female", circle_to_update.number_of_female) # デフォルトは既存の値
+    tags_json_str = request.form.get("tags", "[]")
+    file = request.files.get("circle_icon_file")
+    # --- ▲ データ取得完了 ▲ ---
 
-    # Reactから送られてきた新しいデータを取得
-    data = request.get_json() or {}
-
-    # 必須チェック（add_circle と同様）
-    if not data.get('circle_name') or not data.get('circle_description'):
+    if not data_name or not data_description:
         return jsonify({"error": "circle_name と circle_description は必須です"}), 400
 
-    # データベースのオブジェクトの値を新しいデータで上書き
-    circle_to_update.circle_name = data.get("circle_name")
-    circle_to_update.circle_description = data.get("circle_description")
-    circle_to_update.circle_fee = data.get("circle_fee")
-    circle_to_update.number_of_male = data.get("number_of_male", 0)
-    circle_to_update.number_of_female = data.get("number_of_female", 0)
-    circle_to_update.circle_icon_path = data.get("circle_icon_path")
+    # --- ▼ 4. 画像ファイルの保存 (add_circle と同じロジック) ▼ ---
+    if file:
+        # 新しいファイルが送信された場合のみ、保存・更新
+        saved_path, error = save_image_file(file)
+        if error:
+            return jsonify({"error": f"画像保存エラー: {error}"}), 400
+        
+        # (TODO: ここで古い画像ファイル circle_to_update.circle_icon_path を削除する処理)
+        
+        circle_to_update.circle_icon_path = saved_path # DBに保存するパスを更新
+    
+    # (file がない場合は、既存の icon_path がそのまま保持されます)
+    
+    # --- ▼ 5. テキスト情報の更新 ▼ ---
+    circle_to_update.circle_name = data_name
+    circle_to_update.circle_description = data_description
+    circle_to_update.circle_fee = int(data_fee) if data_fee else None
+    circle_to_update.number_of_male = int(data_male)
+    circle_to_update.number_of_female = int(data_female)
 
-    # タグの更新 (少し面倒)
-    # 1. いったん既存のタグ紐付けを全部クリア
-    circle_to_update.tags.clear() 
-    # 2. 送られてきたタグIDリストで新しく紐付け
-    selected_tag_ids = data.get("tags", [])
-    if selected_tag_ids:
-        tags = Tag.query.filter(Tag.tag_id.in_(selected_tag_ids)).all()
+    # --- ▼ 6. タグ情報の更新  ▼ ---
+    circle_to_update.tags.clear() # 既存のタグ紐付けを一旦すべてクリア
+
+    try:
+        selected_tag_ids = json.loads(tags_json_str) # JSON文字列をリストに変換
+        
+        # [1, null, 15, null, null, 30] のように null が含まれるため除去
+        valid_tag_ids = [tag_id for tag_id in selected_tag_ids if tag_id is not None]
+
+    except json.JSONDecodeError:
+        return jsonify({"error": "タグの形式が不正です"}), 400
+        
+    if valid_tag_ids:
+        tags = Tag.query.filter(Tag.tag_id.in_(valid_tag_ids)).all()
         for tag in tags:
             circle_to_update.tags.append(tag)
             
-    # データベースに保存（コミット）
     try:
-        # db.session.add() は不要（すでに対象はセッションが追跡しているため）
+        # db.session.add(active_session) # 認証を有効化した場合、セッション時刻更新も追加
         db.session.commit()
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": "サーバーエラー", "detail": str(e)}), 500
 
-    # 成功メッセージを返す
     return jsonify({
         "message": "サークルを更新しました",
-        "circle_id": circle_to_update.circle_id
+        "circle_id": circle_to_update.circle_id,
+        "circle_icon_path": circle_to_update.circle_icon_path # 更新後のパスを返す
     }), 200
-# --- ここまでテスト用のコード ---
+# --- ここまで編集用のコード ---
 
 
 @app.route("/api/mypage", methods=["GET"])
