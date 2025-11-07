@@ -10,6 +10,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
+#セッション
 def verify_login():
     """Cookieからセッションを確認し、user_idを返す"""
     session_id_str = request.cookies.get("session_id")
@@ -124,6 +125,48 @@ def add_edit_authorization():
         "circle_id": circle_id,
         "target_user_id": target_user_id
     }), 201
+
+# オーナー権限の譲渡
+@app.route("/api/transfer-ownership", methods=["POST"])
+def transfer_ownership():
+    # ログイン確認
+    user_id, err, code = verify_login()
+    if err:
+        return err, code
+    
+    # リクエストデータ取得
+    data = request.get_json() or {}
+    circle_id = data.get("circle_id")
+    new_owner_id = data.get("new_owner_id")
+    if not circle_id or not new_owner_id:
+        return jsonify({"error": "circle_id と new_owner_id が必要です"}), 400
+    
+    # 現オーナー確認
+    current_owner = EditAuthorization.query.filter_by(
+        user_id=user_id, circle_id=circle_id, role="owner"
+    ).first()
+    if not current_owner:
+        return jsonify({"error": "オーナーのみが譲渡できます"}), 403
+    
+    # 譲渡先ユーザー確認
+    candidate = EditAuthorization.query.filter_by(
+        user_id=new_owner_id, circle_id=circle_id
+    ).first()
+    if not candidate:
+        return jsonify({"error": "譲渡先のユーザーが見つかりません"}), 400
+    
+    # 権限の入れ替え
+    candidate.role = "owner" 
+    db.session.delete(current_owner)  
+    
+    # DB反映
+    db.session.commit()
+    return jsonify({
+        "message": "オーナー権限を譲渡し、元オーナーは退部しました",
+        "circle_id": circle_id,
+        "new_owner_id": new_owner_id
+    }), 200
+
 
 # サークル削除API
 @app.route("/api/circle/<int:circle_id>", methods=["DELETE"])
