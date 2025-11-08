@@ -47,10 +47,10 @@ function Home() {
   }, []);
 
   //サークルの項目をクリックしたときに行う処理
-  const to_circle_page = (circle_id) => {
+  const to_circle_page = async(circle_id) => {
     const json_circle_id = JSON.stringify({circle_id: circle_id})
     console.log("取得したいサークルのid:", json_circle_id)
-    send_Id(json_circle_id);
+    await send_Id(json_circle_id);
     return;
   };
 
@@ -66,8 +66,9 @@ function Home() {
       const data = await response.json();
       console.log("項目をクリックした時：",data);
       const dataString = JSON.stringify(data);
-      localStorage.setItem('circle_detail', dataString);
-      navigate('/Circle_Page');
+      //localStorage.setItem('circle_detail', dataString);
+      //navigate('/Circle_Page');
+      navigate('/Circle_Page', { state: { circleDetail: data } })
     }catch{
       console.error("サークルページへの遷移に失敗しました")
       alert("サークルページへの遷移に失敗しました");

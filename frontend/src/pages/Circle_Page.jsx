@@ -1,28 +1,41 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 //import { useNavigate } from 'react-router-dom';
 import headImage from '../images/head_image.png';
 import '../css/App.css';
 
 function Circle_Page(){
-
+    const location = useLocation();
     const [response_data, setResponse_data] = useState(null);
-    const handleResponse = () => {
-        const raw_circle_detail = localStorage.getItem('circle_detail');
-        if (!raw_circle_detail) {
-            console.log("LocalStorageにデータがありません。");
-            setResponse_data(null);
-            return;
-        }
-        const json_circle_detail = JSON.parse(raw_circle_detail);
-        const circle_detail = json_circle_detail.data;
+    //const handleResponse = () => {
+      //  const raw_circle_detail = location.state?.circleDetail;
+        //if (!raw_circle_detail) {
+          //  console.log("LocalStorageにデータがありません。");
+            //setResponse_data(null);
+            //return;
+        //}
+        //const json_circle_detail = JSON.parse(raw_circle_detail);
+        //const circle_detail = json_circle_detail.data;
         //localStorage.removeItem('circle_detail');
-        console.log("受信したデータ:", circle_detail);
-        setResponse_data(circle_detail);
-    };
+        //console.log("受信したデータ:", circle_detail);
+        //setResponse_data(circle_detail);
+    //};
+    //useEffect(() => {
+     //   handleResponse();
+    //},[]);
+
     useEffect(() => {
-        handleResponse();
-    },[]);
+        // location.stateから、Home.jsxで渡した { circleDetail: data } の 'circleDetail' を取得
+        const circleDetail = location.state?.circleDetail;
+        
+        if (circleDetail) {
+            console.log("受信したデータ (state経由):", circleDetail);
+            setResponse_data(circleDetail);
+        } else {
+            console.log("サークル情報がステート経由で渡されませんでした。");
+            setResponse_data(null);
+        }
+    }, [location.state]);
 
     return (
     <div>
