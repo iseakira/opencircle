@@ -293,16 +293,16 @@ def add_circle():
         db.session.add(new_circle)
         db.session.commit() # circle_id を確定
 
-        # # --- 3. 作成者を管理者として登録 ---
-        # new_authorization = EditAuthorization(
-        #     user_id=user_id,
-        #     circle_id=new_circle.circle_id,
-        #     role="admin"
-        # )
-        # db.session.add(new_authorization)
+        # --- 3. 作成者を管理者として登録 ---
+        new_authorization = EditAuthorization(
+            user_id=user_id,
+            circle_id=new_circle.circle_id,
+            role="owner"
+        )
+        db.session.add(new_authorization)
         
-        # db.session.add(active_session) # セッション時刻更新
-        # db.session.commit() # 権限とセッション更新をコミット
+        db.session.add(active_session) # セッション時刻更新
+        db.session.commit() # 権限とセッション更新をコミット
 
     except IntegrityError as e:
         db.session.rollback()
