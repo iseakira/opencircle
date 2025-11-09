@@ -79,17 +79,17 @@ def say_hello():
 
 @app.route('/home', methods=['POST'])
 def search():
-    #json_dataのキーは["search_term","field","circle_fee","gender_ration","place","mood","frequency"]
-    json_dict = request.get_json()
-    print(json.dumps(json_dict))
-    json_text = dbop.search_circles(json_dict)
-
-    return jsonify([{"circle_icon_path": "/test_image/head_image.png",
-                    "circle_name": "サークルAの名前",
-                    "tag_name":"サークルAの分野のタグ"},
-                    {"circle_icon_path": "サークルBのアイコン",
-                    "circle_name": "サークルBの名前",
-                    "tag_name":"サークルBの分野のタグ"}])
+    try:
+        json_data = request.json 
+        if json_data is None:
+            print('search_circles error: Request body is empty or not JSON')
+            return jsonify({"error": "不正なデータ形式"}), 400
+        items = dbop.search_circles(json_data)
+        return jsonify({"items": items, "total": len(items)})
+    except Exception as e:
+        # エラー時はログ出力して 500 を返す
+        print('search_circles error:', e)
+        return jsonify({"error": "サーバーエラー"}), 500
 
 @app.route('/homestart', methods=['POST'])
 def initial_circles():

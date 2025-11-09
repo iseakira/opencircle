@@ -89,7 +89,6 @@ from sqlalchemy.exc import IntegrityError
 from backend.app import create_app
 from backend.models import db, Tag
 """
-
 def search_circles(json_dict):
     """
     サークル検索用の関数。受け取った文字列とタグをもとにサークルを検索して返す。
@@ -98,29 +97,76 @@ def search_circles(json_dict):
     """
     conn = sqlite3.connect('project.db')
     cursor = conn.cursor()
-    # tmp_dictは検索内容をidに変換して保存する
-    tmp_dict = dict()
-    tmp_dict["search_term"] = json_dict["search_term"]
+    raw_search_term = json_dict.get("search_term", "")
+    keywords = [k.strip() for k in raw_search_term.split() if k.strip()]
+    tags = [tag for tag in json_dict.get("tags", []) if tag]
+    params = []
+    tag_placeholders = ','.join(['?'] * len(tags)) if tags else 'NULL'
+    keyword_where_sql = "1=1"
+    if keywords:
+        keyword_conditions = []
+        for _ in keywords:
+            keyword_conditions.append("(c.circle_name LIKE ? OR c.circle_description LIKE ?)")
+        
+        keyword_where_sql = " AND ".join(keyword_conditions)
+        for keyword in keywords:
+            params.extend([f'%{keyword}%', f'%{keyword}%'])
+            
+    if tags:
+        params.extend(tags)
+        params.extend(tags)
+        params.extend(tags)
+        params.extend(tags)
+    params.append(len(tags))
     
-    sql = '''
-    SELECT t.circle_name, t.circle_icon_path, t.circle_description
-    FROM (
-        SELECT c.circle_name, c.circle_icon_path, c.circle_description
-        FROM circles AS c
-        WHERE c.circle_name LIKE ?
-    ) AS t
-    JOIN circle
+    sql = f'''
+    SELECT c.circle_id, c.circle_name, c.circle_icon_path, c.circle_description, MAX(t.tag_name) AS field_name
+    FROM circles AS c
+    LEFT JOIN circle_tag AS ct ON c.circle_id = ct.circle_id
+    LEFT JOIN circle_tag AS ct_field ON c.circle_id = ct_field.circle_id
+    LEFT JOIN tags AS t ON ct_field.tag_id = t.tag_id AND t.tag_id IN (1, 2, 3, 4)
+    WHERE ({keyword_where_sql})
+        AND (
+            NOT EXISTS (SELECT 1 FROM tags WHERE tag_id IN ({tag_placeholders}))
+            OR ct.tag_id IN ({tag_placeholders})
+        )
+    GROUP BY c.circle_id, c.circle_name, c.circle_icon_path, c.circle_description
+    HAVING
+        -- 3. タグのAND条件 (タグが空なら常に真、タグがあるならCOUNTがタグ総数と一致)
+        (
+            NOT EXISTS (SELECT 1 FROM tags WHERE tag_id IN ({tag_placeholders}))
+            OR COUNT(DISTINCT CASE WHEN ct.tag_id IN ({tag_placeholders}) THEN ct.tag_id END) = ?
+        )
+    ORDER BY
+        c.circle_name;
     '''
+    
+    try:
+        cursor.execute(sql, tuple(params))
+        results_tuples = cursor.fetchall()
+        results_list_of_dicts = []
+        for row in results_tuples:
+            item = {
+                "circle_id": row[0],
+                "circle_name": row[1],
+                "circle_icon_path": row[2],
+                "circle_description": row[3],
+                "field": row[4]
+            }
+            results_list_of_dicts.append(item)
+            
+        # 3. Reactが期待する「辞書のリスト」を返す
+        return results_list_of_dicts
 
-    cursor.execute(sql, ('%' + tmp_dict["search_term"] + '%',))
-    # TagとCircleの間の関係性の名前はどれだ？
-    # res = cursor.execute("SELECT c.circle_name, c.circle_iconpath " \
-    #                     "FROM Circle AS c " \
-    #                     "JOIN circle_tag_table AS ctt ON c.circle_id = ctt.circle_id " \
-    #                     "WHERE ")#ここどうしようか考えてる
-    # res.fetchall()
-    cursor.close()
-    conn.close()
+    except sqlite3.Error as e:
+        print(f"データベースエラーが発生しました: {e}")
+        raise
+    
+
+    finally:
+        cursor.close()
+        conn.close()
+
 
 def get_circle_detail(circle_id):
     """

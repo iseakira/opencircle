@@ -53,7 +53,7 @@ function Home() {
     await send_Id(json_circle_id);
     return;
   };
-
+  //サークルページの表示に伴うサークル情報の取得及びCircle_Pageへの遷移
   const send_Id = async (json_circle_id) => {
     try{
       const response = await fetch("http://localhost:5001/Circle_Page",{
