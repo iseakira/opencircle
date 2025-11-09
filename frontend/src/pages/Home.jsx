@@ -97,6 +97,7 @@ function Home() {
         <h2>サークル一覧</h2>
         <Toggle receivedData_fb={handleResponse} />
         <div>
+        <br />
           {isLoading ? (
             <p>サークル情報を読み込み中です...</p>
             ) : error ? (

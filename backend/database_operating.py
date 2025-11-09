@@ -63,7 +63,7 @@ def get_initial_circles():
         LIMIT 1
       ) AS field
     FROM circles AS c
-    ORDER BY c.circle_id ASC
+    ORDER BY c.circle_name;
     '''
 
     cur.execute(sql)
