@@ -10,6 +10,7 @@ import send_mail as sm
 from datetime import datetime, timedelta, timezone
 import uuid
 from werkzeug.utils import secure_filename
+import threading
 
 # --- ▼ 1. 画像アップロード設定 ▼ ---
 # 許可する拡張子
@@ -64,6 +65,11 @@ def create_app():
 
 )
     db.init_app(app)
+    
+    #定期的にデータベースの不要データを処理するスレッドを立てる
+    clean_thread = threading.Thread(target = dbop.cleanup_session_tmpid, daemon = True)
+    clean_thread.start()
+
     return app
 
 app = create_app()

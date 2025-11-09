@@ -7,6 +7,8 @@ import datetime
 from models import db, Circle, EditAuthorization
 from sqlalchemy.exc import IntegrityError
 import logging # printの代わりにloggingを使うことを推奨
+import threading
+import time
 
 # サークル情報取得関数（まだ使用されていません）initial_circles、search_circles用
 def get_circle_prof(circle_id):
@@ -303,6 +305,23 @@ def make_session(emailaddress):
     cursor.close()
     conn.close()
     return (complete, session_id)
+
+def cleanup_session_tmpid():
+    conn = sqlite3.connect("project.db")
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM sessions " \
+                    "WHERE session_create_time < datetime('now', '-7 days') " \
+                    "OR session_last_access_time < datetime('now', '-1 days')")
+    cursor.execute("DELETE FROM account_creates " \
+                    "WHERE account_expire_time < datetime('now')")
+    conn.commit()
+    cursor.close()
+    conn.close()
+    print("nya")
+    #確認のために5秒にしてある
+    time.sleep(5)
+    clean_thread = threading.Thread(target = cleanup_session_tmpid, daemon = True)
+    clean_thread.start()
 
 def delete_circle_by_id(circle_id):
     """
