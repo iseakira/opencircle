@@ -19,18 +19,43 @@
 
 }
 
+.logo:active {
+  transform: scale(0.8);
+}
+
 .login {
   position: fixed;
-
   right: 0;
-  top: 0;
-
+  top: 0.2rem;
   z-index: 1000;
-
+  padding: 8px 18px;
+  border-radius: 99px;
   height: 2em;
   width: auto;
+  background-color: transparent;
+  border: 2px solid #007bff;
+  color: #007bff;
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-decoration: none;
 
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease,
+              transform 0.15s ease, box-shadow 0.2s ease;
 }
+
+.login:hover {
+  background-color: #007bff;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0px 3px 6px rgba(0, 123, 255, 0.3);
+}
+
+.login:active {
+  transform: translateY(1px);
+  box-shadow: 0px 1px 3px rgba(0, 123, 255, 0.3);
+}
+
 .p-2 {
   position: fixed;
 
@@ -46,21 +71,24 @@
 .tag-select {
   border: 1px solid gray;
   padding: 10px;
+  
   width: auto;
+  border-top: none;
 }
 
 .tags {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
-  
+  line-height: 2.0;
   border-style: outset;
 }
 
 .circle_icon {
   height: 2em;
-  width: auto;
+  width: auto;  
   border-radius: 50%;
+  object-fit: cover;
 }
 
 .circle_icon_page {
@@ -70,7 +98,44 @@
   margin-bottom: 1rem;
 }
 
-.circle-info:hover {
-  background: #f0f0f0;
+.circle-info {
+  display: flex;
+  align-items: center;
+  border: 1px solid gray;
+  gap: 8px;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 8px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  background: #ffffff;
   transition: background-color 0.3s ease;
+}
+
+.circle-info:hover {
+  background: #f7f7f7;
+  transform: scale(1.02);
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.circle-info:active {
+  transform: scale(0.98);
+}
+
+button[aria-expanded] {
+  width: 100%;
+  max-width: 190px;
+  padding: 12px 15px;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  color: #333;
+  background-color: #f4f4f4;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 1rem;
+}
+button[aria-expanded]:hover {
+  background-color: #e9e9e9;
 }
