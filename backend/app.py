@@ -123,10 +123,13 @@ def make_tmp_account():
     #json_dict のキーは {"emailaddress"}
     json_dict = request.get_json()
     emailaddress = json_dict["emailaddress"]
-    #data_tuple は (auth_code, tmp_id) の形
+    #data_tuple は (success, auth_code, tmp_id) の形
     data_tuple = dbop.tmp_registration(emailaddress)
-    sm.send_auth_code(emailaddress, data_tuple[0])
-    return jsonify({"message": "success", "tmp_id": data_tuple[1]})
+    if data_tuple[0]:
+        sm.send_auth_code(emailaddress, data_tuple[1])
+        return jsonify({"message": "success", "tmp_id": data_tuple[2]})
+    else:
+        return jsonify({"message": "failure"})
 
 @app.route("/create_account", methods=["POST"])
 def create_account():
@@ -135,8 +138,10 @@ def create_account():
     checked_dict = dbop.check_auth_code(json_dict["auth_code"], json_dict["tmp_id"])
     if checked_dict["message"] == "failure":
         return jsonify(checked_dict)
-    dbop.create_account(json_dict["emailaddress"], json_dict["password"], json_dict["user_name"])
-    return jsonify(checked_dict)
+    success = dbop.create_account(json_dict["emailaddress"], json_dict["password"], json_dict["user_name"])
+    if not success:
+        return jsonify({"message": "failure", "error_message": "アカウント作成に失敗しました。もう一度入力してください。"})
+    return jsonify({"message": "success"})
 # --- ここまでアカウント作成---
 
 # --- ここからログイン ---
