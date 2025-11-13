@@ -63,17 +63,15 @@ function Input_email() {
 
   return (
     <div>
-      {/* <header className="page-header">
+      <header className="page-header">
         <h1>
           <Link to="/">
             <img className="logo" src={headImage} alt="アイコン" />
           </Link>
         </h1>
       </header>
-      <h1>東京理科大学サークル情報サイト</h1> */}
-      <header className="page-header">
-      <CircleLogo></CircleLogo>
-      </header>
+      <h1>東京理科大学サークル情報サイト</h1>
+
       <main>
         <h3>登録したいメールアドレスを入力してください</h3>
         <form onSubmit={email_processing}>

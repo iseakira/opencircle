@@ -95,17 +95,14 @@ function Make_Account() {
     };
     return (
     <div>
-        {/* <header className="page-header">
+        <header className="page-header">
             <h1>
                 <Link to="/">
                 <img className="logo" src={headImage} alt="アイコン" />
                 </Link>
             </h1>
         </header>
-        <h1>東京理科大学サークル情報サイト</h1> */}
-      <header>
-        <CirlceLogo></CirlceLogo>
-        </header>
+        <h1>東京理科大学サークル情報サイト</h1>
         <main>
             <h3>パスワードとメールアドレスに送信された認証コードとユーザー名を入力してください</h3>
             <form onSubmit={handleCreateAccount}>

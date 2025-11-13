@@ -39,17 +39,14 @@ function Circle_Page(){
 
     return (
     <div>
-        {/* <header className="page-header">
-            <h1>
+        <header className="page-header">
+            {/* <h1>
                 <Link to="/">
                     <img className="logo" src={headImage} alt="アイコン" />
                 </Link>
-            </h1>
-        </header> */}
-        <CircleLogo></CircleLogo>
-<head>
-
-</head>
+            </h1> */}
+            <CircleLogo></CircleLogo>
+        </header>
         <main>
             <h1>サークルページ</h1>
             <div>

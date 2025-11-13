@@ -75,8 +75,8 @@ const [errorFields,setErrorFields]=useState([]);
    if(!circle_name){
     errors.push("circle_name");
    }
-   else if(!circle_description){
-    errors.push("circle_discription");
+   if(!circle_description){
+    errors.push("circle_description");
    }
    if(errors.length >0){
     setErrorFields(errors);
@@ -102,6 +102,7 @@ const [errorFields,setErrorFields]=useState([]);
       tags:selectedValues,
      })
     alert(`サークルを追加しました`);
+    setErrorFields([]);
   }else{
    // alert("キャンセルしました");
   }
@@ -257,7 +258,7 @@ const [errorFields,setErrorFields]=useState([]);
       {/* <AddCircle></AddCircle> */}
       <form onSubmit={handleKey}> 
         <CircleName value={circleData.circle_name} onChange={NameChange} isError={errorFields.includes("circle_name")}></CircleName>
-        <CircleDescription value={circleData.circle_description} onChange={DesChange}></CircleDescription>
+        <CircleDescription value={circleData.circle_description} onChange={DesChange} isError={errorFields.includes("circle_description")}></CircleDescription>
         <CircleMen value={circleData.number_of_male} onChange={MemChange}></CircleMen>
         <CircleFemen value={circleData.number_of_female} onChange={FememChange}></CircleFemen>
         <CircleFee value={circleData.circle_fee} onChange={FeeChange}></CircleFee>

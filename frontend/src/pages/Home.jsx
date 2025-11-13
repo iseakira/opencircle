@@ -79,12 +79,12 @@ function Home() {
   return (
     <div>
       <header className="page-header">
-        {/* <h1>
+        <h1>
           <Link to="/">
             <img className="logo" src={headImage} alt="アイコン" />
           </Link>
-        </h1> */}
-        <CircleLogo></CircleLogo>
+        </h1>
+        {/* <CircleLogo></CircleLogo> */}
         <h3>
           <Link to="Login" className="login">
             ログイン
@@ -94,7 +94,7 @@ function Home() {
       </header>
 
       <main>
-        {/* <h1>東京理科大学サークル情報サイト</h1> */}
+        <h1>東京理科大学サークル情報サイト</h1>
         <p>ここでは東京理科大学のサークル情報を掲載しています。</p>
         <h2>サークル一覧</h2>
         <Toggle receivedData_fb={handleResponse} />
