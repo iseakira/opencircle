@@ -10,6 +10,7 @@ import send_mail as sm
 from datetime import datetime, timedelta, timezone
 import uuid
 from werkzeug.utils import secure_filename
+import threading
 
 # --- ▼ 1. 画像アップロード設定 ▼ ---
 # 許可する拡張子
@@ -64,6 +65,11 @@ def create_app():
 
 )
     db.init_app(app)
+    
+    #定期的にデータベースの不要データを処理するスレッドを立てる
+    clean_thread = threading.Thread(target = dbop.cleanup_session_tmpid, daemon = True)
+    clean_thread.start()
+
     return app
 
 app = create_app()
@@ -76,24 +82,20 @@ def say_hello():
     # JSON形式でメッセージを返す
     return jsonify({"message": "バックエンドからの返事です！🎉"})
 
-#'/hometest'というURLにPOSTリクエストが来たら動く関数
+
 @app.route('/home', methods=['POST'])
 def search():
-    #json_dataのキーは["search_term","field","circle_fee","gender_ration","place","mood","frequency"]
-    json_dict = request.get_json()
-    print(json.dumps(json_dict))
-    #f = open("testdata.txt")
-    #json_text = f.read()
-    #f.close()
-    json_text = dbop.search_circles(json_dict)
-    # return jsonify(json_text)
-
-    return jsonify([{"circle_icon_path": "/test_image/head_image.png",
-                    "circle_name": "サークルAの名前",
-                    "tag_name":"サークルAの分野のタグ"},
-                    {"circle_icon_path": "サークルBのアイコン",
-                    "circle_name": "サークルBの名前",
-                    "tag_name":"サークルBの分野のタグ"}])
+    try:
+        json_data = request.json 
+        if json_data is None:
+            print('search_circles error: Request body is empty or not JSON')
+            return jsonify({"error": "不正なデータ形式"}), 400
+        items = dbop.search_circles(json_data)
+        return jsonify({"items": items, "total": len(items)})
+    except Exception as e:
+        # エラー時はログ出力して 500 を返す
+        print('search_circles error:', e)
+        return jsonify({"error": "サーバーエラー"}), 500
 
 @app.route('/homestart', methods=['POST'])
 def initial_circles():
@@ -106,21 +108,14 @@ def initial_circles():
         print('get_initial_circles error:', e)
         return jsonify({"error": "サーバーエラー"}), 500
 
-# 未使用関数
-# @app.route('/home', methods=['POST'])
-# def search_results():
-#     return jsonify([{"circle_name": "サークルA",
-#                     "circle_description": "これはサークルAの説明です。"},
-#                     {"circle_name": "サークルB",
-#                      "circle_description": "これはサークルBの説明です。"},
-#                     {"circle_name": "サークルC",
-#                      "circle_description": "これはサークルCの説明です。"}])
-
 @app.route('/Circle_Page', methods=['POST'])
 def circle_page():
     json_dict = request.get_json()
     circle_id = json_dict["circle_id"]
-    return jsonify({"message": f"サークルID {circle_id} の詳細情報の取得成功"})
+    circle_detail = dbop.get_circle_detail(circle_id)
+    if circle_detail is None:
+        return jsonify({"message": f"サークルID {circle_id} の詳細情報の取得失敗"}), 404
+    return jsonify(circle_detail)
 
 #--- ここからアカウント作成 ---
 @app.route('/add_account', methods=['POST'])
@@ -128,10 +123,13 @@ def make_tmp_account():
     #json_dict のキーは {"emailaddress"}
     json_dict = request.get_json()
     emailaddress = json_dict["emailaddress"]
-    #data_tuple は (auth_code, tmp_id) の形
+    #data_tuple は (success, auth_code, tmp_id) の形
     data_tuple = dbop.tmp_registration(emailaddress)
-    sm.send_auth_code(emailaddress, data_tuple[0])
-    return jsonify({"message": "success", "tmp_id": data_tuple[1]})
+    if data_tuple[0]:
+        sm.send_auth_code(emailaddress, data_tuple[1])
+        return jsonify({"message": "success", "tmp_id": data_tuple[2]})
+    else:
+        return jsonify({"message": "failure"})
 
 @app.route("/create_account", methods=["POST"])
 def create_account():
@@ -140,8 +138,10 @@ def create_account():
     checked_dict = dbop.check_auth_code(json_dict["auth_code"], json_dict["tmp_id"])
     if checked_dict["message"] == "failure":
         return jsonify(checked_dict)
-    dbop.create_account(json_dict["emailaddress"], json_dict["password"], json_dict["user_name"])
-    return jsonify(checked_dict)
+    success = dbop.create_account(json_dict["emailaddress"], json_dict["password"], json_dict["user_name"])
+    if not success:
+        return jsonify({"message": "failure", "error_message": "アカウント作成に失敗しました。もう一度入力してください。"})
+    return jsonify({"message": "success"})
 # --- ここまでアカウント作成---
 
 # --- ここからログイン ---
@@ -304,16 +304,16 @@ def add_circle():
         db.session.add(new_circle)
         db.session.commit() # circle_id を確定
 
-        # # --- 3. 作成者を管理者として登録 ---
-        # new_authorization = EditAuthorization(
-        #     user_id=user_id,
-        #     circle_id=new_circle.circle_id,
-        #     role="admin"
-        # )
-        # db.session.add(new_authorization)
+        # --- 3. 作成者を管理者として登録 ---
+        new_authorization = EditAuthorization(
+            user_id=user_id,
+            circle_id=new_circle.circle_id,
+            role="owner"
+        )
+        db.session.add(new_authorization)
         
-        # db.session.add(active_session) # セッション時刻更新
-        # db.session.commit() # 権限とセッション更新をコミット
+        db.session.add(active_session) # セッション時刻更新
+        db.session.commit() # 権限とセッション更新をコミット
 
     except IntegrityError as e:
         db.session.rollback()

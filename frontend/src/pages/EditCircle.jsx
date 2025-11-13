@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 
 import Button from '../conponents/Button';
 import CircleDescription from '../conponents/CircleDescription';
@@ -9,6 +9,7 @@ import Tag from '../conponents/Tag';
 import Image from '../conponents/Image';
 import CircleMen from '../conponents/CircleMen';
 import CircleFemen from '../conponents/CircleFemen';
+import CircleLogo from '../conponents/CircleLogo';
 
 function CircleEdit() {
   const { circleId } = useParams();
@@ -181,6 +182,11 @@ function CircleEdit() {
   return (
     <>
       <form onSubmit={handleSubmit}> 
+       <header>
+        {/* <h1> */}
+        <CircleLogo></CircleLogo>
+       {/* </h1> */}
+       </header>
         <CircleName value={circleData.circle_name} onChange={NameChange}></CircleName>
         <CircleDescription value={circleData.circle_description} onChange={DesChange}></CircleDescription>
         <CircleMen value={circleData.number_of_male} onChange={MemChange}></CircleMen>
@@ -208,8 +214,9 @@ function CircleEdit() {
 
         <button type="submit">更新</button>
       </form>
+      <Link to={"/mypage"}>マイページへ戻る</Link>
     </>
   );
 }
 
-export default CircleEdit;
+export default CircleEdit

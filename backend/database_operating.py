@@ -7,6 +7,38 @@ import datetime
 from models import db, Circle, EditAuthorization
 from sqlalchemy.exc import IntegrityError
 import logging # printの代わりにloggingを使うことを推奨
+import threading
+import time
+
+# サークル情報取得関数（まだ使用されていません）initial_circles、search_circles用
+def get_circle_prof(circle_id):
+    """
+    指定した circle_id のサークルの基本情報を取得して辞書で返す。
+    返却フィールド: circle_name, circle_description, circle_icon_path
+    """
+    conn = sqlite3.connect('project.db')
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    sql = '''
+    SELECT circle_name, circle_description, circle_icon_path
+    FROM circles
+    WHERE circle_id = ?
+    LIMIT 1
+    '''
+
+    cur.execute(sql, (circle_id,))
+    row = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    return {
+        'circle_id': circle_id,
+        'circle_name': row['circle_name'],
+        'circle_description': row['circle_description'],
+        'circle_icon_path': row['circle_icon_path']
+    }
 
 def get_initial_circles():
     """
@@ -27,13 +59,13 @@ def get_initial_circles():
       c.circle_name,
       (
         SELECT t.tag_name
-        FROM tags t
+        FROM tags AS t
         JOIN circle_tag AS ct ON t.tag_id = ct.tag_id
         WHERE ct.circle_id = c.circle_id
         LIMIT 1
       ) AS field
-    FROM circles c
-    ORDER BY c.circle_id ASC
+    FROM circles AS c
+    ORDER BY c.circle_name;
     '''
 
     cur.execute(sql)
@@ -59,7 +91,6 @@ from sqlalchemy.exc import IntegrityError
 from backend.app import create_app
 from backend.models import db, Tag
 """
-
 def search_circles(json_dict):
     """
     サークル検索用の関数。受け取った文字列とタグをもとにサークルを検索して返す。
@@ -68,42 +99,81 @@ def search_circles(json_dict):
     """
     conn = sqlite3.connect('project.db')
     cursor = conn.cursor()
-    # tmp_dictは検索内容をidに変換して保存する
-    tmp_dict = dict()
-    tmp_dict["search_term"] = json_dict["search_term"]
+    raw_search_term = json_dict.get("search_term", "")
+    keywords = [k.strip() for k in raw_search_term.split() if k.strip()]
+    tags = [tag for tag in json_dict.get("tags", []) if tag]
+    params = []
+    tag_placeholders = ','.join(['?'] * len(tags)) if tags else 'NULL'
+    keyword_where_sql = "1=1"
+    if keywords:
+        keyword_conditions = []
+        for _ in keywords:
+            keyword_conditions.append("(c.circle_name LIKE ? OR c.circle_description LIKE ?)")
+        
+        keyword_where_sql = " AND ".join(keyword_conditions)
+        for keyword in keywords:
+            params.extend([f'%{keyword}%', f'%{keyword}%'])
+            
+    if tags:
+        params.extend(tags)
+        params.extend(tags)
+        params.extend(tags)
+        params.extend(tags)
+    params.append(len(tags))
     
-    sql = '''
-    SELECT t.circle_name, t.circle_icon_path
-    FROM (
-        SELECT c.circle_name, c.circle_icon_path
-        FROM circles AS c
-        WHERE c.circle_name LIKE ?
-    ) AS t
-    JOIN 
+    sql = f'''
+    SELECT c.circle_id, c.circle_name, c.circle_icon_path, c.circle_description, MAX(t.tag_name) AS field_name
+    FROM circles AS c
+    LEFT JOIN circle_tag AS ct ON c.circle_id = ct.circle_id
+    LEFT JOIN circle_tag AS ct_field ON c.circle_id = ct_field.circle_id
+    LEFT JOIN tags AS t ON ct_field.tag_id = t.tag_id AND t.tag_id IN (1, 2, 3, 4)
+    WHERE ({keyword_where_sql})
+        AND (
+            NOT EXISTS (SELECT 1 FROM tags WHERE tag_id IN ({tag_placeholders}))
+            OR ct.tag_id IN ({tag_placeholders})
+        )
+    GROUP BY c.circle_id, c.circle_name, c.circle_icon_path, c.circle_description
+    HAVING
+        -- 3. タグのAND条件 (タグが空なら常に真、タグがあるならCOUNTがタグ総数と一致)
+        (
+            NOT EXISTS (SELECT 1 FROM tags WHERE tag_id IN ({tag_placeholders}))
+            OR COUNT(DISTINCT CASE WHEN ct.tag_id IN ({tag_placeholders}) THEN ct.tag_id END) = ?
+        )
+    ORDER BY
+        c.circle_name;
     '''
+    
+    try:
+        cursor.execute(sql, tuple(params))
+        results_tuples = cursor.fetchall()
+        results_list_of_dicts = []
+        for row in results_tuples:
+            item = {
+                "circle_id": row[0],
+                "circle_name": row[1],
+                "circle_icon_path": row[2],
+                "circle_description": row[3],
+                "field": row[4]
+            }
+            results_list_of_dicts.append(item)
+            
+        # 3. Reactが期待する「辞書のリスト」を返す
+        return results_list_of_dicts
 
-    cursor.execute(sql, ('%' + tmp_dict["search_term"] + '%',))
-    # TagとCircleの間の関係性の名前はどれだ？
-    # res = cursor.execute("SELECT c.circle_name, c.circle_iconpath " \
-    #                     "FROM Circle AS c " \
-    #                     "JOIN circle_tag_table AS ctt ON c.circle_id = ctt.circle_id " \
-    #                     "WHERE ")#ここどうしようか考えてる
-    # res.fetchall()
-    cursor.close()
-    conn.close()
+    except sqlite3.Error as e:
+        print(f"データベースエラーが発生しました: {e}")
+        raise
+    
+
+    finally:
+        cursor.close()
+        conn.close()
+
 
 def get_circle_detail(circle_id):
     """
     指定した circle_id の詳細情報を DB から取得して辞書で返す。
-    返却フィールド:
-      - circle_name (str)
-      - circle_description (str)
-      - circle_fee (int or None)
-      - number_of_male (int or None)
-      - number_of_female (int or None)
-      - circle_icon_path (str or None)
-
-    見つからなければ None を返す。
+    返却フィールド:circle_name, circle_description, circle_fee, number_of_male, number_of_female, circle_icon, tags (リスト)
     """
     conn = sqlite3.connect('project.db')
     conn.row_factory = sqlite3.Row
@@ -118,40 +188,56 @@ def get_circle_detail(circle_id):
 
     cur.execute(sql, (circle_id,))
     row = cur.fetchone()
+
+    tag_sql = '''
+    SELECT t.tag_name
+    FROM tags AS t
+    JOIN circle_tag AS ct ON t.tag_id = ct.tag_id
+    WHERE ct.circle_id = ?
+    '''
+
+    cur.execute(tag_sql, (circle_id,))
+    tags = [row[0] for row in cur.fetchall()]
     cur.close()
     conn.close()
-
-    if row is None:
-        return None
-
-    def to_int(v):
-        try:
-            return int(v) if v is not None else None
-        except Exception:
-            return None
 
     return {
         'circle_name': row['circle_name'],
         'circle_description': row['circle_description'],
-        'circle_fee': to_int(row['circle_fee']),
-        'number_of_male': to_int(row['number_of_male']),
-        'number_of_female': to_int(row['number_of_female']),
-        'circle_icon_path': row['circle_icon_path']
+        'circle_fee': row['circle_fee'],
+        'number_of_male': row['number_of_male'],
+        'number_of_female': row['number_of_female'],
+        'circle_icon': row['circle_icon_path'],
+        'tags': tags
     }
     
 def tmp_registration(mailaddress):
     #database.dbは仮
     conn = sqlite3.connect('project.db')
     cursor = conn.cursor()
+    check_user_exist = cursor.execute("SELECT * FROM users WHERE mail_adress = ?", (mailaddress,))
+    if check_user_exist.fetchone() != None:
+        cursor.close()
+        conn.close()
+        return (False,)
+
     auth_code = random.randint(100000, 999999)
     tmp_id = int(''.join(secrets.choice(string.digits) for _ in range(6)))
     #tmp_idが重複した時の処理を後で書く
-    cursor.execute("INSERT INTO account_creates (tmp_id, auth_code, account_expire_time, account_create_time, attempt_count) " \
-                    "VALUES (?, ?, datetime('now','+1 minute'), datetime('now'), 0)", (tmp_id,auth_code))
-    conn.commit()
+    complete = False
+    for i in range(5):
+        try:
+            cursor.execute("INSERT INTO account_creates (tmp_id, auth_code, account_expire_time, account_create_time, attempt_count) " \
+                            "VALUES (?, ?, datetime('now','+5 minute'), datetime('now'), 0)", (tmp_id,auth_code))
+            conn.commit()
+        except sqlite3.IntegrityError:
+            tmp_id = int(''.join(secrets.choice(string.digits) for _ in range(6)))
+        else:
+            complete = True
+            break
     cursor.close()
     conn.close()
-    return (auth_code,tmp_id)
+    return (complete, auth_code, tmp_id)
     
 def check_auth_code(auth_code, tmp_id):
     conn = sqlite3.connect("project.db")
@@ -171,14 +257,16 @@ def check_auth_code(auth_code, tmp_id):
         conn.close()
         return {"message": "failure", "error_message": "コードの入力の間違いが一定回数を越えました。メールアドレスの入力からやり直してください。"}
     #期限が切れている場合
-    if datetime.datetime.strptime(tmp_user_db[1], '%Y-%m-%d %H:%M:%S') > datetime.datetime.now():
+    if not datetime.datetime.strptime(tmp_user_db[1], '%Y-%m-%d %H:%M:%S') > datetime.datetime.now():
+        print(tmp_user_db[1])
+        print(datetime.datetime.now())
         cursor.execute("DELETE FROM account_creates WHERE tmp_id = ?", (tmp_id,))
         cursor.close()
         conn.close()
         return {"message": "failure", "error_message": "認証コードの期限が過ぎています。メールアドレスの入力からやり直してください。"}
     #認証コードが間違っている場合
     if tmp_user_db[0] != auth_code:
-        cursor.execute("UPDATE account_creates SET attempt_count = attmpt_count + 1 WHERE tmp_id = ?", (tmp_id,))
+        cursor.execute("UPDATE account_creates SET attempt_count = attempt_count + 1 WHERE tmp_id = ?", (tmp_id,))
         conn.commit()
         cursor.close()
         conn.close()
@@ -195,11 +283,22 @@ def create_account(emailaddress, password, user_name):
     cursor = conn.cursor()
     #ここもuser_id重複時の処理がいる
     user_id = int(''.join(secrets.choice(string.digits) for _ in range(6)))
-    cursor.execute("INSERT INTO users (user_id, user_name, mail_adress, password) " \
-                    "VALUES (?, ?, ?, ?)", (user_id, user_name, emailaddress, password))
-    conn.commit()
+    complete = False
+    for i in range(5):
+        try:
+            print(user_id)
+            cursor.execute("INSERT INTO users (user_id, user_name, mail_adress, password) " \
+                            "VALUES (?, ?, ?, ?)", (user_id, user_name, emailaddress, password))
+            conn.commit()
+        except sqlite3.Error as e:
+            print(e)
+            user_id = int(''.join(secrets.choice(string.digits) for _ in range(6)))
+        else:
+            complete = True
+            break
     cursor.close()
     conn.close()
+    return complete
 
 def check_login(emailaddress, password):
     conn = sqlite3.connect("project.db")
@@ -233,6 +332,22 @@ def make_session(emailaddress):
     cursor.close()
     conn.close()
     return (complete, session_id)
+
+def cleanup_session_tmpid():
+    conn = sqlite3.connect("project.db")
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM sessions " \
+                    "WHERE session_create_time < datetime('now', '-7 days') " \
+                    "OR session_last_access_time < datetime('now', '-1 days')")
+    cursor.execute("DELETE FROM account_creates " \
+                    "WHERE account_expire_time < datetime('now')")
+    conn.commit()
+    cursor.close()
+    conn.close()
+    #確認のために5秒にしてある
+    time.sleep(3600)
+    clean_thread = threading.Thread(target = cleanup_session_tmpid, daemon = True)
+    clean_thread.start()
 
 def delete_circle_by_id(circle_id):
     """

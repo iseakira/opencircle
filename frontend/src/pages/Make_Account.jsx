@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import {useNavigate} from "react-router-dom";
 import { useState, useEffect } from 'react';
 import headImage from '../images/head_image.png';
-
+import CircleLogo from '../conponents/CircleLogo';
 function Make_Account() {
     //imput_email.jsxで入力されたメールアドレスとtmp_idを取得
     let initialEmail = '';
@@ -95,14 +95,17 @@ function Make_Account() {
     };
     return (
     <div>
-        <header className="page-header">
+        {/* <header className="page-header">
             <h1>
                 <Link to="/">
                 <img className="logo" src={headImage} alt="アイコン" />
                 </Link>
             </h1>
         </header>
-        <h1>東京理科大学サークル情報サイト</h1>
+        <h1>東京理科大学サークル情報サイト</h1> */}
+      <header>
+        <CirlceLogo></CirlceLogo>
+        </header>
         <main>
             <h3>パスワードとメールアドレスに送信された認証コードとユーザー名を入力してください</h3>
             <form onSubmit={handleCreateAccount}>

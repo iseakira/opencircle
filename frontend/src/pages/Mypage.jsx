@@ -2,6 +2,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import headImage from '../images/head_image.png';
 import '../css/App.css';
+import CircleLogo from "../conponents/CircleLogo";
 
 function Mypage() {
   const navigate = useNavigate();
@@ -32,11 +33,12 @@ function Mypage() {
   return (
     <div>
       <header className="page-header">
-        <h1>
+        {/* <h1>
           <Link to="/">
             <img className="logo" src={headImage} alt="アイコン" />
           </Link>
-        </h1>
+        </h1> */}
+        <CircleLogo></CircleLogo>
         {hasPermission && (
           <button
             className="sub-button"
