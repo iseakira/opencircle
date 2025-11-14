@@ -1,52 +1,56 @@
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import headImage from '../images/head_image.png';
-import '../css/App.css';
 import CircleLogo from "../conponents/CircleLogo";
+import '../css/App.css';
+import headImage from '../images/head_image.png';
 
 function Mypage() {
   const navigate = useNavigate();
   const [circles, setCircles] = useState([]);
-  const [hasPermission, setHasPermission] = useState(false);
+  const [selectedCircleId, setSelectedCircleId] = useState("");
+  const [targetUserId, setTargetUserId] = useState("");
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
   useEffect(() => {
     fetch("http://localhost:5001/api/mypage", {
       credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => {
-        if (data.items) {
-          setCircles(data.items);
-          if (data.items.length > 0) {//以下お試し
-            const firstCircleId = data.items[0].circle_id;
-            fetch(`http://localhost:5001/api/has-edit-auth?circle_id=${firstCircleId}`, {
-              credentials: "include",
-            })
-              .then((res) => res.json())
-              .then((authData) => {
-                setHasPermission(authData.has_permission);
-              });
-          }
-        }
+        if (data.items) setCircles(data.items);
       })
       .catch((err) => console.error("データ取得失敗:", err));
   }, []);
+  const handleAddAuthorization = () => {
+    setMessage("");
+    setError("");
+    if (!selectedCircleId || !targetUserId) {
+      setError("サークルとユーザーIDを入力してください。");
+      return;
+    }
+    fetch("http://localhost:5001/api/edit-authorization", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        circle_id: selectedCircleId,
+        target_user_id: targetUserId,
+      }),
+    })
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "エラーが発生しました");
+        setMessage(data.message);
+        setTargetUserId("");
+      })
+      .catch((err) => {
+        setError(err.message);
+      });
+  };
   return (
     <div>
       <header className="page-header">
-        {/* <h1>
-          <Link to="/">
-            <img className="logo" src={headImage} alt="アイコン" />
-          </Link>
-        </h1> */}
-        <CircleLogo></CircleLogo>
-        {hasPermission && (
-          <button
-            className="sub-button"
-            onClick={() => navigate("/add-authorization")}
-          >
-            権限を付与
-          </button>
-        )}
+        <CircleLogo />
       </header>
       <main>
         <h1>マイページ</h1>
@@ -55,22 +59,18 @@ function Mypage() {
         </button>
         <p>（サークル追加用の画面へ）</p>
         <h2>編集できるサークル一覧</h2>
-        
-       
-        
-        <button
-          onClick={() => navigate('/edit-circle/1')}
-          style={{ backgroundColor: '#f0ad4e', margin: '10px 0', padding: '8px' }}
-        >
-          (テスト用) ID:1の編集ページへ
-        </button>
         <div className="circle-list">
           {circles.length > 0 ? (
             circles.map((c) => (
               <div
                 key={c.circle_id}
                 className="circle-item"
-                onClick={() => navigate(`/edit-circle/${c.circle_id}`)}
+                onClick={() => setSelectedCircleId(c.circle_id)}
+                style={{
+                  backgroundColor:
+                    selectedCircleId === c.circle_id ? "#D0F0D0" : "white",
+                  cursor: "pointer",
+                }}
               >
                 {c.circle_name}
               </div>
@@ -79,6 +79,26 @@ function Mypage() {
             <p>編集できるサークルがありません。</p>
           )}
         </div>
+        {selectedCircleId && (
+          <div className="auth-form" style={{ marginTop: "20px" }}>
+            <h3>選択中のサークルID: {selectedCircleId}</h3>
+            <input
+              type="text"
+              placeholder="付与するユーザーIDを入力"
+              value={targetUserId}
+              onChange={(e) => setTargetUserId(e.target.value)}
+              style={{ padding: "8px", marginRight: "10px" }}
+            />
+            <button
+              onClick={handleAddAuthorization}
+              style={{ padding: "8px 16px", backgroundColor: "#007BFF", color: "white" }}
+            >
+              権限を付与
+            </button>
+            {message && <p style={{ color: "green" }}>{message}</p>}
+            {error && <p style={{ color: "red" }}>{error}</p>}
+          </div>
+        )}
       </main>
     </div>
   );
