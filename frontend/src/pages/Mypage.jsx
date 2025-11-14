@@ -107,7 +107,7 @@ function Mypage() {
       </div>
 
       <header className="page-header">
-        <CircleLogo />
+        {/* <CircleLogo /> */}
       </header>
 
       <main style={{ paddingTop: "100px" }}>
