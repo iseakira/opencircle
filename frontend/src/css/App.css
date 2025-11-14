@@ -1,15 +1,9 @@
 :root {
   /* カラーパレット - 4色のデザインシステム */
-  --bg-color: #f6f2f4;        /* 背景色 */
-  --base-color: #172b49;      /* ベースカラー（メインテキスト・ダーク） */
-  --accent-color: #f38d2f;    /* アクセントカラー（強調・オレンジ） */
-  --main-color: #9bf8d5;      /* メインカラー（ハイライト・ミント） */
-
-  /* 補助色（使いやすさのため） */
-  --surface-color: #ffffff;   /* カード・サーフェス背景 */
-  --text-on-dark: #ffffff;    /* ダーク背景上のテキスト */
-  --text-muted: rgba(23, 43, 73, 0.6); /* 薄いテキスト */
-  --border-color: rgba(0, 0, 0, 0.1); /* ボーダー */
+  --back-color: #fff;        /* 背景色 */
+  --base-color: hsl(216, 52%, 19%);      /* ベースカラー（メインテキスト・ダーク） */
+  --main-color: rgb(146, 216, 209);    /* アクセントカラー（強調・オレンジ） */
+  --accent-color: #9bf8d5;      /* メインカラー（ハイライト・ミント） */
 }
 
 #root {
@@ -20,7 +14,7 @@
 }
 
 body {
-  background-color: var(--bg-color);
+  background-color: var(--back-color);
   color: var(--base-color);
   margin: 0;
   padding: 0;
@@ -56,9 +50,9 @@ body {
   border-radius: 99px;
   height: 2em;
   width: auto;
-  background-color: transparent;
+  background-color: #fff;
   border: 2px solid;
-  color: #007bff;
+  color: rgb(23, 108, 147);
   font-weight: bold;
   font-size: 0.9rem;
   text-decoration: none;
@@ -69,7 +63,7 @@ body {
 }
 
 .login:hover {
-  background-color: #007bff;
+  background-color: rgb(23, 108, 147);
   color: #fff;
   transform: translateY(-2px);
   box-shadow: 0px 3px 6px rgba(0, 123, 255, 0.3);
@@ -153,7 +147,7 @@ button[aria-expanded] {
   font-weight: bold;
   text-align: center;
   color: #333;
-  background-color: #f4f4f4;
+  background-color: var(--accent-color);
   border: 1px solid #ddd;
   border-radius: 8px;
   cursor: pointer;
@@ -161,5 +155,5 @@ button[aria-expanded] {
   margin-top: 1rem;
 }
 button[aria-expanded]:hover {
-  background-color: #e9e9e9;
+  background-color: rgb(129, 180, 177)
 }
