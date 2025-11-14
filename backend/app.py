@@ -410,6 +410,8 @@ def update_circle(circle_id):
 
     if not data_name or not data_description:
         return jsonify({"error": "circle_name と circle_description は必須です"}), 400
+    
+    old_icon_path = circle_to_update.circle_icon_path
 
     # --- ▼ 4. 画像ファイルの保存 (add_circle と同じロジック) ▼ ---
     if file:
@@ -420,8 +422,24 @@ def update_circle(circle_id):
         
         # (TODO: ここで古い画像ファイル circle_to_update.circle_icon_path を削除する処理)
         
-        circle_to_update.circle_icon_path = saved_path # DBに保存するパスを更新
-    
+        # --- ▼▼▼ (★ 修正点 2: 古いファイルを削除) ▼▼▼ ---
+        if old_icon_path and old_icon_path.startswith(UPLOAD_BASE_URL):
+            try:
+                # URLパス (例: /api/uploads/old.png) から
+                # 物理パス (例: /app/uploads/old.png) を組み立てる
+                old_filename = old_icon_path.replace(UPLOAD_BASE_URL + '/', "")
+                old_file_physical_path = os.path.join(app.config['UPLOAD_FOLDER'], old_filename)
+                
+                # ファイルが存在すれば削除
+                if os.path.exists(old_file_physical_path):
+                    os.remove(old_file_physical_path)
+                    print(f"古い画像ファイルを削除しました: {old_file_physical_path}")
+                
+            except Exception as e:
+                # (削除に失敗しても、更新処理自体は続行する)
+                print(f"古い画像ファイルの削除に失敗: {e}")
+        # --- ▲▲▲ (古いファイルの削除 完了) ▲▲▲ ---
+        
     # (file がない場合は、既存の icon_path がそのまま保持されます)
     
     # --- ▼ 5. テキスト情報の更新 ▼ ---
