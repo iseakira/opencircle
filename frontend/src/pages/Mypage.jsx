@@ -110,7 +110,8 @@ function Mypage() {
         <CircleLogo />
       </header>
 
-      <main style={{ paddingTop: "100px" }}>
+      {/* <main style={{ paddingTop: "10px" }}> */}
+        <main>
         <h1>マイページ</h1>
 
         <button onClick={() => navigate('/add_circle')} className="main-button">
@@ -118,12 +119,18 @@ function Mypage() {
         </button>
 
         <h2 style={{ marginTop: "40px" }}>編集できるサークル一覧</h2>
+        {/* <div className="circle-info"> */}
         <div className="circle-list">
           {circles.length > 0 ? (
             circles.map((c) => (
               <div
                 key={c.circle_id}
+<<<<<<< HEAD
                 className="circle-item"
+=======
+                // className="circle-item"
+                className="circle-info"
+>>>>>>> 27aa118083b4b01c3795a0643e07cbf688a8ab47
                 onClick={() => navigate(`/edit-circle/${c.circle_id}`)}
                 style={{
                   backgroundColor: "white",
@@ -140,7 +147,8 @@ function Mypage() {
           ) : (
             <p>編集できるサークルがありません。</p>
           )}
-        </div>
+          </div>
+        {/* </div> */}
       </main>
     </div>
   );
