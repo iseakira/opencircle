@@ -68,13 +68,14 @@ function Login() {
   return (
     <div>
       <header className="page-header">
-        <h1>
+        {/* <h1>
           <Link to="/">
             <img className="logo" src={headImage} alt="アイコン" />
           </Link>
-        </h1>
+        </h1> */}
+        <CircleLogo></CircleLogo>
       </header>
-      <h1>東京理科大学サークル情報サイト</h1>
+      {/* <h1>東京理科大学サークル情報サイト</h1> */}
       
       <main>
         <h3>メールアドレスとパスワードを入力してください</h3>
