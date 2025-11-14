@@ -3,6 +3,9 @@ import { useState, useEffect } from 'react';
 import '../css/App.css';
 import headImage from '../images/head_image.png';
 import Toggle from './Toggle.jsx';
+import { useContext} from 'react'
+import { AuthContext } from '../AuthStatus.jsx';
+import LoginOutButton from './LogInOutButton.jsx';
 import CircleLogo from '../conponents/CircleLogo.jsx';
 
 
@@ -86,9 +89,7 @@ function Home() {
         </h1>
         {/* <CircleLogo></CircleLogo> */}
         <h3>
-          <Link to="Login" className="login">
-            ログイン
-          </Link>
+          <LoginOutButton />
         </h3>
         
       </header>

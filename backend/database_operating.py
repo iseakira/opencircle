@@ -333,6 +333,28 @@ def make_session(emailaddress):
     conn.close()
     return (complete, session_id)
 
+def check_session(session_id):
+    conn = sqlite3.connect("project.db")
+    cursor = conn.cursor()
+    res = cursor.execute("SELECT session_create_time, session_last_access_time " \
+                            "FROM sessions WHERE session_id = ?", (session_id,))
+    session_data_tuple = res.fetchone()
+    if session_data_tuple == None:
+        return False
+    if not datetime.datetime.strptime(session_id[0], '%Y-%m-%d %H:%M:%S') > datetime.datetime.now() + datetime.timedelta(days=7):
+        cursor.execute("DELETE FROM sessions WHEWE session_id = ?", (session_id,))
+        conn.commit()
+        cursor.close()
+        return False
+    if not datetime.datetime.strptime(session_id[1], '%Y-%m-%d %H:%M:%S') > datetime.datetime.now() + datetime.timedelta(days=1):
+        cursor.execute("DELETE FROM sessions WHEWE session_id = ?", (session_id,))
+        conn.commit()
+        cursor.close()
+        return False
+    cursor.close()
+    conn.close()
+    return True
+
 def cleanup_session_tmpid():
     conn = sqlite3.connect("project.db")
     cursor = conn.cursor()
@@ -344,7 +366,7 @@ def cleanup_session_tmpid():
     conn.commit()
     cursor.close()
     conn.close()
-    #確認のために5秒にしてある
+    #1時間に一回
     time.sleep(3600)
     clean_thread = threading.Thread(target = cleanup_session_tmpid, daemon = True)
     clean_thread.start()

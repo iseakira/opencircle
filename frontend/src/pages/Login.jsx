@@ -2,6 +2,9 @@ import { Link } from 'react-router-dom';
 import {useNavigate} from "react-router-dom";
 import React, { useState } from 'react';
 import headImage from '../images/head_image.png';
+import { AuthContext } from '../AuthStatus';
+import { useContext } from 'react'
+
 import CircleLogo from '../conponents/CircleLogo';
 function Login() {
   const navigate = useNavigate();
@@ -13,6 +16,7 @@ function Login() {
   const handleChange_password = (e) => {
     setPassword(e.target.value);
   }
+  const { setLogin } = useContext(AuthContext)
 
 
   const handleSubmit = (e) => {
@@ -45,6 +49,7 @@ function Login() {
       console.log("サーバーからの応答：",result);
       if(result.message === "success"){
         console.log("ログイン成功");
+        setLogin()//大西さんが編集してるよ
         navigate('/mypage')
       }else{
         alert("もう一度入力してください");
