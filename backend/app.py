@@ -338,48 +338,23 @@ def add_circle():
 
 
 # GET: 1件のサークル情報を取得する
-# GET: 1件のサークル情報を取得する (★ 認証・権限チェック追加 ★)
+
 @app.route('/api/circles/<int:circle_id>', methods=['GET'])
 def get_circle(circle_id):
 
-    # --- ▼ 1. 認証チェック (門番) ▼ ---
-    session_id_str = request.cookies.get("session_id")
-
-    if not session_id_str:
-        return jsonify({"error": "認証されていません (Cookieが見つかりません)"}), 401
-    
-    try:
-        session_id = int(session_id_str)
-    except ValueError:
-        return jsonify({"error": "不正なセッション形式です"}), 401
-
-    active_session = db.session.get(Session, session_id)
-
-    if not active_session:
-        return jsonify({"error": "セッションが無効です（ログインしていません）"}), 401
-
-    session_timeout_hours = 24
-    utc_now = datetime.now(timezone.utc)
-    
-    if active_session.session_last_access_time < utc_now - timedelta(hours=session_timeout_hours):
-        db.session.delete(active_session) 
-        db.session.commit()
-        return jsonify({"error": "セッションが期限切れです。再度ログインしてください"}), 401
-    
-    # 認証成功
-    user_id = active_session.user_id
-    active_session.session_last_access_time = utc_now # セッション時刻を更新
+    # --- ▼ 1. 認証チェック (verify_login に統一) ▼ ---
+    user_id, err, code = verify_login()
+    if err:
+        return err, code
     # --- ▲ 認証チェック完了 ▲ ---
 
 
-    # --- ▼ 2. 編集対象のサークルを取得 ▼ ---
     circle = Circle.query.get(circle_id)
     if not circle:
         return jsonify({"error": "指定されたサークルが見つかりません"}), 404
         
     
-    # --- ▼ 3. (推奨) 権限チェック ▼ ---
-    # この user_id が、この circle_id の編集権限を持っているか確認
+    # --- ▼ 3. 権限チェック ▼ ---
     auth = EditAuthorization.query.filter_by(
         user_id=user_id, 
         circle_id=circle.circle_id
@@ -387,7 +362,6 @@ def get_circle(circle_id):
     
     if not auth:
         # ログインはしているが、このサークルの編集権限がない
-        db.session.rollback() # セッション時刻の更新を取り消す
         return jsonify({"error": "このサークルの編集権限がありません"}), 403
     # --- ▲ 権限チェック完了 ▲ ---
 
@@ -414,12 +388,10 @@ def get_circle(circle_id):
     }
 
     try:
-        # ★ 認証チェックで更新したセッション時刻をコミット
-        db.session.add(active_session) 
-        db.session.commit()
+        db.session.commit() 
     except Exception as e:
         db.session.rollback()
-        return jsonify({"error": "サーバーエラー (セッション更新失敗)", "detail": str(e)}), 500
+        return jsonify({"error": "サーバーエラー (DBコミット失敗)", "detail": str(e)}), 500
 
     # 辞書をJSONにして返す (200 OK)
     return jsonify(circle_data), 200
@@ -428,7 +400,7 @@ def get_circle(circle_id):
 @app.route('/api/circles/<int:circle_id>', methods=['PUT'])
 def update_circle(circle_id):
     
-    # --- ▼ 1. 認証チェック (門番) ▼ ---
+    # --- ▼ 1. 認証チェック  ▼ ---
     session_id_str = request.cookies.get("session_id")
     # print(session_id_str) # (デバッグ用)
 
@@ -447,10 +419,8 @@ def update_circle(circle_id):
 
     session_timeout_hours = 24 # (24時間に設定)
     
-    # (注: datetime.utcnow() は非推奨。タイムゾーン対応の now() を使用)
-    utc_now = datetime.now(timezone.utc) 
+    utc_now = datetime.utcnow()
     
-    # 最終アクセス時刻を 'session_last_access_time' カラムから取得
     if active_session.session_last_access_time < utc_now - timedelta(hours=session_timeout_hours):
         db.session.delete(active_session) 
         db.session.commit()
@@ -462,14 +432,13 @@ def update_circle(circle_id):
     # --- ▲ 認証チェック完了 ▲ ---
 
 
-    # --- ▼ 2. 編集対象のサークルを取得 ▼ ---
+    # ---  2. 編集対象のサークルを取得  ---
     circle_to_update = Circle.query.get(circle_id)
     if not circle_to_update:
         return jsonify({"error": "指定されたサークルが見つかりません"}), 404
         
     
-    # --- ▼ 3. (推奨) 権限チェック ▼ ---
-    # この user_id が、この circle_id の編集権限を持っているか確認
+    # ---  3. (推奨) 権限チェック  ---
     auth = EditAuthorization.query.filter_by(
         user_id=user_id, 
         circle_id=circle_to_update.circle_id
@@ -478,7 +447,7 @@ def update_circle(circle_id):
     if not auth:
         # ログインはしているが、このサークルを編集する権限がない
         return jsonify({"error": "このサークルの編集権限がありません"}), 403
-    # --- ▲ 権限チェック完了 ▲ ---
+    # ---  権限チェック完了  ---
 
 
     # --- ▼ 4. FormData からデータを取得 ▼ ---
@@ -493,9 +462,7 @@ def update_circle(circle_id):
     if not data_name or not data_description:
         return jsonify({"error": "circle_name と circle_description は必須です"}), 400
 
-    # --- ▼ 5. 画像ファイルの保存 (古いファイル削除ロジック含む) ▼ ---
-    
-    # (古いパスを先に控えておく)
+    # --- ▼ 5. 画像ファイルの保存 ▼ ---
     old_icon_path = circle_to_update.circle_icon_path 
     
     if file:
@@ -510,8 +477,6 @@ def update_circle(circle_id):
         # (古いファイルを削除)
         if old_icon_path and old_icon_path.startswith(UPLOAD_BASE_URL):
             try:
-                # URLパス (例: /api/uploads/old.png) から
-                # 物理パス (例: /app/uploads/old.png) を組み立てる
                 old_filename = old_icon_path.replace(UPLOAD_BASE_URL + '/', "")
                 old_file_physical_path = os.path.join(app.config['UPLOAD_FOLDER'], old_filename)
                 
@@ -524,7 +489,6 @@ def update_circle(circle_id):
                 # (削除に失敗しても、更新処理自体は続行する)
                 print(f"古い画像ファイルの削除に失敗: {e}")
         
-    # (file がない場合は、既存の icon_path がそのまま保持されます)
     
     
     # --- ▼ 6. テキスト情報の更新 ▼ ---
@@ -550,7 +514,6 @@ def update_circle(circle_id):
             circle_to_update.tags.append(tag)
             
     try:
-        # ★ 認証チェックで更新したセッション時刻も一緒にコミット
         db.session.add(active_session) 
         db.session.commit()
     except Exception as e:
