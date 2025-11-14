@@ -2,7 +2,10 @@ import { Link } from 'react-router-dom';
 import {useNavigate} from "react-router-dom";
 import React, { useState } from 'react';
 import headImage from '../images/head_image.png';
+import { AuthContext } from '../AuthStatus';
+import { useContext } from 'react'
 
+import CircleLogo from '../conponents/CircleLogo';
 function Login() {
   const navigate = useNavigate();
   const [emailaddress, setEmailaddress] = useState('');
@@ -13,6 +16,7 @@ function Login() {
   const handleChange_password = (e) => {
     setPassword(e.target.value);
   }
+  const { setLogin } = useContext(AuthContext)
 
 
   const handleSubmit = (e) => {
@@ -36,6 +40,7 @@ function Login() {
           'Content-Type': 'application/json',
         },
         body: json_email_pass,
+        credentials: "include"
       });
       if(!response.ok){
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -44,6 +49,7 @@ function Login() {
       console.log("サーバーからの応答：",result);
       if(result.message === "success"){
         console.log("ログイン成功");
+        setLogin()//大西さんが編集してるよ
         navigate('/mypage')
       }else{
         alert("もう一度入力してください");
@@ -69,6 +75,7 @@ function Login() {
         </h1>
       </header>
       <h1>東京理科大学サークル情報サイト</h1>
+      
       <main>
         <h3>メールアドレスとパスワードを入力してください</h3>
         <form onSubmit={handleSubmit}>

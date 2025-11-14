@@ -3,6 +3,10 @@ import { useState, useEffect } from 'react';
 import '../css/App.css';
 import headImage from '../images/head_image.png';
 import Toggle from './Toggle.jsx';
+import { useContext} from 'react'
+import { AuthContext } from '../AuthStatus.jsx';
+import LoginOutButton from './LogInOutButton.jsx';
+import CircleLogo from '../conponents/CircleLogo.jsx';
 
 
 function Home() {
@@ -47,13 +51,13 @@ function Home() {
   }, []);
 
   //サークルの項目をクリックしたときに行う処理
-  const to_circle_page = (circle_id) => {
+  const to_circle_page = async(circle_id) => {
     const json_circle_id = JSON.stringify({circle_id: circle_id})
     console.log("取得したいサークルのid:", json_circle_id)
-    send_Id(json_circle_id);
+    await send_Id(json_circle_id);
     return;
   };
-
+  //サークルページの表示に伴うサークル情報の取得及びCircle_Pageへの遷移
   const send_Id = async (json_circle_id) => {
     try{
       const response = await fetch("http://localhost:5001/Circle_Page",{
@@ -66,8 +70,9 @@ function Home() {
       const data = await response.json();
       console.log("項目をクリックした時：",data);
       const dataString = JSON.stringify(data);
-      localStorage.setItem('circle_detail', dataString);
-      navigate('/Circle_Page');
+      //localStorage.setItem('circle_detail', dataString);
+      //navigate('/Circle_Page');
+      navigate('/Circle_Page', { state: { circleDetail: data } })
     }catch{
       console.error("サークルページへの遷移に失敗しました")
       alert("サークルページへの遷移に失敗しました");
@@ -82,16 +87,11 @@ function Home() {
             <img className="logo" src={headImage} alt="アイコン" />
           </Link>
         </h1>
+        {/* <CircleLogo></CircleLogo> */}
         <h3>
-          <Link to="Login" className="login">
-            ログイン
-          </Link>
+          <LoginOutButton />
         </h3>
-         <h3>
-          <Link to="Mypage" className="mypage">
-            マイページ
-          </Link>
-        </h3>
+        
       </header>
 
       <main>
@@ -100,6 +100,7 @@ function Home() {
         <h2>サークル一覧</h2>
         <Toggle receivedData_fb={handleResponse} />
         <div>
+        <br />
           {isLoading ? (
             <p>サークル情報を読み込み中です...</p>
             ) : error ? (

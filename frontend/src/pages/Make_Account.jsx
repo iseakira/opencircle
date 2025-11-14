@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import {useNavigate} from "react-router-dom";
 import { useState, useEffect } from 'react';
 import headImage from '../images/head_image.png';
-
+import CircleLogo from '../conponents/CircleLogo';
 function Make_Account() {
     //imput_email.jsxで入力されたメールアドレスとtmp_idを取得
     let initialEmail = '';

@@ -1,10 +1,12 @@
 import React from 'react'
 
-export default function CircleDescription({value,onChange}) {
+export default function CircleDescription({value,onChange,isError}) {
   return (
     <div>
-      <p>説明*</p>
-      <textarea type="text" onChange={onChange} value={value} id="Cdes"/>
+       <p style={{color:isError ? "red" : "black"}}>
+        説明*<span style={{color:"red"}}></span>
+        </p>
+      <textarea  onChange={onChange} value={value} id="Cdes"/>
     </div>
   )
 }
