@@ -54,7 +54,7 @@ function Mypage() {
     <div style={{ position: "relative", minHeight: "100vh" }}>
 
       {/* 右上の権限付与ボタン */}
-      <div style={{ position: "absolute", top: "20px", right: "20px" }}>
+      <div style={{ position: "absolute", top: "40px", right: "20px" }}>
         <button
           onClick={() => setShowAuthForm(!showAuthForm)}
           style={{ padding: "8px 16px", backgroundColor: "#007BFF", color: "white", borderRadius: "6px" }}
