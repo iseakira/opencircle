@@ -51,7 +51,7 @@ function Mypage() {
   return (
     <div style={{ position: "relative", minHeight: "100vh" }}>
       
-      {/* ▼ 右上の権限付与フォーム -------------------------------- */}
+      {/*右上の権限付与フォーム --------------------------------*/}
       <div style={{ 
         position: "absolute", 
         top: "20px", 
