@@ -6,6 +6,7 @@ import Toggle from './Toggle.jsx';
 import { useContext} from 'react'
 import { AuthContext } from '../AuthStatus.jsx';
 import LoginOutButton from './LogInOutButton.jsx';
+import CircleLogo from '../conponents/CircleLogo.jsx';
 
 
 function Home() {
@@ -86,6 +87,7 @@ function Home() {
             <img className="logo" src={headImage} alt="アイコン" />
           </Link>
         </h1>
+        {/* <CircleLogo></CircleLogo> */}
         <h3>
           <LoginOutButton />
         </h3>

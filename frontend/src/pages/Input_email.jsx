@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import headImage from '../images/head_image.png';
-
+import CircleLogo from '../conponents/CircleLogo';
 function Input_email() {
   //入力されたメールアドレスを保持するステート
   const [emailaddress, setEmailaddress] = useState('');
@@ -71,6 +71,7 @@ function Input_email() {
         </h1>
       </header>
       <h1>東京理科大学サークル情報サイト</h1>
+
       <main>
         <h3>登録したいメールアドレスを入力してください</h3>
         <form onSubmit={email_processing}>

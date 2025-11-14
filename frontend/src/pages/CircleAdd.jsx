@@ -66,12 +66,22 @@ function CircleAdd() {
 
   
     
-  const [tags,setCircleTags]=useState("");
-
+  const [tags,setCircleTags]=useState([]);
+const [errorFields,setErrorFields]=useState([]);
   const handleKey=(e)=>{
        e.preventDefault(); 
+       const errors =[];
    const {circle_name,circle_description,circle_fee,number_of_male,number_of_female,circle_icon_path,tags}=circleData;
-    if(!circle_name||!circle_description){
+   if(!circle_name){
+    errors.push("circle_name");
+   }
+   if(!circle_description){
+    errors.push("circle_description");
+   }
+   if(errors.length >0){
+    setErrorFields(errors);
+   }
+   if(!circle_name||!circle_description){
       alert("*は必須項目です");
     }else{
     // alert(`サークルを追加しました`);
@@ -92,6 +102,7 @@ function CircleAdd() {
       tags:selectedValues,
      })
     alert(`サークルを追加しました`);
+    setErrorFields([]);
   }else{
    // alert("キャンセルしました");
   }
@@ -235,19 +246,19 @@ function CircleAdd() {
 
     <div>
       <header>
-        <h1>
-          <Link to="/">
-            <img className="logo" src={headImage} alt="アイコン" />
-          </Link>
-        </h1>
+          {/* <Link to="/"> */}
+            {/* <img className="logo" src={headImage} alt="アイコン" /> */}
+          {/* </Link> */}
+          <CircleLogo></CircleLogo>
       </header>
-      <h1>東京理科大学サークル情報サイト</h1>
+      
+      {/* <h1>東京理科大学サークル情報サイト</h1> */}
       <h3>追加したいサークルの情報を入力してください</h3>
       <p>※「*」の項目は必須</p>
       {/* <AddCircle></AddCircle> */}
       <form onSubmit={handleKey}> 
-        <CircleName value={circleData.circle_name} onChange={NameChange} ></CircleName>
-        <CircleDescription value={circleData.circle_description} onChange={DesChange}></CircleDescription>
+        <CircleName value={circleData.circle_name} onChange={NameChange} isError={errorFields.includes("circle_name")}></CircleName>
+        <CircleDescription value={circleData.circle_description} onChange={DesChange} isError={errorFields.includes("circle_description")}></CircleDescription>
         <CircleMen value={circleData.number_of_male} onChange={MemChange}></CircleMen>
         <CircleFemen value={circleData.number_of_female} onChange={FememChange}></CircleFemen>
         <CircleFee value={circleData.circle_fee} onChange={FeeChange}></CircleFee>

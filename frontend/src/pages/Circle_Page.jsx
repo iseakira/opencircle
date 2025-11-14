@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 //import { useNavigate } from 'react-router-dom';
 import headImage from '../images/head_image.png';
 import '../css/App.css';
-
+import CircleLogo from '../conponents/CircleLogo';
 function Circle_Page(){
     const location = useLocation();
     const [response_data, setResponse_data] = useState(null);
@@ -40,13 +40,13 @@ function Circle_Page(){
     return (
     <div>
         <header className="page-header">
-            <h1>
+            {/* <h1>
                 <Link to="/">
                     <img className="logo" src={headImage} alt="アイコン" />
                 </Link>
-            </h1>
+            </h1> */}
+            <CircleLogo></CircleLogo>
         </header>
-
         <main>
             <h1>サークルページ</h1>
             <div>

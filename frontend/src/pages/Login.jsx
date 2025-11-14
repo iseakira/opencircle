@@ -5,6 +5,7 @@ import headImage from '../images/head_image.png';
 import { AuthContext } from '../AuthStatus';
 import { useContext } from 'react'
 
+import CircleLogo from '../conponents/CircleLogo';
 function Login() {
   const navigate = useNavigate();
   const [emailaddress, setEmailaddress] = useState('');
@@ -74,6 +75,7 @@ function Login() {
         </h1>
       </header>
       <h1>東京理科大学サークル情報サイト</h1>
+      
       <main>
         <h3>メールアドレスとパスワードを入力してください</h3>
         <form onSubmit={handleSubmit}>
