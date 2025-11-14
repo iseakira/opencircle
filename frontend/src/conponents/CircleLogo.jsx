@@ -20,6 +20,7 @@ export default function CircleLogo() {
      <img src={PageTitle} alt="あれ？" onClick={reloadPage}
      style={{
       maxWidth:"500px",
+      width:"100%",
      }}
      />
      {/* <h1>東京理科大学サークル情報サイト</h1> */}
