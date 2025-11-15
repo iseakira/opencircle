@@ -1,6 +1,6 @@
 :root {
   /* カラーパレット - 4色のデザインシステム */
-  --back-color: #E6E5E0;        /* 背景色 */
+  --back-color: #f2f1eb;        /* 背景色 */
   --base-color: hsl(216, 52%, 19%);      /* ベースカラー（メインテキスト・ダーク） */
   --main-color: #469DAE;    
   --main-color-sub:#9eb8bc90;

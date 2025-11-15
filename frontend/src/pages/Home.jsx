@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import '../css/App.css';
-import headImage from '../images/head_image.png';
+import headImage from '../images/image.png';
 import Toggle from './Toggle.jsx';
 import { useContext} from 'react'
 import { AuthContext } from '../AuthStatus.jsx';
