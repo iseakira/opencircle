@@ -39,6 +39,36 @@ body {
   transform: scale(0.8);
 }
 
+.mypage_button{
+  display: inline-flex;
+  align-items: center;
+  position: fixed;
+  right: 130px;
+  top: 0.2rem;
+  z-index: 1000;
+  padding: 8px 18px;
+  border-radius: 99px;
+  height: 2em;
+  width: auto;
+  background-color: #fff;
+  border: 2px solid;
+  color: rgb(23, 108, 147);
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-decoration: none;
+
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease,
+              transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.mypage_button:hover {
+  background-color: rgb(23, 108, 147);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0px 3px 6px rgba(0, 123, 255, 0.3);
+}
+
 .login {
   display: inline-flex;
   align-items: center;

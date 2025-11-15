@@ -146,11 +146,15 @@ def create_account():
 
 # --- ここからログイン ---
 @app.route("/api/check_login", methods=["POST"])
-def check_login():
-    session_id = request.cookies.get("session_id")
-    if session_id == None:
-        return jsonify({"isLogin": False})
-    isLogin = dbop.check_session(session_id)
+def check_session():
+    #session_id = request.cookies.get("session_id")
+    #if session_id == None:
+    #    return jsonify({"isLogin": False})
+    #isLogin = dbop.check_session(session_id)
+    #return jsonify({"isLogin": isLogin})
+    user_id = verify_login()[0]
+    print(user_id)
+    isLogin = not (user_id == None)
     return jsonify({"isLogin": isLogin})
 
 @app.route("/login", methods=["POST"])

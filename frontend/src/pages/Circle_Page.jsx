@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import headImage from '../images/head_image.png';
 import '../css/App.css';
 import CircleLogo from '../conponents/CircleLogo';
+import LoginOutButton from './LogInOutButton';
+
 function Circle_Page(){
     const location = useLocation();
     const [response_data, setResponse_data] = useState(null);
@@ -46,6 +48,9 @@ function Circle_Page(){
                 </Link>
             </h1> */}
             <CircleLogo></CircleLogo>
+            <h3>
+                <LoginOutButton />
+            </h3>
         </header>
         <main>
             <h1>サークルページ</h1>
