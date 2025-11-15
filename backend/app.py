@@ -157,8 +157,6 @@ def check_login():
 def login():
     #json_dict のキーは {"emailaddress", "password"}
     json_dict = request.get_json()
-    print(json_dict)
-    print("nuhahahaha")
 
     checked_dict = dbop.check_login(json_dict["emailaddress"], json_dict["password"])
     if checked_dict["message"] == "failure":
@@ -171,9 +169,19 @@ def login():
     else:
         response = make_response(jsonify(checked_dict))
         session_id = str(result_tuple[1])
-        print(session_id)
         response.set_cookie("session_id", session_id)
         return response
+    
+@app.route("/api/logout", methods=["POST"])
+def logout():
+    session_id = request.cookies.get("session_id")
+    print(session_id)
+    if session_id == None:
+        return jsonify({"message": "success"})
+    dbop.delete_session(session_id)
+    response = make_response(jsonify({"message": "fromLogout"}))
+    response.set_cookie("session_id", "", expires = 0)
+    return response
 
 # --- ここまでログイン ---
 

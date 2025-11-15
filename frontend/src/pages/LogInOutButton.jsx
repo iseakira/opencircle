@@ -5,6 +5,25 @@ import { Link } from 'react-router-dom';
 function LoginOutButton(){
     const { getLogin, setLogin, setLogout } = useContext(AuthContext);
 
+    async function logout(){
+        try{
+            const response = await fetch(
+                "http://localhost:5001/api/logout",
+                {method: "POST", headers: {'Content-Type': 'application/json'}, credentials: "include"}
+            )
+            const result = await response.json()
+            console.log(result.message)
+            if(response.ok){
+                console.log("success")
+                setLogout()
+            }else{
+                console.log("failure")
+            }
+        }catch (error){
+            console.log(error)
+        }
+    }
+
     console.log("Button");
     console.log(getLogin());
     if(!getLogin()){
@@ -15,7 +34,7 @@ function LoginOutButton(){
         );
     }else{
         return (
-            <div>
+            <div className="login" onClick={() => logout()}>
                 ログアウト
             </div>
         )

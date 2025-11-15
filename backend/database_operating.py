@@ -355,6 +355,18 @@ def check_session(session_id):
     conn.close()
     return True
 
+def delete_session(session_id):
+    conn = sqlite3.connect("project.db")
+    cursor = conn.cursor()
+    try:
+        print(session_id + "wo kesuzo")
+        cursor.execute("DELETE FROM sessions WHERE session_id = ?", (session_id,))
+        conn.commit()
+    except:
+        print("time over")
+    cursor.close()
+    conn.close()
+
 def cleanup_session_tmpid():
     conn = sqlite3.connect("project.db")
     cursor = conn.cursor()

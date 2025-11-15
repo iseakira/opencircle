@@ -12,13 +12,13 @@ function AuthProvider(){
     const [loading, setLoading] = useState(true);
 
     async function session_check(){
-        /*
         try{
             const response = await fetch(
                 "http://localhost:5001/api/check_login",
                 {
                     method: "POST",
                     headers: {'Content-Type': 'application/json'},
+                    credentials: "include"
                 }
             )
             if(response.ok){
@@ -32,7 +32,6 @@ function AuthProvider(){
         }catch{
             console.log("エラー")
         }
-            */
         setLoading(false);
 
         console.log("初回確認");
@@ -73,6 +72,5 @@ function AuthProvider(){
     }
 };
 
-//value={{getLogin, setLogin, setLogout}}
 export { AuthProvider };
 export { AuthContext };
