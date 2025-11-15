@@ -2,7 +2,7 @@
   /* カラーパレット - 4色のデザインシステム */
   --back-color: #fff;        /* 背景色 */
   --base-color: hsl(216, 52%, 19%);      /* ベースカラー（メインテキスト・ダーク） */
-  --main-color: rgb(146, 216, 209);    /* アクセントカラー（強調・オレンジ） */
+  --main-color: rgb(146, 212, 216);    /* アクセントカラー（強調・オレンジ） */
   --accent-color: #9bf8d5;      /* メインカラー（ハイライト・ミント） */
 }
 
@@ -155,5 +155,5 @@ button[aria-expanded] {
   margin-top: 1rem;
 }
 button[aria-expanded]:hover {
-  background-color: rgb(129, 180, 177)
+  background-color: rgb(129, 180, 176)
 }
