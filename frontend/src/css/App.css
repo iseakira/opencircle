@@ -1,9 +1,12 @@
 :root {
   /* カラーパレット - 4色のデザインシステム */
-  --back-color: #fff;        /* 背景色 */
+  --back-color: #E6E5E0;        /* 背景色 */
   --base-color: hsl(216, 52%, 19%);      /* ベースカラー（メインテキスト・ダーク） */
-  --main-color: rgb(146, 212, 216);    /* アクセントカラー（強調・オレンジ） */
-  --accent-color: #9bf8d5;      /* メインカラー（ハイライト・ミント） */
+  --main-color: #469DAE;    
+  --main-color-sub:#9eb8bc90;
+  --main-color-white:#dde3e490;
+  --accent-color: #d2c104;  
+  --accent-color-white:#e0d681; 
 }
 
 #root {
@@ -50,9 +53,9 @@ body {
   border-radius: 99px;
   height: 2em;
   width: auto;
-  background-color: #fff;
-  border: 2px solid;
-  color: rgb(23, 108, 147);
+  background-color: var(--accent-color);
+  border: 2px solid var(--accent-color);
+  color:var(--base-color);
   font-weight: bold;
   font-size: 0.9rem;
   text-decoration: none;
@@ -63,8 +66,8 @@ body {
 }
 
 .login:hover {
-  background-color: rgb(23, 108, 147);
-  color: #fff;
+  background-color: transparent;
+  color: var(--base-color);
   transform: translateY(-2px);
   box-shadow: 0px 3px 6px rgba(0, 123, 255, 0.3);
 }
@@ -119,18 +122,18 @@ body {
 .circle-info {
   display: flex;
   align-items: center;
-  border: 1px solid gray;
+  border: 1px solid var(--main-color);
   gap: 8px;
   padding: 10px;
   margin: 10px;
   border-radius: 8px;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-  background: #ffffff;
+  background: var(--main-color-sub);
   transition: background-color 0.3s ease;
 }
 
 .circle-info:hover {
-  background: #f7f7f7;
+  background: var(--main-color-white);
   transform: scale(1.02);
   box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.15);
 }
@@ -148,12 +151,12 @@ button[aria-expanded] {
   text-align: center;
   color: #333;
   background-color: var(--accent-color);
-  border: 1px solid #ddd;
+  border: 2px solid var(--accent-color);
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.2s;
   margin-top: 1rem;
 }
 button[aria-expanded]:hover {
-  background-color: rgb(129, 180, 176)
+  background-color: var(--accent-color-white)
 }
