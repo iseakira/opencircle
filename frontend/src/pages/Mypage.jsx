@@ -125,12 +125,8 @@ function Mypage() {
             circles.map((c) => (
               <div
                 key={c.circle_id}
-<<<<<<< HEAD
-                className="circle-item"
-=======
                 // className="circle-item"
                 className="circle-info"
->>>>>>> 27aa118083b4b01c3795a0643e07cbf688a8ab47
                 onClick={() => navigate(`/edit-circle/${c.circle_id}`)}
                 style={{
                   backgroundColor: "white",
