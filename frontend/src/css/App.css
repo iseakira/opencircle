@@ -1,15 +1,12 @@
 :root {
   /* カラーパレット - 4色のデザインシステム */
-  --bg-color: #f6f2f4;        /* 背景色 */
-  --base-color: #172b49;      /* ベースカラー（メインテキスト・ダーク） */
-  --accent-color: #f38d2f;    /* アクセントカラー（強調・オレンジ） */
-  --main-color: #9bf8d5;      /* メインカラー（ハイライト・ミント） */
-
-  /* 補助色（使いやすさのため） */
-  --surface-color: #ffffff;   /* カード・サーフェス背景 */
-  --text-on-dark: #ffffff;    /* ダーク背景上のテキスト */
-  --text-muted: rgba(23, 43, 73, 0.6); /* 薄いテキスト */
-  --border-color: rgba(0, 0, 0, 0.1); /* ボーダー */
+  --back-color: #f2f1eb;        /* 背景色 */
+  --base-color: hsl(216, 52%, 19%);      /* ベースカラー（メインテキスト・ダーク） */
+  --main-color: #469DAE;    
+  --main-color-sub:#9eb8bc90;
+  --main-color-white:#dde3e490;
+  --accent-color: #d2c104;  
+  --accent-color-white:#e0d681; 
 }
 
 #root {
@@ -20,7 +17,7 @@
 }
 
 body {
-  background-color: var(--bg-color);
+  background-color: var(--back-color);
   color: var(--base-color);
   margin: 0;
   padding: 0;
@@ -45,6 +42,36 @@ body {
   transform: scale(0.8);
 }
 
+.mypage_button{
+  display: inline-flex;
+  align-items: center;
+  position: fixed;
+  right: 130px;
+  top: 0.2rem;
+  z-index: 1000;
+  padding: 8px 18px;
+  border-radius: 99px;
+  height: 2em;
+  width: auto;
+  background-color: #fff;
+  border: 2px solid;
+  color: rgb(23, 108, 147);
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-decoration: none;
+
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease,
+              transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.mypage_button:hover {
+  background-color: rgb(23, 108, 147);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0px 3px 6px rgba(0, 123, 255, 0.3);
+}
+
 .login {
   display: inline-flex;
   align-items: center;
@@ -56,9 +83,9 @@ body {
   border-radius: 99px;
   height: 2em;
   width: auto;
-  background-color: transparent;
-  border: 2px solid;
-  color: #007bff;
+  background-color: var(--accent-color);
+  border: 2px solid var(--accent-color);
+  color:var(--base-color);
   font-weight: bold;
   font-size: 0.9rem;
   text-decoration: none;
@@ -69,8 +96,8 @@ body {
 }
 
 .login:hover {
-  background-color: #007bff;
-  color: #fff;
+  background-color: transparent;
+  color: var(--base-color);
   transform: translateY(-2px);
   box-shadow: 0px 3px 6px rgba(0, 123, 255, 0.3);
 }
@@ -97,7 +124,9 @@ body {
   padding: 10px;
   
   width: auto;
-  border-top: none;
+  margin-top: 30px;
+  height: 400px;
+  border-radius: 8px;
 }
 
 .tags {
@@ -105,7 +134,7 @@ body {
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
   line-height: 2.0;
-  border-style: outset;
+  border: none;
 }
 
 .circle_icon {
@@ -125,18 +154,18 @@ body {
 .circle-info {
   display: flex;
   align-items: center;
-  border: 1px solid gray;
+  border: 1px solid var(--main-color);
   gap: 8px;
   padding: 10px;
   margin: 10px;
   border-radius: 8px;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-  background: #ffffff;
+  background: var(--main-color-sub);
   transition: background-color 0.3s ease;
 }
 
 .circle-info:hover {
-  background: #f7f7f7;
+  background: var(--main-color-white);
   transform: scale(1.02);
   box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.15);
 }
@@ -153,13 +182,35 @@ button[aria-expanded] {
   font-weight: bold;
   text-align: center;
   color: #333;
-  background-color: #f4f4f4;
-  border: 1px solid #ddd;
+  background-color: var(--accent-color);
+  border: 2px solid var(--accent-color);
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.2s;
   margin-top: 1rem;
 }
 button[aria-expanded]:hover {
-  background-color: #e9e9e9;
+  background-color: var(--accent-color-white)
+}
+button[aria-expanded="true"] {
+  background-color: var(--accent-color-white);
+}
+
+.allbutton{
+  width: 100%;
+  max-width: 190px;
+  padding: 12px 15px;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  color: #333;
+  background-color: var(--accent-color);
+  border: 2px solid var(--accent-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 1rem;
+}
+.allbutton:hover {
+  background-color: var(--accent-color-white)
 }

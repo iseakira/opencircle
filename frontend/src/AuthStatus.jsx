@@ -5,6 +5,8 @@ const AuthContext = createContext({
     getLogin: () => {},
     setLogin: () => {},
     setLogout: () => {},
+    getUserName: () => {},
+    setUserName: () => {},
 });
 
 function AuthProvider(){
@@ -12,27 +14,28 @@ function AuthProvider(){
     const [loading, setLoading] = useState(true);
 
     async function session_check(){
-        /*
         try{
             const response = await fetch(
                 "http://localhost:5001/api/check_login",
                 {
                     method: "POST",
                     headers: {'Content-Type': 'application/json'},
+                    credentials: "include"
                 }
             )
             if(response.ok){
-                const login_json = await response.json();
-                if(login_json == "true"){
+                const login_obj = await response.json();
+                console.log("かえってきたやつは " + login_obj.isLogin)
+                if(login_obj.isLogin){
                     setIsLogin(true);
                 }else{
+                    console.log("ログインしてない")
                     setIsLogin(false);
                 }
             }
         }catch{
             console.log("エラー")
         }
-            */
         setLoading(false);
 
         console.log("初回確認");
@@ -56,7 +59,7 @@ function AuthProvider(){
         setIsLogin(false);
     }
 
-    console.log("動作確認:loading=")
+    console.log("isLogin = " + isLogin)
 
     if(loading){
         return(
@@ -73,6 +76,5 @@ function AuthProvider(){
     }
 };
 
-//value={{getLogin, setLogin, setLogout}}
 export { AuthProvider };
 export { AuthContext };

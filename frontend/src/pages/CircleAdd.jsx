@@ -1,5 +1,5 @@
 
-// import './App.css'
+import '../css/App.css'
 import Button from '../conponents/Button'
 import CircleDescription from '../conponents/CircleDescription'
 import CircleFee from '../conponents/CircleFee'
