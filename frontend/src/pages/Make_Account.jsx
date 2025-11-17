@@ -120,7 +120,7 @@ function Make_Account() {
                 <label>ユーザー名：</label>
                     <input type="text" name="user_name" value={formData.user_name} required onChange={handleChange}/>
                     <br />
-                <button type="submit" >アカウントを作成する</button>
+                <button type="submit" className="exbutton">アカウントを作成する</button>
             </form>
             <br />
             <div>

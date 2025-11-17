@@ -79,7 +79,7 @@ function Input_email() {
           <label>メールアドレス：</label>
           <input type="text" name="text" placeholder="メールアドレス" value={emailaddress} onChange={retain_email} required />
           <br />
-          <button type="submit">認証コードを送信する</button>
+          <button type="submit" className="exbutton">認証コードを送信する</button>
         </form>
         <br />
  

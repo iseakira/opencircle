@@ -121,7 +121,7 @@ function Home() {
       </main>
       <footer>
         <p>created by 東京理科大学IS科3年</p>
-        <a href="https://www.tus.ac.jp/" target="_blank">
+        <a href="https://www.tus.ac.jp/" target="_blank" >
           東京理科大学ホームページ
         </a>
       </footer>

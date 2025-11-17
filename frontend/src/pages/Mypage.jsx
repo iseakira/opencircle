@@ -90,7 +90,7 @@ function Mypage() {
               placeholder="ユーザーID"
               value={targetUserId}
               onChange={(e) => setTargetUserId(e.target.value)}
-              style={{ width: "100%", padding: "6px", marginBottom: "10px" }}
+              style={{ width: "235px", padding: "6px", marginBottom: "10px" }}
             />
 
             <button

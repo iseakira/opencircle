@@ -212,9 +212,9 @@ function CircleEdit() {
           selectedActive={selectedActive}
         ></Tag>
 
-        <button type="submit">更新</button>
+        <button type="submit" className="allbutton">更新</button>
       </form>
-      <Link to={"/mypage"}>マイページへ戻る</Link>
+      <Link to={"/mypage"} className='link'>マイページへ戻る</Link>
     </>
   );
 }

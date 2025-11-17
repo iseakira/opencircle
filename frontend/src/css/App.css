@@ -125,7 +125,7 @@ body {
   
   width: auto;
   margin-top: 30px;
-  height: 400px;
+  height: 450px;
   border-radius: 8px;
 }
 
@@ -210,7 +210,47 @@ button[aria-expanded="true"] {
   cursor: pointer;
   transition: background-color 0.2s;
   margin-top: 1rem;
+  margin-bottom: 10px;
 }
 .allbutton:hover {
   background-color: var(--accent-color-white)
+}
+
+.exbutton{
+  width: 100%;
+  max-width: 210px;
+  padding: 12px 15px;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  color: #333;
+  background-color: var(--accent-color);
+  border: 2px solid var(--accent-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 1rem;
+}
+.exbutton:hover {
+  background-color: var(--accent-color-white)
+}
+
+.link{
+  font-size: 1rem;
+  font-weight: bold;
+  display: inline-block;
+  text-decoration: none;
+  color: black;
+  padding: 10px 20px;
+  background-color:var(--accent-color);
+  border: 2px solid var(--accent-color);
+  border-radius: 8px;
+}
+
+.link:hover{
+  background-color: var(--accent-color-white);
+}
+
+.descon ul{
+  display: flex;
 }

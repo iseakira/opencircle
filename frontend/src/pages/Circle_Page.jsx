@@ -64,6 +64,7 @@ function Circle_Page(){
                     <p>サークル説明：{response_data.circle_description}</p>
                     <p>費用：{response_data.circle_fee}円</p>
                     <p>男性：{response_data.number_of_male},女性：{response_data.number_of_female}</p>
+                    
                     <div>
                         {Array.isArray(response_data.tags) && response_data.tags.length > 0 ? (
                             <p>キーワード: {response_data.tags.join(', ')}</p>
@@ -77,7 +78,8 @@ function Circle_Page(){
                 )}
             </div>
             <h3>
-                <Link to="/">
+            
+                <Link to="/" className='link'>
                     ホーム画面に戻る
                 </Link>
             </h3>

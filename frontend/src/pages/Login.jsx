@@ -84,12 +84,12 @@ function Login() {
           <input type="email" name="email" required value={emailaddress} onChange={handleChange_email} />
           <br />
           <label>パスワード：</label>
-          <input type="password" name="password" required value={password} onChange={handleChange_password} />
-          <button type="submit">ログイン</button>
+          <input type="password" name="password" required value={password} onChange={handleChange_password} /><br />
+          <button type="submit" className="allbutton">ログイン</button>
         </form>
         <br />
         <h3>
-          <button type="submit" onClick={handleCreateAccount}>アカウント作成はこちら</button>
+          <button type="submit" onClick={handleCreateAccount} className="exbutton">アカウント作成はこちら</button>
         </h3>
       </main>
       <footer>
