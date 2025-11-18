@@ -251,6 +251,31 @@ button[aria-expanded="true"] {
   background-color: var(--accent-color-white);
 }
 
-.descon ul{
-  display: flex;
+
+.descon{
+  max-width: 500px;
+  margin: 0 auto;
+  }
+
+.row{
+  display: grid;
+ grid-template-columns: 120px 1fr;
+ align-items: start;
+ gap: 70px;
+ padding: 4px 0;
 }
+
+.kou{
+  text-align: right;
+  /* font-weight: bold; */
+  /* margin-right: 20px; */
+  /* margin-right: 20px; */
+}
+.data{
+  text-align: left;
+  /* font-weight: bold; */
+  /* margin-left: 30px; */
+}
+
+
+  
