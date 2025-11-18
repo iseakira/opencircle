@@ -331,6 +331,15 @@ def make_session(emailaddress):
     conn.close()
     return (complete, session_id)
 
+def get_username(user_id):
+    conn = sqlite3("project.db")
+    cursor = conn.cursor()
+    res = cursor.execute("SELECT user_name FROM users WHERE user_id = ?", (user_id,))
+    user_name_tuple = res.fetchone()
+    cursor.close()
+    conn.close()
+    return user_name_tuple[0]
+
 # veryfy_loginに置き換えたから使われてない
 def check_session(session_id):
     conn = sqlite3.connect("project.db")

@@ -11,6 +11,7 @@ const AuthContext = createContext({
 
 function AuthProvider(){
     const [isLogin, setIsLogin] = useState(false);
+    const [name, setName] = useState("")
     const [loading, setLoading] = useState(true);
 
     async function session_check(){
@@ -28,6 +29,7 @@ function AuthProvider(){
                 console.log("かえってきたやつは " + login_obj.isLogin)
                 if(login_obj.isLogin){
                     setIsLogin(true);
+                    setName(login_obj.user_name)
                 }else{
                     console.log("ログインしてない")
                     setIsLogin(false);
@@ -59,6 +61,14 @@ function AuthProvider(){
         setIsLogin(false);
     }
 
+    function getUserName(){
+        return name;
+    }
+    
+    function setUserName(new_user_name){
+        setName(new_user_name)
+    }
+
     console.log("isLogin = " + isLogin)
 
     if(loading){
@@ -69,7 +79,7 @@ function AuthProvider(){
         );
     }else{
         return(
-            <AuthContext.Provider value={{getLogin, setLogin, setLogout}}>
+            <AuthContext.Provider value={{getLogin, setLogin, setLogout, getUserName, setUserName}}>
                 <AppRouter />
             </AuthContext.Provider>
         );
