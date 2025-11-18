@@ -108,7 +108,13 @@ function Home() {
           ) : response_data && response_data.items && response_data.items.length > 0 ? (
           <>
           {response_data.items.map((circle, index) => (
-            <div key={index} className="circle-info" onClick={() => to_circle_page(circle.circle_id)} style={{cursor: 'pointer'}}>
+            <div key={index} className="circle-info" onClick={() => to_circle_page(circle.circle_id)} 
+            tabIndex="0"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                to_circle_page(circle.circle_id);
+              }
+            }}style={{cursor: 'pointer'}}>
               <img src={circle.circle_icon_path} className="circle_icon"/>
                 <p>サークル名: {circle.circle_name}</p>
                 <p>分野：{circle.field}</p>
