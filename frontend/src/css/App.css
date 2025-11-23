@@ -7,7 +7,6 @@
   --main-color-white:#dde3e490;
   --accent-color: #d2c104;  
   --accent-color-white:#e0d681; 
-  --accent-color-wwhite:#f6f5ee; 
 }
 
 #root {
@@ -194,8 +193,12 @@ button[aria-expanded]:hover {
   background-color: var(--accent-color-white);
 }
 button[aria-expanded="true"] {
-  background-color: var(--accent-color-wwhite);
+  background-color: var(--back-color);
   border-color: var(--accent-color);
+}
+button[aria-expanded="true"]:hover {
+  background-color: var(--back-color);
+  border-color: var(--back-color);
 }
 
 .allbutton{
