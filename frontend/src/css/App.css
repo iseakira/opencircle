@@ -164,5 +164,5 @@ button[aria-expanded]:hover {
   background-color: var(--accent-color-white)
 }
 button[aria-expanded="true"] {
-  background-color: var(-accent-color-wwhite);
+  background-color: var(--accent-color-wwhite);
 }
