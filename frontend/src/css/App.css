@@ -43,6 +43,36 @@ body {
   transform: scale(0.8);
 }
 
+.mypage_button{
+  display: inline-flex;
+  align-items: center;
+  position: fixed;
+  right: 130px;
+  top: 0.2rem;
+  z-index: 1000;
+  padding: 8px 18px;
+  border-radius: 99px;
+  height: 2em;
+  width: auto;
+  background-color: #fff;
+  border: 2px solid;
+  color: rgb(23, 108, 147);
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-decoration: none;
+
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease,
+              transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.mypage_button:hover {
+  background-color: rgb(23, 108, 147);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0px 3px 6px rgba(0, 123, 255, 0.3);
+}
+
 .login {
   display: inline-flex;
   align-items: center;
@@ -96,7 +126,7 @@ body {
   
   width: auto;
   margin-top: 30px;
-  height: 400px;
+  height: 450px;
   border-radius: 8px;
 }
 
@@ -166,3 +196,87 @@ button[aria-expanded]:hover {
 button[aria-expanded="true"] {
   background-color: var(--accent-color-wwhite);
 }
+
+.allbutton{
+  width: 100%;
+  max-width: 190px;
+  padding: 12px 15px;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  color: #333;
+  background-color: var(--accent-color);
+  border: 2px solid var(--accent-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 1rem;
+  margin-bottom: 10px;
+}
+.allbutton:hover {
+  background-color: var(--accent-color-white)
+}
+
+.exbutton{
+  width: 100%;
+  max-width: 210px;
+  padding: 12px 15px;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  color: #333;
+  background-color: var(--accent-color);
+  border: 2px solid var(--accent-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 1rem;
+}
+.exbutton:hover {
+  background-color: var(--accent-color-white)
+}
+
+.link{
+  font-size: 1rem;
+  font-weight: bold;
+  display: inline-block;
+  text-decoration: none;
+  color: black;
+  padding: 10px 20px;
+  background-color:var(--accent-color);
+  border: 2px solid var(--accent-color);
+  border-radius: 8px;
+}
+
+.link:hover{
+  background-color: var(--accent-color-white);
+}
+
+
+.descon{
+  max-width: 500px;
+  margin: 0 auto;
+  }
+
+.row{
+  display: grid;
+ grid-template-columns: 120px 1fr;
+ align-items: start;
+ gap: 70px;
+ padding: 4px 0;
+}
+
+.kou{
+  text-align: right;
+  /* font-weight: bold; */
+  /* margin-right: 20px; */
+  /* margin-right: 20px; */
+}
+.data{
+  text-align: left;
+  /* font-weight: bold; */
+  /* margin-left: 30px; */
+}
+
+
+  

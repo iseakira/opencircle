@@ -90,7 +90,7 @@ function Mypage() {
               placeholder="ユーザーID"
               value={targetUserId}
               onChange={(e) => setTargetUserId(e.target.value)}
-              style={{ width: "100%", padding: "6px", marginBottom: "10px" }}
+              style={{ width: "235px", padding: "6px", marginBottom: "10px" }}
             />
 
             <button
@@ -114,7 +114,7 @@ function Mypage() {
         <main>
         <h1>マイページ</h1>
 
-        <button onClick={() => navigate('/add_circle')} className="main-button">
+        <button onClick={() => navigate('/add_circle')} className="allbutton">
           サークルを追加
         </button>
 
@@ -128,14 +128,14 @@ function Mypage() {
                 // className="circle-item"
                 className="circle-info"
                 onClick={() => navigate(`/edit-circle/${c.circle_id}`)}
-                style={{
-                  backgroundColor: "white",
-                  cursor: "pointer",
-                  padding: "12px",
-                  border: "1px solid #ccc",
-                  borderRadius: "6px",
-                  marginBottom: "10px",
-                }}
+                // style={{
+                //   // backgroundColor: "white",
+                //   cursor: "pointer",
+                //   padding: "12px",
+                //   border: "1px solid #ccc",
+                //   borderRadius: "6px",
+                //   marginBottom: "10px",
+                // }}
               >
                 {c.circle_name}
               </div>

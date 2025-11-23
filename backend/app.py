@@ -126,7 +126,8 @@ def make_tmp_account():
     #data_tuple は (success, auth_code, tmp_id) の形
     data_tuple = dbop.tmp_registration(emailaddress)
     if data_tuple[0]:
-        sm.send_auth_code(emailaddress, data_tuple[1])
+        mail_thread = threading.Thread(target = sm.send_auth_code, args=(emailaddress, data_tuple[1]))
+        mail_thread.start()
         return jsonify({"message": "success", "tmp_id": data_tuple[2]})
     else:
         return jsonify({"message": "failure"})
@@ -146,12 +147,18 @@ def create_account():
 
 # --- ここからログイン ---
 @app.route("/api/check_login", methods=["POST"])
-def check_login():
-    session_id = request.cookies.get("session_id")
-    if session_id == None:
-        return jsonify({"isLogin": False})
-    isLogin = dbop.check_session(session_id)
-    return jsonify({"isLogin": isLogin})
+def check_session():
+    #session_id = request.cookies.get("session_id")
+    #if session_id == None:
+    #    return jsonify({"isLogin": False})
+    #isLogin = dbop.check_session(session_id)
+    #return jsonify({"isLogin": isLogin})
+    user_id = verify_login()[0]
+    user_name = ""
+    is_login = not (user_id == None)
+    if is_login:
+        user_name = dbop.get_username(user_id)
+    return jsonify({"isLogin": is_login, "userName": user_name})
 
 @app.route("/login", methods=["POST"])
 def login():

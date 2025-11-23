@@ -28,15 +28,20 @@ function LoginOutButton(){
     console.log(getLogin());
     if(!getLogin()){
         return (
-            <Link to="Login" className="login">
+            <Link to="/login" className="login">
                 ログイン
             </Link>
         );
     }else{
         return (
-            <div className="login" onClick={() => logout()}>
-                ログアウト
-            </div>
+            <>
+                <div className="login" onClick={() => logout()}>
+                    ログアウト
+                </div>
+                <Link to="/Mypage" className="mypage_button">
+                    マイページ
+                </Link>
+            </>
         )
     }
 }

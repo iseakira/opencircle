@@ -223,7 +223,6 @@ def tmp_registration(mailaddress):
 
     auth_code = random.randint(100000, 999999)
     tmp_id = int(''.join(secrets.choice(string.digits) for _ in range(6)))
-    #tmp_idが重複した時の処理を後で書く
     complete = False
     for i in range(5):
         try:
@@ -281,7 +280,6 @@ def check_auth_code(auth_code, tmp_id):
 def create_account(emailaddress, password, user_name):
     conn = sqlite3.connect("project.db")
     cursor = conn.cursor()
-    #ここもuser_id重複時の処理がいる
     user_id = int(''.join(secrets.choice(string.digits) for _ in range(6)))
     complete = False
     for i in range(5):
@@ -307,7 +305,7 @@ def check_login(emailaddress, password):
     user_tuple = res.fetchone()
     cursor.close()
     conn.close()
-    if password != user_tuple[0]:
+    if user_tuple == None or password != user_tuple[0]:
         return {"message": "failure"}
     else:
         return {"message": "success"}
@@ -333,6 +331,16 @@ def make_session(emailaddress):
     conn.close()
     return (complete, session_id)
 
+def get_username(user_id):
+    conn = sqlite3("project.db")
+    cursor = conn.cursor()
+    res = cursor.execute("SELECT user_name FROM users WHERE user_id = ?", (user_id,))
+    user_name_tuple = res.fetchone()
+    cursor.close()
+    conn.close()
+    return user_name_tuple[0]
+
+# veryfy_loginに置き換えたから使われてない
 def check_session(session_id):
     conn = sqlite3.connect("project.db")
     cursor = conn.cursor()
