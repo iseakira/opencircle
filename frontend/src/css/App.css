@@ -233,6 +233,10 @@ button[aria-expanded="true"]:hover {
   transform: scale(1.02);
   box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.15);
 }
+.allbutton:active {
+  transform: scale(0.98);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
 
 .exbutton{
   width: 100%;
