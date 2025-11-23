@@ -186,12 +186,11 @@ button[aria-expanded] {
   border: 2px solid var(--accent-color);
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s;
-  margin-top: 1rem;
   transition: background-color 0.25s ease,
               border-color 0.25s ease,
               transform 0.15s ease,
               box-shadow 0.25s ease;
+  margin-top: 1rem;
 }
 button[aria-expanded]:hover {
   background-color: var(--accent-color-white);
