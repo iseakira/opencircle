@@ -195,6 +195,7 @@ button[aria-expanded]:hover {
 }
 button[aria-expanded="true"] {
   background-color: var(--accent-color-wwhite);
+  border-color: var(--accent-color);
 }
 
 .allbutton{
