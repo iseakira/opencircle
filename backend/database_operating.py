@@ -449,13 +449,3 @@ def delete_circle_by_id(circle_id):
         db.session.rollback()
         logging.error(f"サークル ID:{circle_id} 削除中に予期せぬエラー: {e}")
         return (False, f"予期せぬエラー: {e}")
-
-def reset():
-    conn = sqlite3.connect("project.db")
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM users")
-    cursor.execute("DELETE FROM edit_authorizations")
-    cursor.execute("DELETE FROM circles")
-    conn.commit()
-    cursor.close()
-    conn.close()
