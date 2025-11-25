@@ -186,14 +186,27 @@ button[aria-expanded] {
   border: 2px solid var(--accent-color);
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s;
+    transition: background-color 0.3s ease,
+              border-color 0.3s ease,
+              transform 0.3s ease,
+              box-shadow 0.3s ease;
   margin-top: 1rem;
 }
 button[aria-expanded]:hover {
-  background-color: var(--accent-color-white)
+  background-color: var(--accent-color-white);
+  transform: scale(1.02);
 }
 button[aria-expanded="true"] {
-  background-color: var(--accent-color-white);
+  background-color: var(--back-color);
+  border-color: var(--accent-color);
+  transform: scale(1); 
+  box-shadow: none;   
+}
+button[aria-expanded="true"]:hover {
+  background-color: var(--back-color);
+  border-color: var(--accent-color);
+  transform: scale(1);
+  box-shadow: none;
 }
 
 .allbutton{
@@ -208,12 +221,21 @@ button[aria-expanded="true"] {
   border: 2px solid var(--accent-color);
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.3s ease,
+              border-color 0.3s ease,
+              transform 0.3s ease,
+              box-shadow 0.3s ease;
   margin-top: 1rem;
   margin-bottom: 10px;
 }
 .allbutton:hover {
-  background-color: var(--accent-color-white)
+  background-color: var(--accent-color-white);
+  transform: scale(1.02);
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.15);
+}
+.allbutton:active {
+  transform: scale(0.98);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .exbutton{
@@ -251,6 +273,31 @@ button[aria-expanded="true"] {
   background-color: var(--accent-color-white);
 }
 
-.descon ul{
-  display: flex;
+
+.descon{
+  max-width: 500px;
+  margin: 0 auto;
+  }
+
+.row{
+  display: grid;
+ grid-template-columns: 120px 1fr;
+ align-items: start;
+ gap: 70px;
+ padding: 4px 0;
 }
+
+.kou{
+  text-align: right;
+  /* font-weight: bold; */
+  /* margin-right: 20px; */
+  /* margin-right: 20px; */
+}
+.data{
+  text-align: left;
+  /* font-weight: bold; */
+  /* margin-left: 30px; */
+}
+
+
+  
