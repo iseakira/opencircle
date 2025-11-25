@@ -9,6 +9,7 @@ from sqlalchemy.exc import IntegrityError
 import logging # printの代わりにloggingを使うことを推奨
 import threading
 import time
+import hash
 
 # サークル情報取得関数（まだ使用されていません）initial_circles、search_circles用
 def get_circle_prof(circle_id):
@@ -285,8 +286,9 @@ def create_account(emailaddress, password, user_name):
     for i in range(5):
         try:
             print(user_id)
+            hashed_pass = hash.hash_pass(password, user_id)
             cursor.execute("INSERT INTO users (user_id, user_name, mail_adress, password) " \
-                            "VALUES (?, ?, ?, ?)", (user_id, user_name, emailaddress, password))
+                            "VALUES (?, ?, ?, ?)", (user_id, user_name, emailaddress, hashed_pass))
             conn.commit()
         except sqlite3.Error as e:
             print(e)
@@ -301,11 +303,13 @@ def create_account(emailaddress, password, user_name):
 def check_login(emailaddress, password):
     conn = sqlite3.connect("project.db")
     cursor = conn.cursor()
-    res = cursor.execute("SELECT password FROM users WHERE mail_adress = ?", (emailaddress,))
+    res = cursor.execute("SELECT password, user_id FROM users WHERE mail_adress = ?", (emailaddress,))
     user_tuple = res.fetchone()
     cursor.close()
     conn.close()
-    if user_tuple == None or password != user_tuple[0]:
+    user_id = user_tuple[1]
+    hashed_pass = hash.hash_pass(password, user_id)
+    if user_tuple == None or hashed_pass != user_tuple[0]:
         return {"message": "failure"}
     else:
         return {"message": "success"}
@@ -446,3 +450,12 @@ def delete_circle_by_id(circle_id):
         logging.error(f"サークル ID:{circle_id} 削除中に予期せぬエラー: {e}")
         return (False, f"予期せぬエラー: {e}")
 
+def reset():
+    conn = sqlite3.connect("project.db")
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM users")
+    cursor.execute("DELETE FROM edit_authorizations")
+    cursor.execute("DELETE FROM circles")
+    conn.commit()
+    cursor.close()
+    conn.close()
