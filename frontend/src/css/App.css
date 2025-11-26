@@ -6,8 +6,7 @@
   --main-color-sub:#9eb8bc90;
   --main-color-white:#dde3e490;
   --accent-color: #d2c104;  
-  --accent-color-white:#e0d681; 
-}
+  --accent-color-white:#e0d681; }
 
 #root {
   max-width: 1280px;
