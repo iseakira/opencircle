@@ -11,6 +11,7 @@ from datetime import datetime, timedelta, timezone
 import uuid
 from werkzeug.utils import secure_filename
 import threading
+import hash
 
 # --- ▼ 1. 画像アップロード設定 ▼ ---
 # 許可する拡張子
