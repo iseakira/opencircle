@@ -77,6 +77,18 @@ function Toggle({receivedData_fb}) {
     }
   };
 
+  // const [selectRelord,setselectReload] =useState(null);
+ const reloadSelect =()=> {
+  setField('');
+  setCircle_fee('');
+  setGender_ratio('');
+  setPlace('');
+  setMood('');
+  setFrequency('');
+  setSearch_term('');
+// alert("選択肢をクリアしました");
+};
+
   return (
     <div>
       <button onClick={make_visible} aria-expanded={visible}>
@@ -136,7 +148,8 @@ function Toggle({receivedData_fb}) {
             </select>
             <br />
           </div>
-          <br/>
+          {/* <br/> */}
+          <p onClick={reloadSelect}>クリア</p>
           <button onClick={get_jsontags} className='allbutton'>絞り込む</button>
         </div>
       )}

@@ -6,8 +6,7 @@
   --main-color-sub:#9eb8bc90;
   --main-color-white:#dde3e490;
   --accent-color: #d2c104;  
-  --accent-color-white:#e0d681; 
-}
+  --accent-color-white:#e0d681; }
 
 #root {
   max-width: 1280px;
@@ -186,7 +185,7 @@ button[aria-expanded] {
   border: 2px solid var(--accent-color);
   border-radius: 8px;
   cursor: pointer;
-    transition: background-color 0.3s ease,
+  transition: background-color 0.3s ease,
               border-color 0.3s ease,
               transform 0.3s ease,
               box-shadow 0.3s ease;
@@ -225,7 +224,7 @@ button[aria-expanded="true"]:hover {
               border-color 0.3s ease,
               transform 0.3s ease,
               box-shadow 0.3s ease;
-  margin-top: 1rem;
+  /* margin-top: 1rem; */
   margin-bottom: 10px;
 }
 .allbutton:hover {
