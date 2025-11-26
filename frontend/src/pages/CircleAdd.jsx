@@ -1,5 +1,5 @@
 
-// import './App.css'
+import '../css/App.css'
 import Button from '../conponents/Button'
 import CircleDescription from '../conponents/CircleDescription'
 import CircleFee from '../conponents/CircleFee'
@@ -283,7 +283,8 @@ const [errorFields,setErrorFields]=useState([]);
         {/* <Toggle></Toggle> */}
         {/* <Button type="submit" onClick={handleKey} ></Button> */}
         <Button type="submit" onClick={get_jsontags} ></Button>
-        <Link to={"/mypage"}>マイページへ戻る</Link>
+        <Link to={"/mypage"} className='link'>マイページへ戻る</Link>
+    
       </form> 
     </div>
   

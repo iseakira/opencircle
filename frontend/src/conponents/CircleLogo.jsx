@@ -1,6 +1,6 @@
 import React,{useCallback} from 'react';
-import PageTitle from './Page_Title.png';
-import headImage from '../images/head_image.png';
+import PageTitle from './Page-Title.png';
+import headImage from '../images/image.png';
 import { Link } from 'react-router-dom';
 import '../css/App.css';
 export default function CircleLogo() {

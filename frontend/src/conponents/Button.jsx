@@ -3,7 +3,7 @@ import React from 'react'
 export default function Button({onClick}) {  
     return (
     <div>  
-      <button type="submit" id = "button" onClick={onClick}
+      <button type="submit" className="allbutton" onClick={onClick}
       style={{
         marginBottom:"20px",
       }}

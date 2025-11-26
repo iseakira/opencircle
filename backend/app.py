@@ -11,6 +11,7 @@ from datetime import datetime, timedelta, timezone
 import uuid
 from werkzeug.utils import secure_filename
 import threading
+import hash
 
 # --- ▼ 1. 画像アップロード設定 ▼ ---
 # 許可する拡張子
@@ -126,7 +127,8 @@ def make_tmp_account():
     #data_tuple は (success, auth_code, tmp_id) の形
     data_tuple = dbop.tmp_registration(emailaddress)
     if data_tuple[0]:
-        sm.send_auth_code(emailaddress, data_tuple[1])
+        mail_thread = threading.Thread(target = sm.send_auth_code, args=(emailaddress, data_tuple[1]))
+        mail_thread.start()
         return jsonify({"message": "success", "tmp_id": data_tuple[2]})
     else:
         return jsonify({"message": "failure"})
@@ -146,19 +148,24 @@ def create_account():
 
 # --- ここからログイン ---
 @app.route("/api/check_login", methods=["POST"])
-def check_login():
-    session_id = request.cookies.get("session_id")
-    if session_id == None:
-        return jsonify({"isLogin": False})
-    isLogin = dbop.check_session(session_id)
-    return jsonify({"isLogin": isLogin})
+def check_session():
+    #session_id = request.cookies.get("session_id")
+    #if session_id == None:
+    #    return jsonify({"isLogin": False})
+    #isLogin = dbop.check_session(session_id)
+    #return jsonify({"isLogin": isLogin})
+
+    user_id = verify_login()[0]
+    user_name = ""
+    is_login = not (user_id == None)
+    if is_login:
+        user_name = dbop.get_username(user_id)
+    return jsonify({"isLogin": is_login, "userName": user_name})
 
 @app.route("/login", methods=["POST"])
 def login():
     #json_dict のキーは {"emailaddress", "password"}
     json_dict = request.get_json()
-    print(json_dict)
-    print("nuhahahaha")
 
     checked_dict = dbop.check_login(json_dict["emailaddress"], json_dict["password"])
     if checked_dict["message"] == "failure":
@@ -171,9 +178,19 @@ def login():
     else:
         response = make_response(jsonify(checked_dict))
         session_id = str(result_tuple[1])
-        print(session_id)
         response.set_cookie("session_id", session_id)
         return response
+    
+@app.route("/api/logout", methods=["POST"])
+def logout():
+    session_id = request.cookies.get("session_id")
+    print(session_id)
+    if session_id == None:
+        return jsonify({"message": "success"})
+    dbop.delete_session(session_id)
+    response = make_response(jsonify({"message": "fromLogout"}))
+    response.set_cookie("session_id", "", expires = 0)
+    return response
 
 # --- ここまでログイン ---
 

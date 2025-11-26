@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import headImage from '../images/head_image.png';
 import '../css/App.css';
 import CircleLogo from '../conponents/CircleLogo';
+import LoginOutButton from './LogInOutButton';
+
 function Circle_Page(){
     const location = useLocation();
     const [response_data, setResponse_data] = useState(null);
@@ -46,6 +48,9 @@ function Circle_Page(){
                 </Link>
             </h1> */}
             <CircleLogo></CircleLogo>
+            <h3>
+                <LoginOutButton />
+            </h3>
         </header>
         <main>
             <h1>サークルページ</h1>
@@ -55,10 +60,54 @@ function Circle_Page(){
                 ) : response_data && typeof response_data === "object" ? (
                 <div>
                     <img src={response_data.circle_icon} alt="サークルアイコン" className="circle_icon_page" />
-                    <p>サークル名：{response_data.circle_name}</p>
+                    {/* <p>サークル名：{response_data.circle_name}</p>
                     <p>サークル説明：{response_data.circle_description}</p>
                     <p>費用：{response_data.circle_fee}円</p>
-                    <p>男性：{response_data.number_of_male},女性：{response_data.number_of_female}</p>
+                    <p>男性：{response_data.number_of_male},女性：{response_data.number_of_female}</p> */}
+                    
+                    <div className="descon">
+  <div className="row">
+    <div className="kou">サークル名</div>
+    <div className="data">{response_data.circle_name}</div>
+  </div>
+
+  <div className="row">
+    <div className="kou">サークル説明</div>
+    <div className="data">{response_data.circle_description}</div>
+  </div>
+
+  <div className="row">
+    <div className="kou">費用</div>
+    <div className="data">{response_data.circle_fee}円</div>
+  </div>
+
+  <div className="row">
+    <div className="kou">男性</div>
+    <div className="data">{response_data.number_of_male}</div>
+  </div>
+
+  <div className="row">
+    <div className="kou">女性</div>
+    <div className="data">{response_data.number_of_female}</div>
+  </div>
+</div>
+                        {/* <div className='descon'>
+                            <ul className='kou'>
+                            <li>サークル名</li>
+                             <li>サークル説明</li>
+                            <li>費用</li>
+                             <li>男性</li>
+                             <li>女性</li>
+                            </ul>
+               
+                            <ul className='data'>
+                           <li>{response_data.circle_name}</li>
+                            <li>{response_data.circle_description}</li>
+                         <li>{response_data.circle_fee}円</li>
+ <li>{response_data.number_of_male}</li>
+ <li>{response_data.number_of_female}</li>
+                        </ul>
+                        </div> */}
                     <div>
                         {Array.isArray(response_data.tags) && response_data.tags.length > 0 ? (
                             <p>キーワード: {response_data.tags.join(', ')}</p>
@@ -72,7 +121,8 @@ function Circle_Page(){
                 )}
             </div>
             <h3>
-                <Link to="/">
+            
+                <Link to="/" className='link'>
                     ホーム画面に戻る
                 </Link>
             </h3>

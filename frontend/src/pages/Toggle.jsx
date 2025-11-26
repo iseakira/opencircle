@@ -137,7 +137,7 @@ function Toggle({receivedData_fb}) {
             <br />
           </div>
           <br/>
-          <button onClick={get_jsontags}>絞り込む</button>
+          <button onClick={get_jsontags} className='allbutton'>絞り込む</button>
         </div>
       )}
     </div>
