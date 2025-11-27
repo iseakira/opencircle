@@ -16,21 +16,30 @@ import CircleMen from '../conponents/CircleMen'
 import CircleFemen from '../conponents/CircleFemen'
 import headImage from '../images/head_image.png';
 import { Link } from 'react-router-dom';
-
+import {useRef} from "react";
 import CircleLogo from '../conponents/CircleLogo'
 function CircleAdd() {
-  const [circleData,setCircleData]=useState({
-    circle_name:"",
+  // const [circleData,setCircleData]=useState({
+  //   circle_name:"",
+  //   circle_description:"",
+  //   circle_fee:"",
+  //   // circle_fee:0,
+  //   number_of_male:"",
+  //   // number_of_male:0,
+  //   number_of_female:"",
+  //   // number_of_female:0,
+  //   //circle_icon_path:"",
+  //   //tags:[],
+  // });
+  const initialCircleData={
+      circle_name:"",
     circle_description:"",
     circle_fee:"",
-    // circle_fee:0,
     number_of_male:"",
-    // number_of_male:0,
     number_of_female:"",
-    // number_of_female:0,
-    //circle_icon_path:"",
-    //tags:[],
-  });
+  }
+  const [circleData,setCircleData] = useState(initialCircleData);
+
     const NameChange=(e)=>{
     setCircleData({
       ...circleData,
@@ -116,7 +125,7 @@ const [errorFields,setErrorFields]=useState([]);
   const [selectedMood,setSelectedMood]=useState(0);
   const [selectedActive,setSelectedActive]=useState(0);
  
-
+  const fileInputRef = useRef(null);
   // const [preview,setPreview]=useState("");
   const [preview,setPreview]=useState(null);
 
@@ -134,6 +143,15 @@ const [errorFields,setErrorFields]=useState([]);
       }
   }
   
+  const reloadData=()=>{
+    setCircleData(initialCircleData);
+    setSelectedBunya('');
+    setSelectedFee('');
+    setSelectedRatio('');
+    setSelectedPlace('');
+    setSelectedMood('');
+    setSelectedActive('');
+  }
   const get_jsontags = async() => {
     // const dataTosend = {
       // circle_name:circleData.circle_name,
@@ -157,7 +175,7 @@ const [errorFields,setErrorFields]=useState([]);
   formData.append("circle_fee", circleData.circle_fee || "0");
   formData.append("number_of_male", circleData.number_of_male || "0");
   formData.append("number_of_female", circleData.number_of_female || "0");
- formData.append("tags", JSON.stringify(tagList));
+  formData.append("tags", JSON.stringify(tagList));
   // tags:[
         // Number(selectedBunya),
       //  Number(selectedFee),
@@ -242,6 +260,7 @@ const [errorFields,setErrorFields]=useState([]);
       console.log("受信したデータ:", data);
       setResponse_data(data);
     };
+  
   return (
 
     <div>
@@ -262,7 +281,7 @@ const [errorFields,setErrorFields]=useState([]);
         <CircleMen value={circleData.number_of_male} onChange={MemChange}></CircleMen>
         <CircleFemen value={circleData.number_of_female} onChange={FememChange}></CircleFemen>
         <CircleFee value={circleData.circle_fee} onChange={FeeChange}></CircleFee>
-        <Image onChange={hadleImageChange} preview={preview} image={image}/> 
+        <Image onChange={hadleImageChange} preview={preview} image={image} filInputRef={fileInputRef}/> 
         <Tag 
           selectedBunya={selectedBunya} 
           onChangeBunya={setSelectedBunya} 
@@ -282,6 +301,7 @@ const [errorFields,setErrorFields]=useState([]);
   
         {/* <Toggle></Toggle> */}
         {/* <Button type="submit" onClick={handleKey} ></Button> */}
+        <p onClick={reloadData}>クリア</p>
         <Button type="submit" onClick={get_jsontags} ></Button>
         <Link to={"/mypage"} className='link'>マイページへ戻る</Link>
     

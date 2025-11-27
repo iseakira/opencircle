@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState } from 'react'
 
-export default function Image({onChange ,preview,image}) {
+export default function Image({onChange ,preview,image,fileInputRef}) {
 
 
 //   const [preview,setPreview]=useState(null);
@@ -12,6 +12,7 @@ export default function Image({onChange ,preview,image}) {
  <input type="file" 
  accept="image/*"
  onChange={onChange}
+ ref={fileInputRef}
  />     
  {preview&&(
      <div> 
