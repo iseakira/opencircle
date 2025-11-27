@@ -5,7 +5,7 @@ import CircleDescription from '../conponents/CircleDescription'
 import CircleFee from '../conponents/CircleFee'
 import CircleName from '../conponents/CircleName'
 // import AddCircle from '../pages/AddCircle'
-import React,{ useState } from 'react'
+import React,{ useState,useRef} from 'react'
 // import '../index.css'
 // import Toggle from './Toggle'
 import Tag from '../conponents/Tag'
@@ -16,7 +16,6 @@ import CircleMen from '../conponents/CircleMen'
 import CircleFemen from '../conponents/CircleFemen'
 import headImage from '../images/head_image.png';
 import { Link } from 'react-router-dom';
-import {useRef} from "react";
 import CircleLogo from '../conponents/CircleLogo'
 function CircleAdd() {
   // const [circleData,setCircleData]=useState({
@@ -125,7 +124,7 @@ const [errorFields,setErrorFields]=useState([]);
   const [selectedMood,setSelectedMood]=useState(0);
   const [selectedActive,setSelectedActive]=useState(0);
  
-  const fileInputRef = useRef(null);
+
   // const [preview,setPreview]=useState("");
   const [preview,setPreview]=useState(null);
 
@@ -143,6 +142,7 @@ const [errorFields,setErrorFields]=useState([]);
       }
   }
   
+  const fileInputRef = useRef(null);
   const reloadData=()=>{
     setCircleData(initialCircleData);
     setSelectedBunya('');
@@ -151,6 +151,11 @@ const [errorFields,setErrorFields]=useState([]);
     setSelectedPlace('');
     setSelectedMood('');
     setSelectedActive('');
+    setImage(null);
+    setPreview(null);
+    if(fileInputRef.current){
+      fileInputRef.current.value='';
+    }
   }
   const get_jsontags = async() => {
     // const dataTosend = {
@@ -281,7 +286,7 @@ const [errorFields,setErrorFields]=useState([]);
         <CircleMen value={circleData.number_of_male} onChange={MemChange}></CircleMen>
         <CircleFemen value={circleData.number_of_female} onChange={FememChange}></CircleFemen>
         <CircleFee value={circleData.circle_fee} onChange={FeeChange}></CircleFee>
-        <Image onChange={hadleImageChange} preview={preview} image={image} filInputRef={fileInputRef}/> 
+        <Image onChange={hadleImageChange} preview={preview} image={image} ref={fileInputRef}/> 
         <Tag 
           selectedBunya={selectedBunya} 
           onChangeBunya={setSelectedBunya} 
