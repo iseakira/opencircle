@@ -1,7 +1,7 @@
 :root {
   /* カラーパレット - 4色のデザインシステム */
   --back-color: #f2f1eb;        /* 背景色 */
-  --base-color: hsl(216, 52%, 19%);      /* ベースカラー（メインテキスト・ダーク） */
+  --base-color: hsl(0, 0, 0);      /* ベースカラー（メインテキスト・ダーク） */
   --main-color: #88b7bd;    
   --main-color-sub:#9EB8BC90;
   --main-color-white:#DDE3E490;
