@@ -107,7 +107,7 @@ function Mypage() {
               権限付与（ownerのみ）
             </button>
 
-            {showAuthForm && (
+            {!showAuthForm && (
               <div
                 ref={authFormRef}
                 style={{
@@ -156,7 +156,7 @@ function Mypage() {
               </div>
             )}
           </div>
-        )}
+         )} 
 
         <h2 style={{ marginTop: "40px" }}>編集できるサークル一覧</h2>
         <div className="circle-list">

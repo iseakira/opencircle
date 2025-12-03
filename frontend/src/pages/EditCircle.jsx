@@ -150,7 +150,7 @@ function CircleEdit() {
       }
 
       const responseData = await response.json();
-      alert(responseData.message || "サークル情報を更新しました！");
+      alert(responseData.message || "サークル情報をしました！");
       navigate("/mypage");
 
     } catch (error) {
