@@ -31,12 +31,13 @@ class User(db.Model):
   __tablename__ = "users"
   user_id = db.Column(db.Integer,primary_key=True)
   user_name = db.Column(db.String(80),nullable=False)
-  mail_adress = db.Column(db.String(255),unique=True,nullable=False)
+  mail_address = db.Column(db.String(255),unique=True,nullable=False)
   password = db.Column(db.String(255), nullable=False)
 
 
 class Tag(db.Model):
   __tablename__ = "tags"
+  id = db.Column(db.Integer,primary_key=True,autoincrement=True)
   tag_id = db.Column(db.Integer,primary_key=True)
   tag_name = db.Column(db.String(50),unique=True,nullable=False)
 
@@ -50,7 +51,6 @@ class AccountCreate(db.Model):
   tmp_id = db.Column(db.Integer,primary_key=True)
   auth_code = db.Column(db.String(100),nullable=False)
   account_expire_time = db.Column(db.DateTime,nullable=False)
-  account_create_time = db.Column(db.DateTime,nullable=False)
   attempt_count = db.Column(db.Integer,nullable=False,default=0)
 
  
