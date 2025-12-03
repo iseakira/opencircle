@@ -96,13 +96,14 @@ function Make_Account() {
     return (
     <div>
         <header className="page-header">
-            <h1>
+            {/* <h1>
                 <Link to="/">
                 <img className="logo" src={headImage} alt="アイコン" />
                 </Link>
-            </h1>
+            </h1> */}
+            <CircleLogo></CircleLogo>
         </header>
-        <h1>東京理科大学サークル情報サイト</h1>
+        {/* <h1>東京理科大学サークル情報サイト</h1> */}
         <main>
             <h3>パスワードとメールアドレスに送信された認証コードとユーザー名を入力してください</h3>
             <form onSubmit={handleCreateAccount}>
@@ -119,7 +120,7 @@ function Make_Account() {
                 <label>ユーザー名：</label>
                     <input type="text" name="user_name" value={formData.user_name} required onChange={handleChange}/>
                     <br />
-                <button type="submit" >アカウントを作成する</button>
+                <button type="submit" className="exbutton">アカウントを作成する</button>
             </form>
             <br />
             <div>

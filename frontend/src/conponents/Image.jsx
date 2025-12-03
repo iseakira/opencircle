@@ -1,8 +1,8 @@
-import React from 'react'
-import { useState } from 'react'
+import React,{forwardRef} from 'react'
+// import { useState } from 'react'
 
-export default function Image({onChange ,preview,image}) {
-
+// export default function Image({onChange ,preview,image},ref) {
+const ImageComponent = forwardRef(function Image({onChange,preview,image},ref){
 
 //   const [preview,setPreview]=useState(null);
 //   const [image,setImage]=useState(null);
@@ -12,6 +12,7 @@ export default function Image({onChange ,preview,image}) {
  <input type="file" 
  accept="image/*"
  onChange={onChange}
+ ref={ref}
  />     
  {preview&&(
      <div> 
@@ -26,5 +27,7 @@ export default function Image({onChange ,preview,image}) {
      </div>
  )}
     </div>
-  )
-}
+  );
+});
+export default ImageComponent;
+

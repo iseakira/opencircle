@@ -11,6 +11,7 @@ from datetime import datetime, timedelta, timezone
 import uuid
 from werkzeug.utils import secure_filename
 import threading
+import hash
 
 # --- ▼ 1. 画像アップロード設定 ▼ ---
 # 許可する拡張子
@@ -126,7 +127,8 @@ def make_tmp_account():
     #data_tuple は (success, auth_code, tmp_id) の形
     data_tuple = dbop.tmp_registration(emailaddress)
     if data_tuple[0]:
-        sm.send_auth_code(emailaddress, data_tuple[1])
+        mail_thread = threading.Thread(target = sm.send_auth_code, args=(emailaddress, data_tuple[1]))
+        mail_thread.start()
         return jsonify({"message": "success", "tmp_id": data_tuple[2]})
     else:
         return jsonify({"message": "failure"})
@@ -146,19 +148,24 @@ def create_account():
 
 # --- ここからログイン ---
 @app.route("/api/check_login", methods=["POST"])
-def check_login():
-    session_id = request.cookies.get("session_id")
-    if session_id == None:
-        return jsonify({"isLogin": False})
-    isLogin = dbop.check_session(session_id)
-    return jsonify({"isLogin": isLogin})
+def check_session():
+    #session_id = request.cookies.get("session_id")
+    #if session_id == None:
+    #    return jsonify({"isLogin": False})
+    #isLogin = dbop.check_session(session_id)
+    #return jsonify({"isLogin": isLogin})
+
+    user_id = verify_login()[0]
+    user_name = ""
+    is_login = not (user_id == None)
+    if is_login:
+        user_name = dbop.get_username(user_id)
+    return jsonify({"isLogin": is_login, "userName": user_name})
 
 @app.route("/login", methods=["POST"])
 def login():
     #json_dict のキーは {"emailaddress", "password"}
     json_dict = request.get_json()
-    print(json_dict)
-    print("nuhahahaha")
 
     checked_dict = dbop.check_login(json_dict["emailaddress"], json_dict["password"])
     if checked_dict["message"] == "failure":
@@ -171,9 +178,19 @@ def login():
     else:
         response = make_response(jsonify(checked_dict))
         session_id = str(result_tuple[1])
-        print(session_id)
         response.set_cookie("session_id", session_id)
         return response
+    
+@app.route("/api/logout", methods=["POST"])
+def logout():
+    session_id = request.cookies.get("session_id")
+    print(session_id)
+    if session_id == None:
+        return jsonify({"message": "success"})
+    dbop.delete_session(session_id)
+    response = make_response(jsonify({"message": "fromLogout"}))
+    response.set_cookie("session_id", "", expires = 0)
+    return response
 
 # --- ここまでログイン ---
 
@@ -338,48 +355,23 @@ def add_circle():
 
 
 # GET: 1件のサークル情報を取得する
-# GET: 1件のサークル情報を取得する (★ 認証・権限チェック追加 ★)
+
 @app.route('/api/circles/<int:circle_id>', methods=['GET'])
 def get_circle(circle_id):
 
-    # --- ▼ 1. 認証チェック (門番) ▼ ---
-    session_id_str = request.cookies.get("session_id")
-
-    if not session_id_str:
-        return jsonify({"error": "認証されていません (Cookieが見つかりません)"}), 401
-    
-    try:
-        session_id = int(session_id_str)
-    except ValueError:
-        return jsonify({"error": "不正なセッション形式です"}), 401
-
-    active_session = db.session.get(Session, session_id)
-
-    if not active_session:
-        return jsonify({"error": "セッションが無効です（ログインしていません）"}), 401
-
-    session_timeout_hours = 24
-    utc_now = datetime.now(timezone.utc)
-    
-    if active_session.session_last_access_time < utc_now - timedelta(hours=session_timeout_hours):
-        db.session.delete(active_session) 
-        db.session.commit()
-        return jsonify({"error": "セッションが期限切れです。再度ログインしてください"}), 401
-    
-    # 認証成功
-    user_id = active_session.user_id
-    active_session.session_last_access_time = utc_now # セッション時刻を更新
+    # --- ▼ 1. 認証チェック (verify_login に統一) ▼ ---
+    user_id, err, code = verify_login()
+    if err:
+        return err, code
     # --- ▲ 認証チェック完了 ▲ ---
 
 
-    # --- ▼ 2. 編集対象のサークルを取得 ▼ ---
     circle = Circle.query.get(circle_id)
     if not circle:
         return jsonify({"error": "指定されたサークルが見つかりません"}), 404
         
     
-    # --- ▼ 3. (推奨) 権限チェック ▼ ---
-    # この user_id が、この circle_id の編集権限を持っているか確認
+    # --- ▼ 3. 権限チェック ▼ ---
     auth = EditAuthorization.query.filter_by(
         user_id=user_id, 
         circle_id=circle.circle_id
@@ -387,7 +379,6 @@ def get_circle(circle_id):
     
     if not auth:
         # ログインはしているが、このサークルの編集権限がない
-        db.session.rollback() # セッション時刻の更新を取り消す
         return jsonify({"error": "このサークルの編集権限がありません"}), 403
     # --- ▲ 権限チェック完了 ▲ ---
 
@@ -414,12 +405,10 @@ def get_circle(circle_id):
     }
 
     try:
-        # ★ 認証チェックで更新したセッション時刻をコミット
-        db.session.add(active_session) 
-        db.session.commit()
+        db.session.commit() 
     except Exception as e:
         db.session.rollback()
-        return jsonify({"error": "サーバーエラー (セッション更新失敗)", "detail": str(e)}), 500
+        return jsonify({"error": "サーバーエラー (DBコミット失敗)", "detail": str(e)}), 500
 
     # 辞書をJSONにして返す (200 OK)
     return jsonify(circle_data), 200
@@ -428,7 +417,7 @@ def get_circle(circle_id):
 @app.route('/api/circles/<int:circle_id>', methods=['PUT'])
 def update_circle(circle_id):
     
-    # --- ▼ 1. 認証チェック (門番) ▼ ---
+    # --- ▼ 1. 認証チェック  ▼ ---
     session_id_str = request.cookies.get("session_id")
     # print(session_id_str) # (デバッグ用)
 
@@ -447,10 +436,8 @@ def update_circle(circle_id):
 
     session_timeout_hours = 24 # (24時間に設定)
     
-    # (注: datetime.utcnow() は非推奨。タイムゾーン対応の now() を使用)
-    utc_now = datetime.now(timezone.utc) 
+    utc_now = datetime.utcnow()
     
-    # 最終アクセス時刻を 'session_last_access_time' カラムから取得
     if active_session.session_last_access_time < utc_now - timedelta(hours=session_timeout_hours):
         db.session.delete(active_session) 
         db.session.commit()
@@ -462,14 +449,13 @@ def update_circle(circle_id):
     # --- ▲ 認証チェック完了 ▲ ---
 
 
-    # --- ▼ 2. 編集対象のサークルを取得 ▼ ---
+    # ---  2. 編集対象のサークルを取得  ---
     circle_to_update = Circle.query.get(circle_id)
     if not circle_to_update:
         return jsonify({"error": "指定されたサークルが見つかりません"}), 404
         
     
-    # --- ▼ 3. (推奨) 権限チェック ▼ ---
-    # この user_id が、この circle_id の編集権限を持っているか確認
+    # ---  3. (推奨) 権限チェック  ---
     auth = EditAuthorization.query.filter_by(
         user_id=user_id, 
         circle_id=circle_to_update.circle_id
@@ -478,7 +464,7 @@ def update_circle(circle_id):
     if not auth:
         # ログインはしているが、このサークルを編集する権限がない
         return jsonify({"error": "このサークルの編集権限がありません"}), 403
-    # --- ▲ 権限チェック完了 ▲ ---
+    # ---  権限チェック完了  ---
 
 
     # --- ▼ 4. FormData からデータを取得 ▼ ---
@@ -493,9 +479,7 @@ def update_circle(circle_id):
     if not data_name or not data_description:
         return jsonify({"error": "circle_name と circle_description は必須です"}), 400
 
-    # --- ▼ 5. 画像ファイルの保存 (古いファイル削除ロジック含む) ▼ ---
-    
-    # (古いパスを先に控えておく)
+    # --- ▼ 5. 画像ファイルの保存 ▼ ---
     old_icon_path = circle_to_update.circle_icon_path 
     
     if file:
@@ -510,8 +494,6 @@ def update_circle(circle_id):
         # (古いファイルを削除)
         if old_icon_path and old_icon_path.startswith(UPLOAD_BASE_URL):
             try:
-                # URLパス (例: /api/uploads/old.png) から
-                # 物理パス (例: /app/uploads/old.png) を組み立てる
                 old_filename = old_icon_path.replace(UPLOAD_BASE_URL + '/', "")
                 old_file_physical_path = os.path.join(app.config['UPLOAD_FOLDER'], old_filename)
                 
@@ -524,7 +506,6 @@ def update_circle(circle_id):
                 # (削除に失敗しても、更新処理自体は続行する)
                 print(f"古い画像ファイルの削除に失敗: {e}")
         
-    # (file がない場合は、既存の icon_path がそのまま保持されます)
     
     
     # --- ▼ 6. テキスト情報の更新 ▼ ---
@@ -550,7 +531,6 @@ def update_circle(circle_id):
             circle_to_update.tags.append(tag)
             
     try:
-        # ★ 認証チェックで更新したセッション時刻も一緒にコミット
         db.session.add(active_session) 
         db.session.commit()
     except Exception as e:
@@ -651,82 +631,98 @@ def prepare_new_circle():
 # 編集権限の付与
 @app.route("/api/edit-authorization", methods=["POST"])
 def add_edit_authorization():
-   
-     # ログインチェック
+    # ログインチェック
     user_id, err, code = verify_login()
     if err:
         return err, code
-
     data = request.get_json() or {}
     circle_id = data.get("circle_id")
-    target_user_id = data.get("target_user_id")
-
-    if not circle_id or not target_user_id:
-        return jsonify({"error": "circle_id と target_user_id が必要です"}), 400
-
+    target_email = data.get("target_email")  # メールアドレスを受け取る
+    if not circle_id or not target_email:
+        return jsonify({"error": "circle_id と target_email が必要です"}), 400
+    
+    # オーナー権限確認
     owner_auth = EditAuthorization.query.filter_by(
-        user_id=user_id, circle_id=circle_id
+        user_id=user_id, circle_id=circle_id, role="owner"
     ).first()
     if not owner_auth:
         return jsonify({"error": "このサークルに権限を付与する権限がありません"}), 403
+    target_user = User.query.filter_by(mail_adress=target_email).first()
+    if not target_user:
+        return jsonify({"error": "指定したメールアドレスのユーザーが見つかりません"}), 404
+    target_user_id = target_user.user_id
 
+    # すでに権限があるか確認
     exists = EditAuthorization.query.filter_by(
         user_id=target_user_id, circle_id=circle_id
     ).first()
     if exists:
         return jsonify({"error": "このユーザーは既に権限を持っています"}), 400
-
-    new_auth = EditAuthorization(user_id=target_user_id, circle_id=circle_id)
+    
+    # 権限付与
+    new_auth = EditAuthorization(
+        user_id=target_user_id,
+        circle_id=circle_id,
+        role="editor"
+    )
     db.session.add(new_auth)
     db.session.commit()
-
     return jsonify({
         "message": "編集権限を付与しました",
         "circle_id": circle_id,
+        "target_email": target_email,
         "target_user_id": target_user_id
     }), 201
 
 # オーナー権限の譲渡
 @app.route("/api/transfer-ownership", methods=["POST"])
 def transfer_ownership():
-    # ログイン確認
+    # ログインチェック
     user_id, err, code = verify_login()
     if err:
         return err, code
-    
-    # リクエストデータ取得
     data = request.get_json() or {}
     circle_id = data.get("circle_id")
-    new_owner_id = data.get("new_owner_id")
-    if not circle_id or not new_owner_id:
-        return jsonify({"error": "circle_id と new_owner_id が必要です"}), 400
+    new_owner_email = data.get("new_owner_email")  # メールアドレスを受け取る
+    if not circle_id or not new_owner_email:
+        return jsonify({"error": "circle_id と new_owner_email が必要です"}), 400
     
-    # 現オーナー確認
+    # 現在のオーナー確認
     current_owner = EditAuthorization.query.filter_by(
         user_id=user_id, circle_id=circle_id, role="owner"
     ).first()
     if not current_owner:
         return jsonify({"error": "オーナーのみが譲渡できます"}), 403
     
-    # 譲渡先ユーザー確認
+    #メールアドレスからユーザー検索
+    candidate_user = User.query.filter_by(mail_adress=new_owner_email).first()
+    if not candidate_user:
+        return jsonify({"error": "指定したメールアドレスのユーザーが存在しません"}), 404
+    new_owner_id = candidate_user.user_id
+
+    # 譲渡先がサークル編集者リストに存在するか
     candidate = EditAuthorization.query.filter_by(
         user_id=new_owner_id, circle_id=circle_id
     ).first()
+
     if not candidate:
-        return jsonify({"error": "譲渡先のユーザーが見つかりません"}), 400
-    
+        candidate = EditAuthorization(
+            user_id=new_owner_id,
+            circle_id=circle_id,
+            role="editor"
+        )
+        db.session.add(candidate)
+
     # 権限の入れ替え
-    candidate.role = "owner" 
-    db.session.delete(current_owner)  
-    
-    # DB反映
+    candidate.role = "owner"
+    db.session.delete(current_owner)
     db.session.commit()
     return jsonify({
-        "message": "オーナー権限を譲渡し、元オーナーは退部しました",
+        "message": "オーナー権限を譲渡しました（元オーナーは退部）",
         "circle_id": circle_id,
+        "new_owner_email": new_owner_email,
         "new_owner_id": new_owner_id
     }), 200
-
 
 # サークル削除API
 @app.route("/api/circle/<int:circle_id>", methods=["DELETE"])

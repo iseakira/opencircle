@@ -68,13 +68,14 @@ function Login() {
   return (
     <div>
       <header className="page-header">
-        <h1>
+        {/* <h1>
           <Link to="/">
             <img className="logo" src={headImage} alt="アイコン" />
           </Link>
-        </h1>
+        </h1> */}
+        <CircleLogo></CircleLogo>
       </header>
-      <h1>東京理科大学サークル情報サイト</h1>
+      {/* <h1>東京理科大学サークル情報サイト</h1> */}
       
       <main>
         <h3>メールアドレスとパスワードを入力してください</h3>
@@ -83,12 +84,12 @@ function Login() {
           <input type="email" name="email" required value={emailaddress} onChange={handleChange_email} />
           <br />
           <label>パスワード：</label>
-          <input type="password" name="password" required value={password} onChange={handleChange_password} />
-          <button type="submit">ログイン</button>
+          <input type="password" name="password" required value={password} onChange={handleChange_password} /><br />
+          <button type="submit" className="allbutton">ログイン</button>
         </form>
         <br />
         <h3>
-          <button type="submit" onClick={handleCreateAccount}>アカウント作成はこちら</button>
+          <button type="submit" onClick={handleCreateAccount} className="exbutton">アカウント作成はこちら</button>
         </h3>
       </main>
       <footer>

@@ -9,6 +9,7 @@ from sqlalchemy.exc import IntegrityError
 import logging # printの代わりにloggingを使うことを推奨
 import threading
 import time
+import hash
 
 # サークル情報取得関数（まだ使用されていません）initial_circles、search_circles用
 def get_circle_prof(circle_id):
@@ -223,7 +224,6 @@ def tmp_registration(mailaddress):
 
     auth_code = random.randint(100000, 999999)
     tmp_id = int(''.join(secrets.choice(string.digits) for _ in range(6)))
-    #tmp_idが重複した時の処理を後で書く
     complete = False
     for i in range(5):
         try:
@@ -281,14 +281,14 @@ def check_auth_code(auth_code, tmp_id):
 def create_account(emailaddress, password, user_name):
     conn = sqlite3.connect("project.db")
     cursor = conn.cursor()
-    #ここもuser_id重複時の処理がいる
     user_id = int(''.join(secrets.choice(string.digits) for _ in range(6)))
     complete = False
     for i in range(5):
         try:
             print(user_id)
+            hashed_pass = hash.hash_pass(password, user_id)
             cursor.execute("INSERT INTO users (user_id, user_name, mail_adress, password) " \
-                            "VALUES (?, ?, ?, ?)", (user_id, user_name, emailaddress, password))
+                            "VALUES (?, ?, ?, ?)", (user_id, user_name, emailaddress, hashed_pass))
             conn.commit()
         except sqlite3.Error as e:
             print(e)
@@ -303,11 +303,13 @@ def create_account(emailaddress, password, user_name):
 def check_login(emailaddress, password):
     conn = sqlite3.connect("project.db")
     cursor = conn.cursor()
-    res = cursor.execute("SELECT password FROM users WHERE mail_adress = ?", (emailaddress,))
+    res = cursor.execute("SELECT password, user_id FROM users WHERE mail_adress = ?", (emailaddress,))
     user_tuple = res.fetchone()
     cursor.close()
     conn.close()
-    if password != user_tuple[0]:
+    user_id = user_tuple[1]
+    hashed_pass = hash.hash_pass(password, user_id)
+    if user_tuple == None or hashed_pass != user_tuple[0]:
         return {"message": "failure"}
     else:
         return {"message": "success"}
@@ -333,6 +335,16 @@ def make_session(emailaddress):
     conn.close()
     return (complete, session_id)
 
+def get_username(user_id):
+    conn = sqlite3("project.db")
+    cursor = conn.cursor()
+    res = cursor.execute("SELECT user_name FROM users WHERE user_id = ?", (user_id,))
+    user_name_tuple = res.fetchone()
+    cursor.close()
+    conn.close()
+    return user_name_tuple[0]
+
+# veryfy_loginに置き換えたから使われてない
 def check_session(session_id):
     conn = sqlite3.connect("project.db")
     cursor = conn.cursor()
@@ -354,6 +366,18 @@ def check_session(session_id):
     cursor.close()
     conn.close()
     return True
+
+def delete_session(session_id):
+    conn = sqlite3.connect("project.db")
+    cursor = conn.cursor()
+    try:
+        print(session_id + "wo kesuzo")
+        cursor.execute("DELETE FROM sessions WHERE session_id = ?", (session_id,))
+        conn.commit()
+    except:
+        print("time over")
+    cursor.close()
+    conn.close()
 
 def cleanup_session_tmpid():
     conn = sqlite3.connect("project.db")
@@ -426,3 +450,13 @@ def delete_circle_by_id(circle_id):
         logging.error(f"サークル ID:{circle_id} 削除中に予期せぬエラー: {e}")
         return (False, f"予期せぬエラー: {e}")
 
+def reset():
+    conn = sqlite3.connect("project.db")
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM users")
+    cursor.execute("DELETE FROM edit_authorizations")
+    cursor.execute("DELETE FROM circles")
+    cursor.execute("DELETE FROM circle_tag")
+    conn.commit()
+    cursor.close()
+    conn.close()

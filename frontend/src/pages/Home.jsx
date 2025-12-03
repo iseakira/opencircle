@@ -82,12 +82,12 @@ function Home() {
   return (
     <div>
       <header className="page-header">
-        <h1>
+        {/* <h1>
           <Link to="/">
             <img className="logo" src={headImage} alt="アイコン" />
           </Link>
-        </h1>
-        {/* <CircleLogo></CircleLogo> */}
+        </h1> */}
+        <CircleLogo></CircleLogo>
         <h3>
           <LoginOutButton />
         </h3>
@@ -95,7 +95,7 @@ function Home() {
       </header>
 
       <main>
-        <h1>東京理科大学サークル情報サイト</h1>
+        {/* <h1>東京理科大学サークル情報サイト</h1> */}
         <p>ここでは東京理科大学のサークル情報を掲載しています。</p>
         <h2>サークル一覧</h2>
         <Toggle receivedData_fb={handleResponse} />
@@ -108,11 +108,26 @@ function Home() {
           ) : response_data && response_data.items && response_data.items.length > 0 ? (
           <>
           {response_data.items.map((circle, index) => (
-            <div key={index} className="circle-info" onClick={() => to_circle_page(circle.circle_id)} style={{cursor: 'pointer'}}>
+            <Link to={`/Circle_Page/${circle.circle_id}`}>
+              <div key={circle.circle_id}  className="circle-info" style={{cursor: 'pointer'}}>
+                <img src={circle.circle_icon_path} className="circle_icon"/>
+                <p>サークル名: {circle.circle_name}</p>
+                <p>分野：{circle.field}</p>
+              </div>
+            </Link>
+            /*
+            <div key={index} className="circle-info" onClick={() => to_circle_page(circle.circle_id)} 
+            tabIndex="0"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                to_circle_page(circle.circle_id);
+              }
+            }}style={{cursor: 'pointer'}}>
               <img src={circle.circle_icon_path} className="circle_icon"/>
                 <p>サークル名: {circle.circle_name}</p>
                 <p>分野：{circle.field}</p>
             </div>
+            */
           ))}
           <br />
           </>
@@ -121,7 +136,7 @@ function Home() {
       </main>
       <footer>
         <p>created by 東京理科大学IS科3年</p>
-        <a href="https://www.tus.ac.jp/" target="_blank">
+        <a href="https://www.tus.ac.jp/" target="_blank" >
           東京理科大学ホームページ
         </a>
       </footer>

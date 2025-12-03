@@ -1,9 +1,10 @@
 import React from 'react'
+// import React,{ useState } from 'react'
 
 export default function Button({onClick}) {  
-    return (
+  return (
     <div>  
-      <button type="submit" id = "button" onClick={onClick}
+      <button type="submit" className="allbutton" onClick={onClick}
       style={{
         marginBottom:"20px",
       }}

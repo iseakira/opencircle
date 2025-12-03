@@ -64,13 +64,14 @@ function Input_email() {
   return (
     <div>
       <header className="page-header">
-        <h1>
-          <Link to="/">
+        {/* <h1> */}
+          {/* <Link to="/">
             <img className="logo" src={headImage} alt="アイコン" />
-          </Link>
-        </h1>
+          </Link> */}
+          <CircleLogo></CircleLogo>
+        {/* </h1> */}
       </header>
-      <h1>東京理科大学サークル情報サイト</h1>
+      {/* <h1>東京理科大学サークル情報サイト</h1> */}
 
       <main>
         <h3>登録したいメールアドレスを入力してください</h3>
@@ -78,7 +79,7 @@ function Input_email() {
           <label>メールアドレス：</label>
           <input type="text" name="text" placeholder="メールアドレス" value={emailaddress} onChange={retain_email} required />
           <br />
-          <button type="submit">認証コードを送信する</button>
+          <button type="submit" className="exbutton">認証コードを送信する</button>
         </form>
         <br />
  
