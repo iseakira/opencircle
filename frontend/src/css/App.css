@@ -195,6 +195,7 @@ button[aria-expanded] {
 button[aria-expanded]:hover {
   background-color: var(--accent-color-white);
   transform: scale(1.02);
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.15);
 }
 button[aria-expanded="true"] {
   background-color: var(--accent-color);
@@ -205,12 +206,13 @@ button[aria-expanded="true"] {
 button[aria-expanded="true"]:hover {
   background-color: var(--accent-color-white);
   border-color: var(--accent-color);
-  transform: scale(1);
-  box-shadow: none;
+  transform: scale(1.02);
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.15);
 }
 button[aria-expanded]:active {
-  animation: flashWhite 1.0s ease-out; 
   background-color: #fff;
+  transform: scale(0.98);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .allbutton{
