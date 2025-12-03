@@ -144,7 +144,7 @@ def check_session():
     #    return jsonify({"isLogin": False})
     #isLogin = dbop.check_session(session_id)
     #return jsonify({"isLogin": isLogin})
-    dbop.reset()
+
     user_id = verify_login()[0]
     user_name = ""
     is_login = not (user_id == None)

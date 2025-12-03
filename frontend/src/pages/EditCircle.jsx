@@ -23,12 +23,12 @@ function CircleEdit() {
     number_of_female: "",
   });
 
-  const [selectedBunya, setSelectedBunya] = useState(null);
-  const [selectedFee, setSelectedFee] = useState(null);
-  const [selectedRatio, setSelectedRatio] = useState(null);
-  const [selectedPlace, setSelectedPlace] = useState(null);
-  const [selectedMood, setSelectedMood] = useState(null);
-  const [selectedActive, setSelectedActive] = useState(null);
+  const [selectedBunya, setSelectedBunya] = useState(0);
+  const [selectedFee, setSelectedFee] = useState(0);
+  const [selectedRatio, setSelectedRatio] = useState(0);
+  const [selectedPlace, setSelectedPlace] = useState(0);
+  const [selectedMood, setSelectedMood] = useState(0);
+  const [selectedActive, setSelectedActive] = useState(0);
   
   const [preview, setPreview] = useState(null);
   const [image, setImage] = useState(null); // (File オブジェクトがここに入る)
