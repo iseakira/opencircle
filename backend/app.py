@@ -75,15 +75,6 @@ def create_app():
 
 app = create_app()
 
-# --- ここからテスト用のコード ---
-
-# `/api/hello` というURLにアクセスが来たら動く関数
-@app.route('/api/hello', methods=['GET'])
-def say_hello():
-    # JSON形式でメッセージを返す
-    return jsonify({"message": "バックエンドからの返事です！🎉"})
-
-
 @app.route('/home', methods=['POST'])
 def search():
     try:
@@ -94,7 +85,6 @@ def search():
         items = dbop.search_circles(json_data)
         return jsonify({"items": items, "total": len(items)})
     except Exception as e:
-        # エラー時はログ出力して 500 を返す
         print('search_circles error:', e)
         return jsonify({"error": "サーバーエラー"}), 500
 
@@ -235,15 +225,11 @@ def save_image_file(file_storage):
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
-# --- (他のAPI ... /api/hello, /hometest など) ---
-
-#'/api/circles'というURLにPOSTリクエストが来たら動く関数#
 @app.route('/api/circles', methods=['POST'])
 def add_circle():
 
     # --- ▼ 1. Cookieによるログイン認証チェック ▼ ---
     session_id_str = request.cookies.get("session_id")
-    print(session_id_str)
     if not session_id_str:
         return jsonify({"error": "認証されていません (Cookieが見つかりません)"}), 401
     
@@ -284,10 +270,6 @@ def add_circle():
     # 画像ファイルを request.files から取得
     file = request.files.get("circle_icon_file")
     # --- ▲ データ取得完了 ▲ ---
-    
-    print("FORM:", request.form)
-    print("FILES:", request.files)
-
     
     # 必須チェック
     if not data_name or not data_description:
@@ -403,14 +385,6 @@ def get_circle(circle_id):
         "circle_icon_path": circle.circle_icon_path,
         "tags": tags_id_list
     }
-
-    try:
-        db.session.commit() 
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": "サーバーエラー (DBコミット失敗)", "detail": str(e)}), 500
-
-    # 辞書をJSONにして返す (200 OK)
     return jsonify(circle_data), 200
 
 #サークル情報更新API
@@ -565,16 +539,21 @@ def verify_login():
     active_session = db.session.get(Session, session_id)
     if not active_session:
         return None, jsonify({"error": "セッションが無効です（ログインしていません）"}), 401
+    
+    now_utc = datetime.now(timezone.utc)
+    last_access = active_session.session_last_access_time
+    if last_access.tzinfo is None:
+        last_access = last_access.replace(tzinfo=timezone.utc)
 
     # 有効期限チェック（24時間）
     session_timeout_hours = 24
-    if active_session.session_last_access_time < datetime.utcnow() - timedelta(hours=session_timeout_hours):
+    if last_access < now_utc - timedelta(hours=session_timeout_hours):
         db.session.delete(active_session)
         db.session.commit()
         return None, jsonify({"error": "セッションが期限切れです。再度ログインしてください"}), 401
 
     # 最終アクセス時刻を更新
-    active_session.session_last_access_time = datetime.utcnow()
+    active_session.session_last_access_time = now_utc
     db.session.add(active_session)
     db.session.commit()
 
