@@ -298,5 +298,10 @@ button[aria-expanded="true"]:hover {
   /* margin-left: 30px; */
 }
 
+a {
+  color: black;
+}
+
+
 
   
