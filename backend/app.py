@@ -631,107 +631,173 @@ def prepare_new_circle():
 # 編集権限の付与
 @app.route("/api/edit-authorization", methods=["POST"])
 def add_edit_authorization():
-   
-     # ログインチェック
+    # ログインチェック
     user_id, err, code = verify_login()
     if err:
         return err, code
-
     data = request.get_json() or {}
     circle_id = data.get("circle_id")
-    target_user_id = data.get("target_user_id")
-
-    if not circle_id or not target_user_id:
-        return jsonify({"error": "circle_id と target_user_id が必要です"}), 400
-
+    target_email = data.get("target_email")  # メールアドレスを受け取る
+    if not circle_id or not target_email:
+        return jsonify({"error": "circle_id と target_email が必要です"}), 400
+    
+    # オーナー権限確認
     owner_auth = EditAuthorization.query.filter_by(
-        user_id=user_id, circle_id=circle_id
+        user_id=user_id, circle_id=circle_id, role="owner"
     ).first()
     if not owner_auth:
         return jsonify({"error": "このサークルに権限を付与する権限がありません"}), 403
+    target_user = User.query.filter_by(mail_adress=target_email).first()
+    if not target_user:
+        return jsonify({"error": "指定したメールアドレスのユーザーが見つかりません"}), 404
+    target_user_id = target_user.user_id
 
+    # すでに権限があるか確認
     exists = EditAuthorization.query.filter_by(
         user_id=target_user_id, circle_id=circle_id
     ).first()
     if exists:
         return jsonify({"error": "このユーザーは既に権限を持っています"}), 400
-
-    new_auth = EditAuthorization(user_id=target_user_id, circle_id=circle_id)
+    
+    # 権限付与
+    new_auth = EditAuthorization(
+        user_id=target_user_id,
+        circle_id=circle_id,
+        role="editor"
+    )
     db.session.add(new_auth)
     db.session.commit()
-
     return jsonify({
         "message": "編集権限を付与しました",
         "circle_id": circle_id,
+        "target_email": target_email,
         "target_user_id": target_user_id
     }), 201
 
 # オーナー権限の譲渡
 @app.route("/api/transfer-ownership", methods=["POST"])
 def transfer_ownership():
-    # ログイン確認
+    # ログインチェック
     user_id, err, code = verify_login()
     if err:
         return err, code
-    
-    # リクエストデータ取得
     data = request.get_json() or {}
     circle_id = data.get("circle_id")
-    new_owner_id = data.get("new_owner_id")
-    if not circle_id or not new_owner_id:
-        return jsonify({"error": "circle_id と new_owner_id が必要です"}), 400
+    new_owner_email = data.get("new_owner_email")  # メールアドレスを受け取る
+    if not circle_id or not new_owner_email:
+        return jsonify({"error": "circle_id と new_owner_email が必要です"}), 400
     
-    # 現オーナー確認
+    # 現在のオーナー確認
     current_owner = EditAuthorization.query.filter_by(
         user_id=user_id, circle_id=circle_id, role="owner"
     ).first()
     if not current_owner:
         return jsonify({"error": "オーナーのみが譲渡できます"}), 403
     
-    # 譲渡先ユーザー確認
+    #メールアドレスからユーザー検索
+    candidate_user = User.query.filter_by(mail_adress=new_owner_email).first()
+    if not candidate_user:
+        return jsonify({"error": "指定したメールアドレスのユーザーが存在しません"}), 404
+    new_owner_id = candidate_user.user_id
+
+    # 譲渡先がサークル編集者リストに存在するか
     candidate = EditAuthorization.query.filter_by(
         user_id=new_owner_id, circle_id=circle_id
     ).first()
+
     if not candidate:
-        return jsonify({"error": "譲渡先のユーザーが見つかりません"}), 400
-    
+        candidate = EditAuthorization(
+            user_id=new_owner_id,
+            circle_id=circle_id,
+            role="editor"
+        )
+        db.session.add(candidate)
+
     # 権限の入れ替え
-    candidate.role = "owner" 
-    db.session.delete(current_owner)  
-    
-    # DB反映
+    candidate.role = "owner"
+    db.session.delete(current_owner)
     db.session.commit()
     return jsonify({
-        "message": "オーナー権限を譲渡し、元オーナーは退部しました",
+        "message": "オーナー権限を譲渡しました（元オーナーは退部）",
         "circle_id": circle_id,
+        "new_owner_email": new_owner_email,
         "new_owner_id": new_owner_id
     }), 200
 
-
 # サークル削除API
+#@app.route("/api/circle/<int:circle_id>", methods=["DELETE"])
+# def delete_circle(circle_id):
+#     # ログイン確認
+#     user_id, err, code = verify_login()
+#     if err:
+#         return err, code
+
+#     # サークルの存在確認
+#     circle = Circle.query.get(circle_id)
+#     if not circle:
+#         return jsonify({"error": "指定されたサークルが存在しません"}), 404
+
+#     # 権限確認
+#     owner_auth = EditAuthorization.query.filter_by(
+#         user_id=user_id, circle_id=circle_id, role="owner"
+#     ).first()
+#     if not owner_auth:
+#         return jsonify({"error": "削除権限がありません（オーナーではありません）"}), 403
+
+#     # 関連する編集権限をすべて削除
+#     EditAuthorization.query.filter_by(circle_id=circle_id).delete()
+
+#     # サークル自体を削除
+#     db.session.delete(circle)
+#     db.session.commit()
+
+#     return jsonify({
+#         "message": f"サークル '{circle.circle_name}' を削除しました。",
+#         "deleted_circle_id": circle_id
+#     }), 200
+
+
 @app.route("/api/circle/<int:circle_id>", methods=["DELETE"])
 def delete_circle(circle_id):
-    # ログイン確認
+    # 1. ログイン確認
     user_id, err, code = verify_login()
     if err:
         return err, code
 
-    # サークルの存在確認
+    # 2. サークルの存在確認
     circle = Circle.query.get(circle_id)
     if not circle:
         return jsonify({"error": "指定されたサークルが存在しません"}), 404
 
-    # 権限確認
+    # 3. 権限確認 (オーナーのみ削除可能)
     owner_auth = EditAuthorization.query.filter_by(
         user_id=user_id, circle_id=circle_id, role="owner"
     ).first()
     if not owner_auth:
         return jsonify({"error": "削除権限がありません（オーナーではありません）"}), 403
 
-    # 関連する編集権限をすべて削除
+    # --- ▼ 画像ファイルの削除処理 (ここを追加・強化しました) ▼ ---
+    if circle.circle_icon_path and circle.circle_icon_path.startswith(UPLOAD_BASE_URL):
+        try:
+            # DBのパス("/api/uploads/xxx.png")からファイル名("xxx.png")を抽出
+            filename = circle.circle_icon_path.replace(UPLOAD_BASE_URL + '/', "")
+            
+            # 物理パスを作成 (.../backend/uploads/xxx.png)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            
+            # ファイルが存在すれば削除
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                print(f"画像ファイルを削除しました: {file_path}")
+        except Exception as e:
+            # 画像削除に失敗しても、サークル削除自体は止めないようにログだけ出す
+            print(f"画像削除エラー（DB削除は続行します）: {e}")
+    # --- ▲ 画像ファイルの削除処理 ▲ ---
+
+    # 4. 関連データの削除 (権限テーブルから削除)
     EditAuthorization.query.filter_by(circle_id=circle_id).delete()
 
-    # サークル自体を削除
+    # 5. サークル本体の削除
     db.session.delete(circle)
     db.session.commit()
 

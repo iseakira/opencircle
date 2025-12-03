@@ -1,4 +1,4 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 //import { useNavigate } from 'react-router-dom';
 import headImage from '../images/head_image.png';
@@ -7,8 +7,10 @@ import CircleLogo from '../conponents/CircleLogo';
 import LoginOutButton from './LogInOutButton';
 
 function Circle_Page(){
+    const { id } = useParams();
+    const [loading, setLoading] = useState(true);
     const location = useLocation();
-    const [response_data, setResponse_data] = useState(null);
+    const [responseData, setResponseData] = useState(null);
     //const handleResponse = () => {
       //  const raw_circle_detail = location.state?.circleDetail;
         //if (!raw_circle_detail) {
@@ -26,19 +28,57 @@ function Circle_Page(){
      //   handleResponse();
     //},[]);
 
+    /*いったんコメントアウトしておいた
     useEffect(() => {
         // location.stateから、Home.jsxで渡した { circleDetail: data } の 'circleDetail' を取得
         const circleDetail = location.state?.circleDetail;
         
         if (circleDetail) {
             console.log("受信したデータ (state経由):", circleDetail);
-            setResponse_data(circleDetail);
+            setResponseData(circleDetail);
         } else {
             console.log("サークル情報がステート経由で渡されませんでした。");
-            setResponse_data(null);
+            setResponseData(null);
         }
     }, [location.state]);
+    */
 
+    async function get_circle_data(id){
+        try{
+            const response = await fetch(
+                "http://localhost:5001/Circle_Page",
+                {
+                    method: "POST",
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({"circle_id": id})
+                }
+            )
+            if(response.ok){
+                const response_obj = await response.json();
+                setResponseData(response_obj);
+            }else{
+                setResponseData(null);
+            }
+        }catch{
+            setResponseData(null);
+        }
+    }
+
+    console.log(id + " " + typeof(id));
+    useEffect(
+        () => {
+            get_circle_data(id);
+            setLoading(false);
+        },[]
+    )
+
+    if(loading){
+        return(
+            <div>
+                loading
+            </div>
+        )
+    }else{
     return (
     <div>
         <header className="page-header">
@@ -55,11 +95,11 @@ function Circle_Page(){
         <main>
             <h1>サークルページ</h1>
             <div>
-                {response_data === null ? (
+                {responseData === null ? (
                     <p>サークル情報を読み込み中です...</p>
-                ) : response_data && typeof response_data === "object" ? (
+                ) : responseData && typeof responseData === "object" ? (
                 <div>
-                    <img src={response_data.circle_icon} alt="サークルアイコン" className="circle_icon_page" />
+                    <img src={responseData.circle_icon} alt="サークルアイコン" className="circle_icon_page" />
                     {/* <p>サークル名：{response_data.circle_name}</p>
                     <p>サークル説明：{response_data.circle_description}</p>
                     <p>費用：{response_data.circle_fee}円</p>
@@ -68,27 +108,27 @@ function Circle_Page(){
                     <div className="descon">
   <div className="row">
     <div className="kou">サークル名</div>
-    <div className="data">{response_data.circle_name}</div>
+    <div className="data">{responseData.circle_name}</div>
   </div>
 
   <div className="row">
     <div className="kou">サークル説明</div>
-    <div className="data">{response_data.circle_description}</div>
+    <div className="data">{responseData.circle_description}</div>
   </div>
 
   <div className="row">
     <div className="kou">費用</div>
-    <div className="data">{response_data.circle_fee}円</div>
+    <div className="data">{responseData.circle_fee}円</div>
   </div>
 
   <div className="row">
     <div className="kou">男性</div>
-    <div className="data">{response_data.number_of_male}</div>
+    <div className="data">{responseData.number_of_male}</div>
   </div>
 
   <div className="row">
     <div className="kou">女性</div>
-    <div className="data">{response_data.number_of_female}</div>
+    <div className="data">{responseData.number_of_female}</div>
   </div>
 </div>
                         {/* <div className='descon'>
@@ -109,8 +149,8 @@ function Circle_Page(){
                         </ul>
                         </div> */}
                     <div>
-                        {Array.isArray(response_data.tags) && response_data.tags.length > 0 ? (
-                            <p>キーワード: {response_data.tags.join(', ')}</p>
+                        {Array.isArray(responseData.tags) && responseData.tags.length > 0 ? (
+                            <p>キーワード: {responseData.tags.join(', ')}</p>
                         ) : (
                         <p>キーワード: なし</p>
                         )}
@@ -129,5 +169,6 @@ function Circle_Page(){
         </main>
     </div>
     )
+}
 }
 export default Circle_Page;
