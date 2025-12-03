@@ -1,13 +1,12 @@
 :root {
   /* カラーパレット - 4色のデザインシステム */
   --back-color: #f2f1eb;        /* 背景色 */
-  --base-color: hsl(216, 52%, 19%);      /* ベースカラー（メインテキスト・ダーク） */
-  --main-color: #469DAE;    
-  --main-color-sub:#9eb8bc90;
-  --main-color-white:#dde3e490;
-  --accent-color: #d2c104;  
-  --accent-color-white:#e0d681; 
-}
+  --base-color: #000;      /* ベースカラー（メインテキスト・ダーク） */
+  --main-color: #88b7bd;    
+  --main-color-sub:#9EB8BC90;
+  --main-color-white:#DDE3E490;
+  --accent-color: #D2C104;  
+  --accent-color-white:#E0D681; }
 
 #root {
   max-width: 1280px;
@@ -159,7 +158,7 @@ body {
   padding: 10px;
   margin: 10px;
   border-radius: 8px;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 2px 5px rgba(255, 254, 254, 0.1);
   background: var(--main-color-sub);
   transition: background-color 0.3s ease;
 }
@@ -186,7 +185,7 @@ button[aria-expanded] {
   border: 2px solid var(--accent-color);
   border-radius: 8px;
   cursor: pointer;
-    transition: background-color 0.3s ease,
+  transition: background-color 0.3s ease,
               border-color 0.3s ease,
               transform 0.3s ease,
               box-shadow 0.3s ease;
@@ -225,7 +224,7 @@ button[aria-expanded="true"]:hover {
               border-color 0.3s ease,
               transform 0.3s ease,
               box-shadow 0.3s ease;
-  margin-top: 1rem;
+  /* margin-top: 1rem; */
   margin-bottom: 10px;
 }
 .allbutton:hover {
@@ -298,6 +297,11 @@ button[aria-expanded="true"]:hover {
   /* font-weight: bold; */
   /* margin-left: 30px; */
 }
+
+a {
+  color: black;
+}
+
 
 
   

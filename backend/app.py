@@ -75,15 +75,6 @@ def create_app():
 
 app = create_app()
 
-# --- ここからテスト用のコード ---
-
-# `/api/hello` というURLにアクセスが来たら動く関数
-@app.route('/api/hello', methods=['GET'])
-def say_hello():
-    # JSON形式でメッセージを返す
-    return jsonify({"message": "バックエンドからの返事です！🎉"})
-
-
 @app.route('/home', methods=['POST'])
 def search():
     try:
@@ -94,7 +85,6 @@ def search():
         items = dbop.search_circles(json_data)
         return jsonify({"items": items, "total": len(items)})
     except Exception as e:
-        # エラー時はログ出力して 500 を返す
         print('search_circles error:', e)
         return jsonify({"error": "サーバーエラー"}), 500
 
@@ -154,7 +144,7 @@ def check_session():
     #    return jsonify({"isLogin": False})
     #isLogin = dbop.check_session(session_id)
     #return jsonify({"isLogin": isLogin})
-
+    dbop.reset()
     user_id = verify_login()[0]
     user_name = ""
     is_login = not (user_id == None)
@@ -235,15 +225,11 @@ def save_image_file(file_storage):
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
-# --- (他のAPI ... /api/hello, /hometest など) ---
-
-#'/api/circles'というURLにPOSTリクエストが来たら動く関数#
 @app.route('/api/circles', methods=['POST'])
 def add_circle():
 
     # --- ▼ 1. Cookieによるログイン認証チェック ▼ ---
     session_id_str = request.cookies.get("session_id")
-    print(session_id_str)
     if not session_id_str:
         return jsonify({"error": "認証されていません (Cookieが見つかりません)"}), 401
     
@@ -284,10 +270,6 @@ def add_circle():
     # 画像ファイルを request.files から取得
     file = request.files.get("circle_icon_file")
     # --- ▲ データ取得完了 ▲ ---
-    
-    print("FORM:", request.form)
-    print("FILES:", request.files)
-
     
     # 必須チェック
     if not data_name or not data_description:
@@ -403,14 +385,6 @@ def get_circle(circle_id):
         "circle_icon_path": circle.circle_icon_path,
         "tags": tags_id_list
     }
-
-    try:
-        db.session.commit() 
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": "サーバーエラー (DBコミット失敗)", "detail": str(e)}), 500
-
-    # 辞書をJSONにして返す (200 OK)
     return jsonify(circle_data), 200
 
 #サークル情報更新API
@@ -565,16 +539,21 @@ def verify_login():
     active_session = db.session.get(Session, session_id)
     if not active_session:
         return None, jsonify({"error": "セッションが無効です（ログインしていません）"}), 401
+    
+    now_utc = datetime.now(timezone.utc)
+    last_access = active_session.session_last_access_time
+    if last_access.tzinfo is None:
+        last_access = last_access.replace(tzinfo=timezone.utc)
 
     # 有効期限チェック（24時間）
     session_timeout_hours = 24
-    if active_session.session_last_access_time < datetime.utcnow() - timedelta(hours=session_timeout_hours):
+    if last_access < now_utc - timedelta(hours=session_timeout_hours):
         db.session.delete(active_session)
         db.session.commit()
         return None, jsonify({"error": "セッションが期限切れです。再度ログインしてください"}), 401
 
     # 最終アクセス時刻を更新
-    active_session.session_last_access_time = datetime.utcnow()
+    active_session.session_last_access_time = now_utc
     db.session.add(active_session)
     db.session.commit()
 
@@ -631,82 +610,98 @@ def prepare_new_circle():
 # 編集権限の付与
 @app.route("/api/edit-authorization", methods=["POST"])
 def add_edit_authorization():
-   
-     # ログインチェック
+    # ログインチェック
     user_id, err, code = verify_login()
     if err:
         return err, code
-
     data = request.get_json() or {}
     circle_id = data.get("circle_id")
-    target_user_id = data.get("target_user_id")
-
-    if not circle_id or not target_user_id:
-        return jsonify({"error": "circle_id と target_user_id が必要です"}), 400
-
+    target_email = data.get("target_email")  # メールアドレスを受け取る
+    if not circle_id or not target_email:
+        return jsonify({"error": "circle_id と target_email が必要です"}), 400
+    
+    # オーナー権限確認
     owner_auth = EditAuthorization.query.filter_by(
-        user_id=user_id, circle_id=circle_id
+        user_id=user_id, circle_id=circle_id, role="owner"
     ).first()
     if not owner_auth:
         return jsonify({"error": "このサークルに権限を付与する権限がありません"}), 403
+    target_user = User.query.filter_by(mail_adress=target_email).first()
+    if not target_user:
+        return jsonify({"error": "指定したメールアドレスのユーザーが見つかりません"}), 404
+    target_user_id = target_user.user_id
 
+    # すでに権限があるか確認
     exists = EditAuthorization.query.filter_by(
         user_id=target_user_id, circle_id=circle_id
     ).first()
     if exists:
         return jsonify({"error": "このユーザーは既に権限を持っています"}), 400
-
-    new_auth = EditAuthorization(user_id=target_user_id, circle_id=circle_id)
+    
+    # 権限付与
+    new_auth = EditAuthorization(
+        user_id=target_user_id,
+        circle_id=circle_id,
+        role="editor"
+    )
     db.session.add(new_auth)
     db.session.commit()
-
     return jsonify({
         "message": "編集権限を付与しました",
         "circle_id": circle_id,
+        "target_email": target_email,
         "target_user_id": target_user_id
     }), 201
 
 # オーナー権限の譲渡
 @app.route("/api/transfer-ownership", methods=["POST"])
 def transfer_ownership():
-    # ログイン確認
+    # ログインチェック
     user_id, err, code = verify_login()
     if err:
         return err, code
-    
-    # リクエストデータ取得
     data = request.get_json() or {}
     circle_id = data.get("circle_id")
-    new_owner_id = data.get("new_owner_id")
-    if not circle_id or not new_owner_id:
-        return jsonify({"error": "circle_id と new_owner_id が必要です"}), 400
+    new_owner_email = data.get("new_owner_email")  # メールアドレスを受け取る
+    if not circle_id or not new_owner_email:
+        return jsonify({"error": "circle_id と new_owner_email が必要です"}), 400
     
-    # 現オーナー確認
+    # 現在のオーナー確認
     current_owner = EditAuthorization.query.filter_by(
         user_id=user_id, circle_id=circle_id, role="owner"
     ).first()
     if not current_owner:
         return jsonify({"error": "オーナーのみが譲渡できます"}), 403
     
-    # 譲渡先ユーザー確認
+    #メールアドレスからユーザー検索
+    candidate_user = User.query.filter_by(mail_adress=new_owner_email).first()
+    if not candidate_user:
+        return jsonify({"error": "指定したメールアドレスのユーザーが存在しません"}), 404
+    new_owner_id = candidate_user.user_id
+
+    # 譲渡先がサークル編集者リストに存在するか
     candidate = EditAuthorization.query.filter_by(
         user_id=new_owner_id, circle_id=circle_id
     ).first()
+
     if not candidate:
-        return jsonify({"error": "譲渡先のユーザーが見つかりません"}), 400
-    
+        candidate = EditAuthorization(
+            user_id=new_owner_id,
+            circle_id=circle_id,
+            role="editor"
+        )
+        db.session.add(candidate)
+
     # 権限の入れ替え
-    candidate.role = "owner" 
-    db.session.delete(current_owner)  
-    
-    # DB反映
+    candidate.role = "owner"
+    db.session.delete(current_owner)
     db.session.commit()
     return jsonify({
-        "message": "オーナー権限を譲渡し、元オーナーは退部しました",
+        "message": "オーナー権限を譲渡しました（元オーナーは退部）",
         "circle_id": circle_id,
+        "new_owner_email": new_owner_email,
         "new_owner_id": new_owner_id
     }), 200
-
 
 # サークル削除API
 @app.route("/api/circle/<int:circle_id>", methods=["DELETE"])

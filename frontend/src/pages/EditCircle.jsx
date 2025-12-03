@@ -170,10 +170,10 @@ function CircleEdit() {
         <h1>エラーが発生しました</h1>
         <p>{error}</p>
         <button 
-          onClick={() => navigate("/mypage")} 
+          onClick={() => navigate("/")} 
           className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"
         >
-          マイページに戻る
+          ホームに戻る
         </button>
       </div>
     );
