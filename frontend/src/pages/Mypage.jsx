@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
-import CircleLogo from "../components/CircleLogo";
+import CircleLogo from "../conponents/CircleLogo";
 import '../css/App.css';
 import headImage from '../images/head_image.png';
 
