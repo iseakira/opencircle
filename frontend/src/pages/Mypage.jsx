@@ -183,7 +183,7 @@ function Mypage() {
             circles.map((c) => (
               <div
                 key={c.circle_id}
-                className="circle-info"
+                className="circle-item"
                 onClick={() => navigate(`/edit-circle/${c.circle_id}`)}
               >
                 {c.circle_name}（{c.role}）
