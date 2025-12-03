@@ -704,29 +704,79 @@ def transfer_ownership():
     }), 200
 
 # サークル削除API
+#@app.route("/api/circle/<int:circle_id>", methods=["DELETE"])
+# def delete_circle(circle_id):
+#     # ログイン確認
+#     user_id, err, code = verify_login()
+#     if err:
+#         return err, code
+
+#     # サークルの存在確認
+#     circle = Circle.query.get(circle_id)
+#     if not circle:
+#         return jsonify({"error": "指定されたサークルが存在しません"}), 404
+
+#     # 権限確認
+#     owner_auth = EditAuthorization.query.filter_by(
+#         user_id=user_id, circle_id=circle_id, role="owner"
+#     ).first()
+#     if not owner_auth:
+#         return jsonify({"error": "削除権限がありません（オーナーではありません）"}), 403
+
+#     # 関連する編集権限をすべて削除
+#     EditAuthorization.query.filter_by(circle_id=circle_id).delete()
+
+#     # サークル自体を削除
+#     db.session.delete(circle)
+#     db.session.commit()
+
+#     return jsonify({
+#         "message": f"サークル '{circle.circle_name}' を削除しました。",
+#         "deleted_circle_id": circle_id
+#     }), 200
+
+
 @app.route("/api/circle/<int:circle_id>", methods=["DELETE"])
 def delete_circle(circle_id):
-    # ログイン確認
+    # 1. ログイン確認
     user_id, err, code = verify_login()
     if err:
         return err, code
 
-    # サークルの存在確認
+    # 2. サークルの存在確認
     circle = Circle.query.get(circle_id)
     if not circle:
         return jsonify({"error": "指定されたサークルが存在しません"}), 404
 
-    # 権限確認
+    # 3. 権限確認 (オーナーのみ削除可能)
     owner_auth = EditAuthorization.query.filter_by(
         user_id=user_id, circle_id=circle_id, role="owner"
     ).first()
     if not owner_auth:
         return jsonify({"error": "削除権限がありません（オーナーではありません）"}), 403
 
-    # 関連する編集権限をすべて削除
+    # --- ▼ 画像ファイルの削除処理 (ここを追加・強化しました) ▼ ---
+    if circle.circle_icon_path and circle.circle_icon_path.startswith(UPLOAD_BASE_URL):
+        try:
+            # DBのパス("/api/uploads/xxx.png")からファイル名("xxx.png")を抽出
+            filename = circle.circle_icon_path.replace(UPLOAD_BASE_URL + '/', "")
+            
+            # 物理パスを作成 (.../backend/uploads/xxx.png)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            
+            # ファイルが存在すれば削除
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                print(f"画像ファイルを削除しました: {file_path}")
+        except Exception as e:
+            # 画像削除に失敗しても、サークル削除自体は止めないようにログだけ出す
+            print(f"画像削除エラー（DB削除は続行します）: {e}")
+    # --- ▲ 画像ファイルの削除処理 ▲ ---
+
+    # 4. 関連データの削除 (権限テーブルから削除)
     EditAuthorization.query.filter_by(circle_id=circle_id).delete()
 
-    # サークル自体を削除
+    # 5. サークル本体の削除
     db.session.delete(circle)
     db.session.commit()
 

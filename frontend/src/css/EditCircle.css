@@ -1,0 +1,135 @@
+/* CircleEdit.css */
+
+/* --- 1. ページ全体の背景 --- */
+.edit-page-container {
+  background-color: #f2f1eb; /* 薄いグレーの背景 */
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", sans-serif;
+}
+
+/* --- 2. 白いカード（入力フォームの土台） --- */
+.edit-card {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 600px; /* カードの最大幅 */
+  padding: 40px;
+  border-radius: 20px; /* 角を丸く */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); /* ふんわりした影 */
+}
+
+/* ヘッダーロゴ周り */
+.edit-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+.edit-header h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-top: 10px;
+}
+
+/* --- 3. 入力項目のまとまり --- */
+.form-group {
+  margin-bottom: 24px; /* 項目ごとの間隔 */
+}
+
+.label-text {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #4b5563; /* 少し濃いグレー */
+  margin-bottom: 8px;
+}
+
+/* --- 4. 入力フォームのスタイル上書き --- */
+/* 子コンポーネントの中にあるinputやtextareaに無理やりスタイルを適用する技 */
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb; /* 薄い枠線 */
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s;
+  box-sizing: border-box; /* 枠線を含めたサイズ計算 */
+}
+
+/* クリック（フォーカス）した時の「ぽわっ」とする青い光 */
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #3b82f6; /* 青色 */
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+/* 男女比などを横並びにするレイアウト */
+.grid-row {
+  display: flex;
+  gap: 20px;
+}
+.grid-col {
+  flex: 1; /* 等分にする */
+}
+
+/* --- 5. 更新ボタン（グラデーション） --- */
+.btn-update {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); /* かっこいい青グラデ */
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: 10px;
+}
+
+.btn-update:hover {
+  transform: translateY(-2px); /* 少し浮く */
+  box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4); /* 影が濃くなる */
+}
+
+/* --- 6. 削除エリア --- */
+.delete-section {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px dashed #ddd; /* 点線で区切る */
+  text-align: center;
+}
+
+.btn-delete {
+  background: transparent;
+  color: #ef4444; /* 赤色 */
+  border: 1px solid #ef4444;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-delete:hover {
+  background-color: #f2f1eb; /* 薄い赤背景 */
+}
+
+/* --- 7. 戻るリンク --- */
+.back-link-container {
+  text-align: center;
+  margin-top: 20px;
+}
+.back-link {
+  color: #6b7280;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.back-link:hover {
+  text-decoration: underline;
+  color: #333;
+}
