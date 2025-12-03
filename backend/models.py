@@ -38,7 +38,7 @@ class User(db.Model):
 
 class Tag(db.Model):
   __tablename__ = "tags"
-  tag_id = db.Column(db.Integer,unique=True,nullable=False)
+  tag_id = db.Column(db.Integer,unique=True,primary_key=True)
   tag_name = db.Column(db.String(50),unique=True,nullable=False)
 
   ## CircleモデルとTagモデルの多対多のリレーションシップ
