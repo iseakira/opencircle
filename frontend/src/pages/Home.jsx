@@ -110,7 +110,7 @@ function Home() {
           {response_data.items.map((circle, index) => (
             <Link to={`/Circle_Page/${circle.circle_id}`}>
               <div key={circle.circle_id}  className="circle-info" style={{cursor: 'pointer'}}>
-                <img src={circle.circle_icon_path} className="circle_icon"/>
+                <img src={circle.circle_icon_path} className="circle_icon" alt='サークルのアイコン'/>
                 <p>サークル名: {circle.circle_name}</p>
                 <p>分野：{circle.field}</p>
               </div>
