@@ -156,7 +156,7 @@ function Mypage() {
           editor 権限付与
         </button>
 
-        {/* owner 付与（譲渡）ボタン */}
+        {/* sowner 付与（譲渡）ボタン */}
         <button
           onClick={() => handleAddAuthorization("owner")}
           style={{
