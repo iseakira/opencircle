@@ -13,6 +13,8 @@ from werkzeug.utils import secure_filename
 import threading
 import hash
 
+import insert_tag
+
 # --- ▼ 1. 画像アップロード設定 ▼ ---
 # 許可する拡張子
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
