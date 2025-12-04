@@ -28,8 +28,8 @@ function CircleEdit() {
   const [selectedFee, setSelectedFee] = useState(0);
   const [selectedRatio, setSelectedRatio] = useState(0);
   const [selectedPlace, setSelectedPlace] = useState(0);
-  const [selectedMood, setSelectedMood] = useState(0);
-  const [selectedActive, setSelectedActive] = useState(0);
+  const [selectedMood, setSelectedMood] = useState();
+  const [selectedActive, setSelectedActive] = useState();
   
   const [preview, setPreview] = useState(null);
   const [image, setImage] = useState(null); // (File オブジェクトがここに入る)

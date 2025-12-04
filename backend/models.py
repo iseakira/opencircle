@@ -7,8 +7,9 @@ db = SQLAlchemy()
 
 ## circlesとtagsの多対多の関係を定義する中間テーブル
 circle_tag_table = db.Table('circle_tag',
-  db.Column('circle_id',db.Integer,db.ForeignKey('circles.circle_id'),primary_key=True),
-  db.Column('tag_id',db.Integer,db.ForeignKey('tags.id'),primary_key=True)
+  db.Column('id',db.Integer,primary_key=True,autoincrement=True), 
+  db.Column('circle_id',db.Integer,db.ForeignKey('circles.circle_id'),nullable=False),
+  db.Column('tag_id',db.Integer,db.ForeignKey('tags.tag_id'),nullable=False)
 )
 
 
@@ -37,8 +38,7 @@ class User(db.Model):
 
 class Tag(db.Model):
   __tablename__ = "tags"
-  id = db.Column(db.Integer,primary_key=True,autoincrement=True)
-  tag_id = db.Column(db.Integer,unique=True,nullable=False)
+  tag_id = db.Column(db.Integer,unique=True,primary_key=True)
   tag_name = db.Column(db.String(50),unique=True,nullable=False)
 
   ## CircleモデルとTagモデルの多対多のリレーションシップ
