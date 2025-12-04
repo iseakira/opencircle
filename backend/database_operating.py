@@ -227,7 +227,7 @@ def tmp_registration(mailaddress):
     for i in range(5):
         try:
             cursor.execute("INSERT INTO account_creates (tmp_id, auth_code, account_expire_time, attempt_count) " \
-                            "VALUES (?, ?, datetime('now','+5 minute'), datetime('now'), 0)", (tmp_id,auth_code))
+                            "VALUES (?, ?, datetime('now','+5 minute'), 0)", (tmp_id,auth_code))
             conn.commit()
         except sqlite3.IntegrityError:
             tmp_id = int(''.join(secrets.choice(string.digits) for _ in range(6)))
@@ -335,7 +335,7 @@ def make_session(emailaddress):
     return (complete, session_id)
 
 def get_username(user_id):
-    conn = sqlite3("project.db", timeout=2.0)
+    conn = sqlite3.connect("project.db", timeout=2.0)
     cursor = conn.cursor()
     res = cursor.execute("SELECT user_name FROM users WHERE user_id = ?", (user_id,))
     user_name_tuple = res.fetchone()

@@ -13,6 +13,7 @@ from werkzeug.utils import secure_filename
 import threading
 import hash
 
+import init_db
 import insert_tag
 
 # --- ▼ 1. 画像アップロード設定 ▼ ---
@@ -147,6 +148,9 @@ def check_session():
     #isLogin = dbop.check_session(session_id)
     #return jsonify({"isLogin": isLogin})
 
+    #init_db.create_database()
+    #insert_tag.it()
+
     user_id = verify_login()[0]
     user_name = ""
     is_login = not (user_id == None)
@@ -254,7 +258,6 @@ def add_circle():
     user_id = active_session.user_id
     active_session.session_last_access_time = datetime.utcnow()
     # --- ▲ 認証チェック完了 ▲ ---
-
 
     # --- ▼ 2. FormData からデータを取得 ▼ ---
     # (request.get_json() は使わない)
