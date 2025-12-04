@@ -63,6 +63,7 @@ def get_initial_circles():
         FROM tags AS t
         JOIN circle_tag AS ct ON t.tag_id = ct.tag_id
         WHERE ct.circle_id = c.circle_id
+          AND t.tag_id IN (1, 2, 3, 4)
         LIMIT 1
       ) AS field
     FROM circles AS c
