@@ -7,7 +7,6 @@ def send_auth_code(emailaddress, auth_code):
     #bodyがメールの本文。いい文章考えたらなおしとくれ。HTML形式でも可。
     body = "認証コード:{}".format(auth_code)
     msg = MIMEText(body, "plain", "utf-8")
-    #送り元メールアドレスは後で変える(一旦今野の)。
     msg["From"] = "OpenCircleTUS@gmail.com"
     msg["To"] = emailaddress
     #タイトルもいいのあったら変えたいね。

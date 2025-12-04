@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import '/app/src/css/EditCircle.css';
 
 import Button from '../conponents/Button';
 import CircleDescription from '../conponents/CircleDescription';
@@ -23,12 +24,12 @@ function CircleEdit() {
     number_of_female: "",
   });
 
-  const [selectedBunya, setSelectedBunya] = useState(null);
-  const [selectedFee, setSelectedFee] = useState(null);
-  const [selectedRatio, setSelectedRatio] = useState(null);
-  const [selectedPlace, setSelectedPlace] = useState(null);
-  const [selectedMood, setSelectedMood] = useState(null);
-  const [selectedActive, setSelectedActive] = useState(null);
+  const [selectedBunya, setSelectedBunya] = useState(0);
+  const [selectedFee, setSelectedFee] = useState(0);
+  const [selectedRatio, setSelectedRatio] = useState(0);
+  const [selectedPlace, setSelectedPlace] = useState(0);
+  const [selectedMood, setSelectedMood] = useState();
+  const [selectedActive, setSelectedActive] = useState();
   
   const [preview, setPreview] = useState(null);
   const [image, setImage] = useState(null); // (File オブジェクトがここに入る)
@@ -160,6 +161,36 @@ function CircleEdit() {
   };
 
 
+  const handleDelete = async () => {
+    // 1. 確認ダイアログ
+    if (!window.confirm("本当に削除しますか？\n削除すると元に戻せません。")) {
+      return;
+    }
+
+    try {
+      // 2. 削除APIを叩く (URLは /api/circle/ID)
+      const response = await fetch(`http://localhost:5001/api/circle/${circleId}`, {
+        method: "DELETE",
+        credentials: "include", // Cookie送信に必須
+      });
+
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || "削除に失敗しました");
+      }
+
+      alert("サークルを削除しました");
+      
+      // 3. マイページへ戻る
+      navigate("/mypage");
+
+    } catch (error) {
+      console.error("削除エラー", error);
+      alert(`削除に失敗しました: ${error.message}`);
+    }
+  };
+
+
   if (loading) {
     return <div className="p-8 text-center">ID: {circleId} のサークル情報を読み込み中...</div>;
   }
@@ -179,43 +210,87 @@ function CircleEdit() {
     );
   }
 
-  return (
-    <>
-      <form onSubmit={handleSubmit}> 
-       <header>
-        {/* <h1> */}
-        <CircleLogo></CircleLogo>
-       {/* </h1> */}
-       </header>
-        <CircleName value={circleData.circle_name} onChange={NameChange}></CircleName>
-        <CircleDescription value={circleData.circle_description} onChange={DesChange}></CircleDescription>
-        <CircleMen value={circleData.number_of_male} onChange={MemChange}></CircleMen>
-        <CircleFemen value={circleData.number_of_female} onChange={FememChange}></CircleFemen>
-        <CircleFee value={circleData.circle_fee} onChange={FeeChange}></CircleFee>
+return (
+    <div className="edit-page-container">
+      <div className="edit-card">
         
-        <Image onChange={hadleImageChange} preview={preview} image={image} />
-        
-        <Tag
-          onChangeBunya={setSelectedBunya}
-          onChangeFee={setSelectedFee}
-          onChangeRatio={setSelectedRatio}
-          onChangePlace={setSelectedPlace}
-          onChangeMood={setSelectedMood}
-          onChangeActive={setSelectedActive}
-          
-          // (Tag コンポーネント側が value プロパティに対応している必要があります)
-          selectedBunya={selectedBunya}
-          selectedFee={selectedFee}
-          selectedRatio={selectedRatio}
-          selectedPlace={selectedPlace}
-          selectedMood={selectedMood}
-          selectedActive={selectedActive}
-        ></Tag>
+        {/* ヘッダー */}
+        <div className="edit-header">
+          <CircleLogo />
+          <h2>サークル情報の編集</h2>
+        </div>
 
-        <button type="submit" className="allbutton">更新</button>
-      </form>
-      <Link to={"/mypage"} className='link'>マイページへ戻る</Link>
-    </>
+        <form onSubmit={handleSubmit}> 
+          
+          <div className="form-group">
+            <label className="label-text">サークル名</label>
+            <CircleName value={circleData.circle_name} onChange={NameChange} />
+          </div>
+
+          <div className="form-group">
+            <label className="label-text">活動内容・説明</label>
+            <CircleDescription value={circleData.circle_description} onChange={DesChange} />
+          </div>
+
+          {/* 男女比などを横並びにする */}
+          <div className="grid-row">
+            <div className="grid-col form-group">
+              <label className="label-text">男子人数</label>
+              <CircleMen value={circleData.number_of_male} onChange={MemChange} />
+            </div>
+            <div className="grid-col form-group">
+              <label className="label-text">女子人数</label>
+              <CircleFemen value={circleData.number_of_female} onChange={FememChange} />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="label-text">会費（円）</label>
+            <CircleFee value={circleData.circle_fee} onChange={FeeChange} />
+          </div>
+          
+          <div className="form-group">
+            <label className="label-text">アイコン画像</label>
+            <Image onChange={hadleImageChange} preview={preview} image={image} />
+          </div>
+          
+          <div className="form-group">
+            <label className="label-text">タグ設定</label>
+            <Tag
+              onChangeBunya={setSelectedBunya}
+              onChangeFee={setSelectedFee}
+              onChangeRatio={setSelectedRatio}
+              onChangePlace={setSelectedPlace}
+              onChangeMood={setSelectedMood}
+              onChangeActive={setSelectedActive}
+              selectedBunya={selectedBunya}
+              selectedFee={selectedFee}
+              selectedRatio={selectedRatio}
+              selectedPlace={selectedPlace}
+              selectedMood={selectedMood}
+              selectedActive={selectedActive}
+            />
+          </div>
+
+          {/* 更新ボタン */}
+          <button type="submit" className="btn-update">
+            情報を更新する
+          </button>
+          
+          {/* 削除エリア */}
+          <div className="delete-section">
+            <button type="button" onClick={handleDelete} className="btn-delete">
+              このサークルを削除する
+            </button>
+          </div>
+
+        </form>
+        
+        <div className="back-link-container">
+          <Link to={"/mypage"} className="back-link">← マイページへ戻る</Link>
+        </div>
+      </div>
+    </div>
   );
 }
 
