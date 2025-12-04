@@ -213,10 +213,9 @@ def get_circle_detail(circle_id):
     }
     
 def tmp_registration(mailaddress):
-    #database.dbは仮
     conn = sqlite3.connect('project.db', timeout=2.0)
     cursor = conn.cursor()
-    check_user_exist = cursor.execute("SELECT * FROM users WHERE mail_adress = ?", (mailaddress,))
+    check_user_exist = cursor.execute("SELECT * FROM users WHERE mail_address = ?", (mailaddress,))
     if check_user_exist.fetchone() != None:
         cursor.close()
         conn.close()
@@ -227,7 +226,7 @@ def tmp_registration(mailaddress):
     complete = False
     for i in range(5):
         try:
-            cursor.execute("INSERT INTO account_creates (tmp_id, auth_code, account_expire_time, account_create_time, attempt_count) " \
+            cursor.execute("INSERT INTO account_creates (tmp_id, auth_code, account_expire_time, attempt_count) " \
                             "VALUES (?, ?, datetime('now','+5 minute'), datetime('now'), 0)", (tmp_id,auth_code))
             conn.commit()
         except sqlite3.IntegrityError:
@@ -242,7 +241,7 @@ def tmp_registration(mailaddress):
 def check_auth_code(auth_code, tmp_id):
     conn = sqlite3.connect("project.db", timeout=2.0)
     cursor = conn.cursor()
-    res = cursor.execute("SELECT auth_code, account_expire_time, account_create_time, attempt_count " \
+    res = cursor.execute("SELECT auth_code, account_expire_time, attempt_count " \
                         "FROM account_creates WHERE tmp_id = ?", (tmp_id,))
     tmp_user_db = res.fetchone()
     #データがない場合
@@ -251,7 +250,7 @@ def check_auth_code(auth_code, tmp_id):
         conn.close()
         return {"message": "failure", "error_message": "セッション情報がありません。メールアドレスの入力からやり直してください。"}
     #回数制限を超えた場合
-    if tmp_user_db[3] > 3:
+    if tmp_user_db[2] > 3:
         cursor.execute("DELETE FROM account_creates WHERE tmp_id = ?", (tmp_id,))
         cursor.close()
         conn.close()
@@ -287,7 +286,7 @@ def create_account(emailaddress, password, user_name):
         try:
             print(user_id)
             hashed_pass = hash.hash_pass(password, user_id)
-            cursor.execute("INSERT INTO users (user_id, user_name, mail_adress, password) " \
+            cursor.execute("INSERT INTO users (user_id, user_name, mail_address, password) " \
                             "VALUES (?, ?, ?, ?)", (user_id, user_name, emailaddress, hashed_pass))
             conn.commit()
         except sqlite3.Error as e:
@@ -303,7 +302,7 @@ def create_account(emailaddress, password, user_name):
 def check_login(emailaddress, password):
     conn = sqlite3.connect("project.db", timeout=2.0)
     cursor = conn.cursor()
-    res = cursor.execute("SELECT password, user_id FROM users WHERE mail_adress = ?", (emailaddress,))
+    res = cursor.execute("SELECT password, user_id FROM users WHERE mail_address = ?", (emailaddress,))
     user_tuple = res.fetchone()
     cursor.close()
     conn.close()
@@ -317,7 +316,7 @@ def check_login(emailaddress, password):
 def make_session(emailaddress):
     conn = sqlite3.connect("project.db", timeout=2.0)
     cursor = conn.cursor()
-    res = cursor.execute("SELECT user_id FROM users WHERE mail_adress = ?",(emailaddress,))
+    res = cursor.execute("SELECT user_id FROM users WHERE mail_address = ?",(emailaddress,))
     user_id = int(res.fetchone()[0])
     session_id = int(''.join(secrets.choice(string.digits) for _ in range(16)))
     complete = False

@@ -8,7 +8,7 @@ db = SQLAlchemy()
 ## circlesとtagsの多対多の関係を定義する中間テーブル
 circle_tag_table = db.Table('circle_tag',
   db.Column('circle_id',db.Integer,db.ForeignKey('circles.circle_id'),primary_key=True),
-  db.Column('tag_id',db.Integer,db.ForeignKey('tags.tag_id'),primary_key=True)
+  db.Column('tag_id',db.Integer,db.ForeignKey('tags.id'),primary_key=True)
 )
 
 
@@ -31,13 +31,14 @@ class User(db.Model):
   __tablename__ = "users"
   user_id = db.Column(db.Integer,primary_key=True)
   user_name = db.Column(db.String(80),nullable=False)
-  mail_adress = db.Column(db.String(255),unique=True,nullable=False)
+  mail_address = db.Column(db.String(255),unique=True,nullable=False)
   password = db.Column(db.String(255), nullable=False)
 
 
 class Tag(db.Model):
   __tablename__ = "tags"
-  tag_id = db.Column(db.Integer,primary_key=True)
+  id = db.Column(db.Integer,primary_key=True,autoincrement=True)
+  tag_id = db.Column(db.Integer,unique=True,nullable=False)
   tag_name = db.Column(db.String(50),unique=True,nullable=False)
 
   ## CircleモデルとTagモデルの多対多のリレーションシップ
@@ -50,7 +51,6 @@ class AccountCreate(db.Model):
   tmp_id = db.Column(db.Integer,primary_key=True)
   auth_code = db.Column(db.String(100),nullable=False)
   account_expire_time = db.Column(db.DateTime,nullable=False)
-  account_create_time = db.Column(db.DateTime,nullable=False)
   attempt_count = db.Column(db.Integer,nullable=False,default=0)
 
  
