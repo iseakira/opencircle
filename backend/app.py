@@ -259,7 +259,6 @@ def add_circle():
     active_session.session_last_access_time = datetime.utcnow()
     # --- ▲ 認証チェック完了 ▲ ---
 
-
     # --- ▼ 2. FormData からデータを取得 ▼ ---
     # (request.get_json() は使わない)
     
