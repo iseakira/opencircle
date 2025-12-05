@@ -2,7 +2,7 @@ import React from 'react'
 
 export default function CircleDescription({value,onChange,isError}) {
   return (
-    <div>
+    <div style={{ marginBottom: "20px" }}>
        <label
        htmlFor="Cdes" 
        style={{color:isError ? "red" : "black", display: "block"}}>

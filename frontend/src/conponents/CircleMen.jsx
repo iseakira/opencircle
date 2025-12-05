@@ -2,7 +2,7 @@ import React from 'react'
 
 export default function CircleMen({value,onChange}) {
   return (
-    <div>
+    <div style={{ marginBottom: "20px" }}>
       <label
         htmlFor="Cmen"
         style={{ display: "block" }}     
