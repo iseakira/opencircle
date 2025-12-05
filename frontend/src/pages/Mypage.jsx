@@ -99,7 +99,6 @@ function Mypage() {
 
       <main>
         <h1>マイページ</h1>
-        <p>あなたのユーザーID：{userId ?? "取得中..."}</p>
 
         <button
           onClick={() => navigate('/add_circle')}
