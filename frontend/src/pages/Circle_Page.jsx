@@ -5,6 +5,7 @@ import headImage from '../images/head_image.png';
 import '../css/App.css';
 import CircleLogo from '../conponents/CircleLogo';
 import LoginOutButton from './LogInOutButton';
+import Circleitems from '../conponents/Circleitems';
 
 function Circle_Page(){
     const { id } = useParams();
@@ -63,7 +64,6 @@ function Circle_Page(){
             setResponseData(null);
         }
     }
-
     console.log(id + " " + typeof(id));
     useEffect(
         () => {
@@ -149,11 +149,13 @@ function Circle_Page(){
                         </ul>
                         </div> */}
                     <div>
-                        {Array.isArray(responseData.tags) && responseData.tags.length > 0 ? (
-                            <p>キーワード: {responseData.tags.join(', ')}</p>
-                        ) : (
+                        {/* {Array.isArray(responseData.tags) && responseData.tags.length > 0 ? ( */}
+                         {/* {Array.isArray(items) && items.length > 0 ? ( */}
+                            {/* <p>キーワード: {responseData.tags.join(', ')}</p> */}
+                        {/* ) : (
                         <p>キーワード: なし</p>
-                        )}
+                        )} */}
+                        <Circleitems items={responseData.tags}></Circleitems>
                     </div>
                 </div>
                 ) : (

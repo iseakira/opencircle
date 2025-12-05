@@ -48,8 +48,8 @@
 /* --- 4. 入力フォームのスタイル上書き --- */
 /* 子コンポーネントの中にあるinputやtextareaに無理やりスタイルを適用する技 */
 .form-group input,
-.form-group textarea,
-.form-group select {
+.form-group textarea{
+/* .form-group select { */
   width: 100%;
   padding: 12px 16px;
   border: 2px solid #e5e7eb; /* 薄い枠線 */
@@ -59,7 +59,6 @@
   box-sizing: border-box; /* 枠線を含めたサイズ計算 */
 }
 
-/* クリック（フォーカス）した時の「ぽわっ」とする青い光 */
 .form-group input:focus,
 .form-group textarea:focus {
   border-color: #3b82f6; /* 青色 */
