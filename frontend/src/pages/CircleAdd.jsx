@@ -12,7 +12,6 @@ import CircleFemen from '../conponents/CircleFemen';
 import headImage from '../images/head_image.png';
 import { Link } from 'react-router-dom';
 import Header from '../conponents/Header.jsx';
-import CircleLogo from '../conponents/CircleLogo'
 import '../css/CircleAdd.css';
 function CircleAdd() {
   const initialCircleData = {
@@ -249,86 +248,32 @@ function CircleAdd() {
     console.log('受信したデータ:', data);
     setResponse_data(data);
   };
-  
-//   return (
 
-//     <div>
-//       <header>
-//           {/* <Link to="/"> */}
-//             {/* <img className="logo" src={headImage} alt="アイコン" /> */}
-//           {/* </Link> */}
-//           <CircleLogo></CircleLogo>
-//       </header>
-      
-//       {/* <h1>東京理科大学サークル情報サイト</h1> */}
-//       <h3>追加したいサークルの情報を入力してください</h3>
-//       <p>※「*」の項目は必須</p>
-//       {/* <AddCircle></AddCircle> */}
-//       <form onSubmit={handleKey}> 
-//         <CircleName value={circleData.circle_name} onChange={NameChange} isError={errorFields.includes("circle_name")}></CircleName>
-//         <CircleDescription value={circleData.circle_description} onChange={DesChange} isError={errorFields.includes("circle_description")}></CircleDescription>
-//         <CircleMen value={circleData.number_of_male} onChange={MemChange}></CircleMen>
-//         <CircleFemen value={circleData.number_of_female} onChange={FememChange}></CircleFemen>
-//         <CircleFee value={circleData.circle_fee} onChange={FeeChange}></CircleFee>
-//         <Image onChange={hadleImageChange} preview={preview} image={image} ref={fileInputRef}/> 
-//         <Tag 
-//           selectedBunya={selectedBunya} 
-//           onChangeBunya={setSelectedBunya} 
-//           selectedFee={selectedFee} 
-//           onChangeFee={setSelectedFee} 
-//           selectedRatio={selectedRatio}
-//           onChangeRatio={setSelectedRatio}
-//           selectedPlace={selectedPlace}
-//           onChangePlace={setSelectedPlace}
-//           selectedMood={selectedMood}
-//           onChangeMood={setSelectedMood}
-//           selectedActive={selectedActive}
-//           onChangeActive={setSelectedActive}
-//         ></Tag>
-//        {/*<Tag onChangeBunya={setSelectedBunya} onChangeFee={setSelectedFee} onChangeRatio={setSelectedRatio} onChangePlace={setSelectedPlace} onChangeMood={setSelectedMood} onChangeActive={setSelectedActive} 
-//         //></Tag> 
-  
-//         {/* <Toggle></Toggle> */}
-//         {/* <Button type="submit" onClick={handleKey} ></Button> */}
-//         <p onClick={reloadData}>クリア</p>
-//         <Button type="submit" onClick={get_jsontags} ></Button>
-//         <Link to={"/mypage"} className='link'>マイページへ戻る</Link>
-    
-//       </form> 
-//     </div>
-  
-//   )
-// }
-
-
-return (
+  return (
     <div className="add-page-container">
       <div className="add-card">
-        
-        {/* ヘッダー部分 */}
         <div className="add-header">
-          <CircleLogo />
+          <Header />
           <h3>サークル情報の追加</h3>
           <p>※「*」の項目は必須です</p>
         </div>
 
         <form onSubmit={handleKey}>
-          
           <div className="form-group">
             <label className="label-text">サークル名 *</label>
-            <CircleName 
-              value={circleData.circle_name} 
-              onChange={NameChange} 
-              isError={errorFields.includes("circle_name")} 
+            <CircleName
+              value={circleData.circle_name}
+              onChange={NameChange}
+              isError={errorFields.includes('circle_name')}
             />
           </div>
 
           <div className="form-group">
             <label className="label-text">活動内容・説明 *</label>
-            <CircleDescription 
-              value={circleData.circle_description} 
-              onChange={DesChange} 
-              isError={errorFields.includes("circle_description")} 
+            <CircleDescription
+              value={circleData.circle_description}
+              onChange={DesChange}
+              isError={errorFields.includes('circle_description')}
             />
           </div>
 
@@ -336,11 +281,17 @@ return (
           <div className="grid-row">
             <div className="grid-col form-group">
               <label className="label-text">男子人数</label>
-              <CircleMen value={circleData.number_of_male} onChange={MemChange} />
+              <CircleMen
+                value={circleData.number_of_male}
+                onChange={MemChange}
+              />
             </div>
             <div className="grid-col form-group">
               <label className="label-text">女子人数</label>
-              <CircleFemen value={circleData.number_of_female} onChange={FememChange} />
+              <CircleFemen
+                value={circleData.number_of_female}
+                onChange={FememChange}
+              />
             </div>
           </div>
 
@@ -351,50 +302,45 @@ return (
 
           <div className="form-group">
             <label className="label-text">アイコン画像</label>
-            <Image 
-              onChange={hadleImageChange} 
-              preview={preview} 
-              image={image} 
+            <Image
+              onChange={hadleImageChange}
+              preview={preview}
+              image={image}
               ref={fileInputRef}
             />
           </div>
 
           <div className="form-group">
             <label className="label-text">タグ設定</label>
-            <Tag 
-              selectedBunya={selectedBunya} 
-              onChangeBunya={setSelectedBunya} 
-              selectedFee={selectedFee} 
-              onChangeFee={setSelectedFee} 
-              selectedRatio={selectedRatio} 
-              onChangeRatio={setSelectedRatio} 
-              selectedPlace={selectedPlace} 
-              onChangePlace={setSelectedPlace} 
-              selectedMood={selectedMood} 
-              onChangeMood={setSelectedMood} 
-              selectedActive={selectedActive} 
-              onChangeActive={setSelectedActive} 
+            <Tag
+              selectedBunya={selectedBunya}
+              onChangeBunya={setSelectedBunya}
+              selectedFee={selectedFee}
+              onChangeFee={setSelectedFee}
+              selectedRatio={selectedRatio}
+              onChangeRatio={setSelectedRatio}
+              selectedPlace={selectedPlace}
+              onChangePlace={setSelectedPlace}
+              selectedMood={selectedMood}
+              onChangeMood={setSelectedMood}
+              selectedActive={selectedActive}
+              onChangeActive={setSelectedActive}
             />
           </div>
 
-          {/* ボタン類 */}
-          <p onClick={reloadData} className="clear-link">入力をクリア</p>
-          
-          {/* 元のButtonコンポーネントを使う場合、classNameを渡せる作りになっているか確認が必要です。
-              もしButtonコンポーネントがclassNameを受け取らない場合、以下のように直接buttonタグを書くか、
-              divで囲む必要があります。ここでは直接書き換える例を載せます */}
-          
-          {/* <Button type="submit" onClick={get_jsontags} /> の代わり ↓ */}
-<button type="submit" className='allbutton'>
+          <p onClick={reloadData} className="clear-link">
+            入力をクリア
+          </p>
+          <button type="submit" className="allbutton">
             サークルを追加する
           </button>
-
         </form>
 
         <div className="back-link-container">
-          <Link to={"/mypage"} className="back-link">← マイページへ戻る</Link>
+          <Link to={'/mypage'} className="back-link">
+            ← マイページへ戻る
+          </Link>
         </div>
-
       </div>
     </div>
   );
