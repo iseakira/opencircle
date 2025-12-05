@@ -256,19 +256,19 @@ return (
           
           <div className="form-group">
             <label className="label-text">タグ設定</label>
-            <Tag
-              onChangeBunya={setSelectedBunya}
-              onChangeFee={setSelectedFee}
-              onChangeRatio={setSelectedRatio}
-              onChangePlace={setSelectedPlace}
-              onChangeMood={setSelectedMood}
-              onChangeActive={setSelectedActive}
-              selectedBunya={selectedBunya}
-              selectedFee={selectedFee}
+            <Tag 
+              selectedBunya={selectedBunya} 
+              onChangeBunya={setSelectedBunya} 
+              selectedFee={selectedFee} 
+              onChangeFee={setSelectedFee} 
               selectedRatio={selectedRatio}
+              onChangeRatio={setSelectedRatio}
               selectedPlace={selectedPlace}
+              onChangePlace={setSelectedPlace}
               selectedMood={selectedMood}
+              onChangeMood={setSelectedMood}
               selectedActive={selectedActive}
+              onChangeActive={setSelectedActive}
             />
           </div>
 

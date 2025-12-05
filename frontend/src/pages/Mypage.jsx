@@ -15,7 +15,7 @@ function Mypage() {
   const [showAuthForm, setShowAuthForm] = useState(false);
   const [userId, setUserId] = useState(null);
 
-  // 権限付与フォームの ref
+
   const authFormRef = useRef(null);
 
   useEffect(() => {
