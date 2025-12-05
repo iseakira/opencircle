@@ -6,8 +6,8 @@ import Toggle from './Toggle.jsx';
 import { useContext } from 'react';
 import { AuthContext } from '../AuthStatus.jsx';
 import LoginOutButton from './LogInOutButton.jsx';
-import CircleLogo from '../conponents/CircleLogo.jsx';
 import Footer from '../conponents/footer.jsx';
+import Header from '../conponents/Header.jsx';
 
 function Home() {
   //バックエンドからの応答ステート（絞り込み結果を受け取る）
@@ -53,20 +53,10 @@ function Home() {
 
   return (
     <div>
-      <header className="page-header">
-        {/* <h1>
-          <Link to="/">
-            <img className="logo" src={headImage} alt="アイコン" />
-          </Link>
-        </h1> */}
-        <CircleLogo></CircleLogo>
-        <h3>
-          <LoginOutButton />
-        </h3>
-      </header>
+      <Header />
+      <LoginOutButton />
 
       <main>
-        {/* <h1>東京理科大学サークル情報サイト</h1> */}
         <p>ここでは東京理科大学のサークル情報を掲載しています。</p>
         <h2>サークル一覧</h2>
         <Toggle receivedData_fb={handleResponse} />

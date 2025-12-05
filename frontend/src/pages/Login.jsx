@@ -5,8 +5,8 @@ import headImage from '../images/head_image.png';
 import { AuthContext } from '../AuthStatus';
 import { useContext } from 'react';
 import Footer from '../conponents/footer.jsx';
+import Header from '../conponents/Header.jsx';
 
-import CircleLogo from '../conponents/CircleLogo';
 function Login() {
   const navigate = useNavigate();
   const [emailaddress, setEmailaddress] = useState('');
@@ -65,15 +65,7 @@ function Login() {
   };
   return (
     <div>
-      <header className="page-header">
-        {/* <h1>
-          <Link to="/">
-            <img className="logo" src={headImage} alt="アイコン" />
-          </Link>
-        </h1> */}
-        <CircleLogo></CircleLogo>
-      </header>
-      {/* <h1>東京理科大学サークル情報サイト</h1> */}
+      <Header />
 
       <main>
         <h3>メールアドレスとパスワードを入力してください</h3>
