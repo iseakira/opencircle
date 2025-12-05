@@ -95,9 +95,19 @@ function Mypage() {
               権限付与（ownerのみ）
             </button>
 
-            {showAuthForm && (
-              <div ref={authFormRef} style={{ marginTop: "10px", background: "white", padding: "15px", borderRadius: "8px", boxShadow: "0 0 6px rgba(0,0,0,0.15)", width: "260px" }}>
-                <h4>権限付与</h4>
+            {!showAuthForm && (
+              <div
+                ref={authFormRef}
+                style={{
+                  marginTop: "10px",
+                  background: "white",
+                  padding: "15px",
+                  borderRadius: "8px",
+                  boxShadow: "0 0 6px rgba(0,0,0,0.15)",
+                  width: "250px"
+                }}
+              >
+                <h4>権限付与フォーム</h4>
 
                 <select
                   value={selectedCircleId}
@@ -137,7 +147,7 @@ function Mypage() {
               </div>
             )}
           </div>
-        )}
+         )} 
 
         <h2 style={{ marginTop: "40px" }}>編集できるサークル一覧</h2>
         <div className="circle-list">

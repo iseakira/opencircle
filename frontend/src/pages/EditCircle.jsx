@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import '/app/src/css/EditCircle.css';
-
+import '../css/App.css'
 import Button from '../conponents/Button';
 import CircleDescription from '../conponents/CircleDescription';
 import CircleFee from '../conponents/CircleFee';
@@ -28,8 +28,8 @@ function CircleEdit() {
   const [selectedFee, setSelectedFee] = useState(0);
   const [selectedRatio, setSelectedRatio] = useState(0);
   const [selectedPlace, setSelectedPlace] = useState(0);
-  const [selectedMood, setSelectedMood] = useState();
-  const [selectedActive, setSelectedActive] = useState();
+  const [selectedMood, setSelectedMood] = useState(0);
+  const [selectedActive, setSelectedActive] = useState(0);
   
   const [preview, setPreview] = useState(null);
   const [image, setImage] = useState(null); // (File オブジェクトがここに入る)
@@ -151,7 +151,7 @@ function CircleEdit() {
       }
 
       const responseData = await response.json();
-      alert(responseData.message || "サークル情報を更新しました！");
+      alert(responseData.message || "サークル情報をしました！");
       navigate("/mypage");
 
     } catch (error) {
@@ -273,7 +273,8 @@ return (
           </div>
 
           {/* 更新ボタン */}
-          <button type="submit" className="btn-update">
+          {/* <button type="submit" className="btn-update"> */}
+          <button type="submit" className='allbutton'>
             情報を更新する
           </button>
           

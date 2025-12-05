@@ -15,15 +15,15 @@ export default function CircleLogo() {
             {/* <img src={headImage} alt="アイコン" /> */}
             <img className="logo" src={headImage} alt="アイコン" />
           </Link>
-      {/* <h1 onClick={reloadPage}>サークルついた</h1> */}
-     <img src={PageTitle} alt="あれ？" 
+      <h1 className="circleTitle">東京理科大学サークル情報サイト</h1>
+     {/* <img src={PageTitle} alt="あれ？" 
     //  onClick={reloadPage}
      style={{
       maxWidth:"400px",
       width:"100%",
      }}
      
-     />
+     /> */}
       {/* <p onClick={reloadPage}
       style={{
         fontSize:"20px",
