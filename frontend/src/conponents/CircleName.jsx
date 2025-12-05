@@ -3,7 +3,7 @@ import React from 'react'
 export default function CircleName( {value,onChange,isError}) {
   // const isEmpty = !value || value.trim() === "";
     return (
-    <div>
+    <div style={{ marginBottom: "20px" }}>
       <label
        htmlFor="Cname"
        style={{color:isError ? "red" : "black" , display: "block"}}>
