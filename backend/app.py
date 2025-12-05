@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, make_response
-from flask_cors import CORS # ◀ flask_corsをインポート
-from flask import Flask, jsonify, make_response, request, send_from_directory, session
+from flask import Flask, jsonify, make_response, request, send_from_directory
 import json
 from  models import db, Circle, Tag, EditAuthorization, User, Session 
 import os
@@ -11,10 +10,15 @@ from datetime import datetime, timedelta, timezone
 import uuid
 from werkzeug.utils import secure_filename
 import threading
-import hash
 
-import init_db
-import insert_tag
+app = Flask(__name__)
+base_dir = os.path.abspath(os.path.dirname(__file__))
+instance_dir = os.path.join(base_dir, 'instance')
+os.makedirs(instance_dir, exist_ok=True)
+db_path = os.path.join(instance_dir, 'project.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
 
 # --- ▼ 1. 画像アップロード設定 ▼ ---
 # 許可する拡張子
@@ -46,37 +50,7 @@ TAG_ID_TO_CATEGORY = {
     15: "active", 16: "active", 17: "active",
     # (ID: 0 の "未選択" はカテゴリがないのでここでは無視)
 }
-# --- ▲▲▲ 対応表の追加完了 ▲▲▲ ---
 
-def create_app():
-    app = Flask(__name__)
-
-    # DB の場所をプロジェクトの backend ディレクトリ内の project.db に設定
-    base_dir = os.path.dirname(__file__)
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(base_dir, "project.db")
-    
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-    upload_dir = os.path.join(base_dir, "uploads")
-    os.makedirs(upload_dir, exist_ok=True)
-    app.config["UPLOAD_FOLDER"] = upload_dir
-    print("UPLOAD_FOLDER 設定:", app.config["UPLOAD_FOLDER"]) 
-    # CORSを有効にする（これでフロントからの通信が許可される）
-    # origins=["http://localhost:3000"] のように限定することも可能
-    CORS(app, 
-     resources={r"/*": {"origins": "http://localhost:3000"}},  #変更クッキー関係
-     supports_credentials=True
-
-)
-    db.init_app(app)
-    
-    #定期的にデータベースの不要データを処理するスレッドを立てる
-    clean_thread = threading.Thread(target = dbop.cleanup_session_tmpid, daemon = True)
-    clean_thread.start()
-
-    return app
-
-app = create_app()
 
 @app.route('/home', methods=['POST'])
 def search():
