@@ -4,7 +4,7 @@ import '../css/App.css';
 import headImage from '../images/head_image.png';
 import Toggle from './Toggle.jsx';
 import { useContext} from 'react'
-import { AuthContext } from '../AuthStatus.jsx';
+import { ToastContext } from '../AppContext.jsx';
 import LoginOutButton from './LogInOutButton.jsx';
 import CircleLogo from '../conponents/CircleLogo.jsx';
 
@@ -17,6 +17,8 @@ function Home(){
     console.log("絞り込み結果:", data);
     setResponse_data(data);
   };
+
+  const { setToast } = useContext(ToastContext);
 
   const catch_all_circles = async () => {
     try {
@@ -32,6 +34,7 @@ function Home(){
         setResponse_data(data);
       }else{
         console.log("全サークルデータの取得に失敗:", initial_response.status);
+        setToast("データの取得に失敗したんご");
         setError(`データの取得に失敗しました。ステータス:  ${initial_response.status}`);
         setResponse_data(null);
       }

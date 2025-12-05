@@ -28,8 +28,8 @@ function CircleEdit() {
   const [selectedFee, setSelectedFee] = useState(0);
   const [selectedRatio, setSelectedRatio] = useState(0);
   const [selectedPlace, setSelectedPlace] = useState(0);
-  const [selectedMood, setSelectedMood] = useState();
-  const [selectedActive, setSelectedActive] = useState();
+  const [selectedMood, setSelectedMood] = useState(0);
+  const [selectedActive, setSelectedActive] = useState(0);
   
   const [preview, setPreview] = useState(null);
   const [image, setImage] = useState(null); // (File オブジェクトがここに入る)
@@ -38,26 +38,23 @@ function CircleEdit() {
   const [loading, setLoading] = useState(true);
 
   // 既存データを読み込む useEffect
-  useEffect(() => {
-    setLoading(true); 
+ // 1. データ取得処理を関数にする
+  const fetchCircleData = () => {
+    setLoading(true);
     setError(null);
-    
+
     fetch(`http://localhost:5001/api/circles/${circleId}`, {
       credentials: "include",
     })
       .then(res => {
         if (res.status === 401 || res.status === 403) {
-            throw new Error("このサークルを編集する権限がありません。");
+           throw new Error("このサークルを編集する権限がありません。");
         }
-        if (res.status === 404) {
-          throw new Error(`ID: ${circleId} のサークルは見つかりませんでした`);
-        }
-        if (!res.ok) {
-          throw new Error("サーバーエラーにより情報の取得に失敗しました");
-        }
+        if (!res.ok) throw new Error("情報の取得に失敗しました");
         return res.json();
       })
       .then(data => {
+        // ステートを更新
         setCircleData({
           circle_name: data.circle_name,
           circle_description: data.circle_description,
@@ -66,7 +63,8 @@ function CircleEdit() {
           number_of_female: data.number_of_female || 0,
         });
         
-        setPreview(data.circle_icon_path); 
+        setPreview(data.circle_icon_path);
+        setImage(null); // 画像選択状態をクリア
 
         if (data.tags && data.tags.length === 6) {
           setSelectedBunya(data.tags[0]);
@@ -79,11 +77,23 @@ function CircleEdit() {
         setLoading(false);
       })
       .catch(err => {
-        console.error("Fetch error:", err);
-        setError(err.message); 
-        setLoading(false); 
+        console.error(err);
+        setError(err.message);
+        setLoading(false);
       });
+  };
+
+  // 2. 最初の読み込みでその関数を使う
+  useEffect(() => {
+    fetchCircleData();
   }, [circleId]);
+
+  // 3. リセットボタンが押された時の処理
+  const handleReset = () => {
+    if (window.confirm("変更を破棄して、元の状態に戻しますか？")) {
+      fetchCircleData(); // 再取得して上書き
+    }
+  };
 
   // --- onChange ハンドラ ---
   const NameChange = (e) => setCircleData({ ...circleData, circle_name: e.target.value });
@@ -216,7 +226,6 @@ return (
         
         {/* ヘッダー */}
         <div className="edit-header">
-          <CircleLogo />
           <h2>サークル情報の編集</h2>
         </div>
 
@@ -256,27 +265,34 @@ return (
           
           <div className="form-group">
             <label className="label-text">タグ設定</label>
-            <Tag
-              onChangeBunya={setSelectedBunya}
-              onChangeFee={setSelectedFee}
-              onChangeRatio={setSelectedRatio}
-              onChangePlace={setSelectedPlace}
-              onChangeMood={setSelectedMood}
-              onChangeActive={setSelectedActive}
-              selectedBunya={selectedBunya}
-              selectedFee={selectedFee}
+            <Tag 
+              selectedBunya={selectedBunya} 
+              onChangeBunya={setSelectedBunya} 
+              selectedFee={selectedFee} 
+              onChangeFee={setSelectedFee} 
               selectedRatio={selectedRatio}
+              onChangeRatio={setSelectedRatio}
               selectedPlace={selectedPlace}
+              onChangePlace={setSelectedPlace}
               selectedMood={selectedMood}
+              onChangeMood={setSelectedMood}
               selectedActive={selectedActive}
+              onChangeActive={setSelectedActive}
             />
           </div>
 
+
+
+      
           {/* 更新ボタン */}
           {/* <button type="submit" className="btn-update"> */}
           <button type="submit" className='allbutton'>
             情報を更新する
           </button>
+
+          <p onClick={handleReset} className="clear-link" style={{textAlign:'center', cursor:'pointer', textDecoration:'underline', color:'#6b7280'}}>
+             変更を元に戻す
+          </p>
           
           {/* 削除エリア */}
           <div className="delete-section">

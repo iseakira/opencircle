@@ -61,9 +61,10 @@ onChangeActive(value);
       <p>タグを選択してください</p>
       <ul className="tag-list">
         <li className='tag-row'>
-<label htmlFor="">分野</label>
-
-<select value={selectedBunya || OPTIONS.BUNYA[0].value} onChange={handleChangeBunya}>
+<label htmlFor="tag_bunya">分野</label>
+<select 
+id="tag_bunya"
+value={selectedBunya || OPTIONS.BUNYA[0].value} onChange={handleChangeBunya}>
     {OPTIONS.BUNYA.map((option)=>(
     <option key={option.value} value={option.value}>
 {option.label}
@@ -72,9 +73,10 @@ onChangeActive(value);
 </select>
 </li> 
 <li className='tag-row'>
-<label htmlFor="">費用</label>
-
-<select value={selectedFee|| OPTIONS.FEE[0].value} onChange={handleChangeFee}>
+<label htmlFor="tag_fee">費用</label>
+<select
+id="tag_fee"
+value={selectedFee|| OPTIONS.FEE[0].value} onChange={handleChangeFee}>
     {OPTIONS.FEE.map((option)=>(
     <option key={option.value} value={option.value}>
 {option.label}
@@ -83,8 +85,10 @@ onChangeActive(value);
 </select>
 </li> 
 <li className='tag-row'>
-<label htmlFor="">男女比</label>
-<select value={selectedRatio|| OPTIONS.RATIO[0].value} onChange={handleChangeRatio}>
+<label htmlFor="tag_ratio">男女比</label>
+<select 
+id="tag_ratio"
+value={selectedRatio|| OPTIONS.RATIO[0].value} onChange={handleChangeRatio}>
     {OPTIONS.RATIO.map((option)=>(
     <option key={option.value} value={option.value}>
 {option.label}
@@ -93,8 +97,10 @@ onChangeActive(value);
 </select>
 </li>
 <li className='tag-row'>
-<label htmlFor="">活動場所</label>
-<select value={selectedPlace|| OPTIONS.PLACE[0].value} onChange={handleChangePlace}>
+<label htmlFor="tag_place">活動場所</label>
+<select 
+id="tag_place"
+value={selectedPlace|| OPTIONS.PLACE[0].value} onChange={handleChangePlace}>
     {OPTIONS.PLACE.map((option)=>(
     <option key={option.value} value={option.value}>
 {option.label}
@@ -103,9 +109,10 @@ onChangeActive(value);
 </select>
 </li>
 <li className='tag-row'>
-<label htmlFor="">雰囲気</label>
-
-<select value={selectedMood|| OPTIONS.MOOD[0].value} onChange={handleChangeMood}>
+<label htmlFor="tag_mood">雰囲気</label>
+<select 
+id="tag_mood"
+value={selectedMood|| OPTIONS.MOOD[0].value} onChange={handleChangeMood}>
     {OPTIONS.MOOD.map((option)=>(
     <option key={option.value} value={option.value}>
 {option.label}
@@ -114,8 +121,10 @@ onChangeActive(value);
 </select>
 </li>
 <li className='tag-row'>
-<label htmlFor="">活動頻度</label>
-<select value={selectedActive || OPTIONS.ACTIVE[0].value} onChange={handleChangeActive}>
+<label htmlFor="tag_active">活動頻度</label>
+<select 
+id="tag_active"
+value={selectedActive || OPTIONS.ACTIVE[0].value} onChange={handleChangeActive}>
     {OPTIONS.ACTIVE.map((option)=>(
     <option key={option.value} value={option.value}>
 {option.label}

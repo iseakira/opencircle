@@ -117,14 +117,15 @@ def make_tmp_account():
     #json_dict のキーは {"emailaddress"}
     json_dict = request.get_json()
     emailaddress = json_dict["emailaddress"]
-    #data_tuple は (success, auth_code, tmp_id) の形
+    #data_tuple は (success, auth_code, tmp_id, error) の形
     data_tuple = dbop.tmp_registration(emailaddress)
-    if data_tuple[0]:
-        mail_thread = threading.Thread(target = sm.send_auth_code, args=(emailaddress, data_tuple[1]))
+    (success, auth_code, tmp_id, error) = data_tuple
+    if success:
+        mail_thread = threading.Thread(target = sm.send_auth_code, args=(emailaddress, auth_code))
         mail_thread.start()
-        return jsonify({"message": "success", "tmp_id": data_tuple[2]})
+        return jsonify({"message": "success", "tmp_id": tmp_id})
     else:
-        return jsonify({"message": "failure"})
+        return jsonify({"message": "failure", "error": error})
 
 @app.route("/create_account", methods=["POST"])
 def create_account():
@@ -377,7 +378,7 @@ def get_circle(circle_id):
         if category:
             tag_map[category] = tag.tag_id
             
-    tags_id_list = [tag_map.get(category) for category in TAG_CATEGORY_ORDER]
+    tags_id_list = [tag_map.get(category, 0) for category in TAG_CATEGORY_ORDER]
     
     # --- ▼ 5. フロントに返すデータを構築 ▼ ---
     circle_data = {
@@ -575,7 +576,8 @@ def get_editable_circles():
 
     # 編集権限を取得
     auths = EditAuthorization.query.filter_by(user_id=user_id).all()
-    circle_ids = [a.circle_id for a in auths]
+    role_map = {a.circle_id: a.role for a in auths}
+    circle_ids = list(role_map.keys())
 
     # 編集できるサークルがない場合
     if not circle_ids:
@@ -590,6 +592,7 @@ def get_editable_circles():
             "circle_id": c.circle_id,
             "circle_name": c.circle_name,
             "circle_description": c.circle_description,
+            "role": role_map.get(c.circle_id)
         }
         for c in circles
     ]

@@ -3,7 +3,7 @@ import React from 'react'
 export default function CircleMen({value,onChange}) {
   return (
     <div>
-      <p>サークル人数（男性）</p>
+      {/* <p>サークル人数（男性）</p> */}
       <input type="number" onChange={onChange} value={value} id="Cmen"/>
     </div>
   )

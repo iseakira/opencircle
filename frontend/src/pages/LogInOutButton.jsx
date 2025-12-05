@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { AuthContext } from '../AuthStatus';
+import { AuthContext } from '../AppContext';
 import { Link } from 'react-router-dom';
 
 function LoginOutButton(){
