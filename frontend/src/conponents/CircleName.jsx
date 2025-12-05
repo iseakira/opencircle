@@ -6,7 +6,7 @@ export default function CircleName( {value,onChange,isError}) {
     <div>
       <label
        htmlFor="Cname"
-       style={{color:isError ? "red" : "black"}}>
+       style={{color:isError ? "red" : "black" , display: "block"}}>
         サークル名*<span style={{color:"red"}}></span>
         </label>
       <input value={value} onChange={onChange} type="text" id="Cname"/>
