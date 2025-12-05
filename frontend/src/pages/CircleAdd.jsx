@@ -11,12 +11,9 @@ import CircleMen from '../conponents/CircleMen';
 import CircleFemen from '../conponents/CircleFemen';
 import headImage from '../images/head_image.png';
 import { Link } from 'react-router-dom';
-<<<<<<< HEAD
 import Header from '../conponents/Header.jsx';
-=======
 import CircleLogo from '../conponents/CircleLogo'
 import '../css/CircleAdd.css';
->>>>>>> 5e78b606abf79bb5f95d10b6c68b926c7e6fcf14
 function CircleAdd() {
   const initialCircleData = {
     circle_name: '',
@@ -252,69 +249,6 @@ function CircleAdd() {
     console.log('受信したデータ:', data);
     setResponse_data(data);
   };
-
-<<<<<<< HEAD
-  return (
-    <div>
-      <Header />
-      <h3>追加したいサークルの情報を入力してください</h3>
-      <p>※「*」の項目は必須</p>
-      {/* <AddCircle></AddCircle> */}
-      <form onSubmit={handleKey}>
-        <CircleName
-          value={circleData.circle_name}
-          onChange={NameChange}
-          isError={errorFields.includes('circle_name')}
-        ></CircleName>
-        <CircleDescription
-          value={circleData.circle_description}
-          onChange={DesChange}
-          isError={errorFields.includes('circle_description')}
-        ></CircleDescription>
-        <CircleMen
-          value={circleData.number_of_male}
-          onChange={MemChange}
-        ></CircleMen>
-        <CircleFemen
-          value={circleData.number_of_female}
-          onChange={FememChange}
-        ></CircleFemen>
-        <CircleFee
-          value={circleData.circle_fee}
-          onChange={FeeChange}
-        ></CircleFee>
-        <Image
-          onChange={hadleImageChange}
-          preview={preview}
-          image={image}
-          ref={fileInputRef}
-        />
-        <Tag
-          selectedBunya={selectedBunya}
-          onChangeBunya={setSelectedBunya}
-          selectedFee={selectedFee}
-          onChangeFee={setSelectedFee}
-          selectedRatio={selectedRatio}
-          onChangeRatio={setSelectedRatio}
-          selectedPlace={selectedPlace}
-          onChangePlace={setSelectedPlace}
-          selectedMood={selectedMood}
-          onChangeMood={setSelectedMood}
-          selectedActive={selectedActive}
-          onChangeActive={setSelectedActive}
-        ></Tag>
-        <p onClick={reloadData}>クリア</p>
-        <Button type="submit" onClick={get_jsontags}></Button>
-        <Link to={'/mypage'} className="link">
-          マイページへ戻る
-        </Link>
-      </form>
-=======
-   const [response_data, setResponse_data] = useState(null);
-    const handleResponse = (data) => {
-      console.log("受信したデータ:", data);
-      setResponse_data(data);
-    };
   
 //   return (
 
@@ -462,7 +396,6 @@ return (
         </div>
 
       </div>
->>>>>>> 5e78b606abf79bb5f95d10b6c68b926c7e6fcf14
     </div>
   );
 }
