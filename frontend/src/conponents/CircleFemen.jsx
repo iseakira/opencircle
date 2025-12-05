@@ -11,5 +11,6 @@ export default function CircleFemen({value,onChange}) {
       {/* <p>サークル人数（女性）</p> */}
       <input type="number" onChange={onChange} value={value} id="Cfemen"/>
     </div>
+    </div>
   )
 }
