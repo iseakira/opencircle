@@ -17,7 +17,7 @@ def get_circle_prof(circle_id):
     指定した circle_id のサークルの基本情報を取得して辞書で返す。
     返却フィールド: circle_name, circle_description, circle_icon_path
     """
-    conn = sqlite3.connect('project.db')
+    conn = sqlite3.connect('project.db', timeout=2.0)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -49,7 +49,7 @@ def get_initial_circles():
     """
  
     # データベースに接続
-    conn = sqlite3.connect('project.db')
+    conn = sqlite3.connect('project.db', timeout=2.0)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -63,6 +63,7 @@ def get_initial_circles():
         FROM tags AS t
         JOIN circle_tag AS ct ON t.tag_id = ct.tag_id
         WHERE ct.circle_id = c.circle_id
+          AND t.tag_id IN (1, 2, 3, 4)
         LIMIT 1
       ) AS field
     FROM circles AS c
@@ -98,7 +99,7 @@ def search_circles(json_dict):
     termは部分一致させる。サークルの中でtagsをすべて含むサークルを返す。
     {"search_term":"","tags":[]}
     """
-    conn = sqlite3.connect('project.db')
+    conn = sqlite3.connect('project.db', timeout=2.0)
     cursor = conn.cursor()
     raw_search_term = json_dict.get("search_term", "")
     keywords = [k.strip() for k in raw_search_term.split() if k.strip()]
@@ -176,7 +177,7 @@ def get_circle_detail(circle_id):
     指定した circle_id の詳細情報を DB から取得して辞書で返す。
     返却フィールド:circle_name, circle_description, circle_fee, number_of_male, number_of_female, circle_icon, tags (リスト)
     """
-    conn = sqlite3.connect('project.db')
+    conn = sqlite3.connect('project.db', timeout=2.0)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -213,10 +214,9 @@ def get_circle_detail(circle_id):
     }
     
 def tmp_registration(mailaddress):
-    #database.dbは仮
-    conn = sqlite3.connect('project.db')
+    conn = sqlite3.connect('project.db', timeout=2.0)
     cursor = conn.cursor()
-    check_user_exist = cursor.execute("SELECT * FROM users WHERE mail_adress = ?", (mailaddress,))
+    check_user_exist = cursor.execute("SELECT * FROM users WHERE mail_address = ?", (mailaddress,))
     if check_user_exist.fetchone() != None:
         cursor.close()
         conn.close()
@@ -227,8 +227,8 @@ def tmp_registration(mailaddress):
     complete = False
     for i in range(5):
         try:
-            cursor.execute("INSERT INTO account_creates (tmp_id, auth_code, account_expire_time, account_create_time, attempt_count) " \
-                            "VALUES (?, ?, datetime('now','+5 minute'), datetime('now'), 0)", (tmp_id,auth_code))
+            cursor.execute("INSERT INTO account_creates (tmp_id, auth_code, account_expire_time, attempt_count) " \
+                            "VALUES (?, ?, datetime('now','+5 minute'), 0)", (tmp_id,auth_code))
             conn.commit()
         except sqlite3.IntegrityError:
             tmp_id = int(''.join(secrets.choice(string.digits) for _ in range(6)))
@@ -240,9 +240,9 @@ def tmp_registration(mailaddress):
     return (complete, auth_code, tmp_id)
     
 def check_auth_code(auth_code, tmp_id):
-    conn = sqlite3.connect("project.db")
+    conn = sqlite3.connect("project.db", timeout=2.0)
     cursor = conn.cursor()
-    res = cursor.execute("SELECT auth_code, account_expire_time, account_create_time, attempt_count " \
+    res = cursor.execute("SELECT auth_code, account_expire_time, attempt_count " \
                         "FROM account_creates WHERE tmp_id = ?", (tmp_id,))
     tmp_user_db = res.fetchone()
     #データがない場合
@@ -251,7 +251,7 @@ def check_auth_code(auth_code, tmp_id):
         conn.close()
         return {"message": "failure", "error_message": "セッション情報がありません。メールアドレスの入力からやり直してください。"}
     #回数制限を超えた場合
-    if tmp_user_db[3] > 3:
+    if tmp_user_db[2] > 3:
         cursor.execute("DELETE FROM account_creates WHERE tmp_id = ?", (tmp_id,))
         cursor.close()
         conn.close()
@@ -279,7 +279,7 @@ def check_auth_code(auth_code, tmp_id):
     return {"message": "success"}
 
 def create_account(emailaddress, password, user_name):
-    conn = sqlite3.connect("project.db")
+    conn = sqlite3.connect("project.db", timeout=2.0)
     cursor = conn.cursor()
     user_id = int(''.join(secrets.choice(string.digits) for _ in range(6)))
     complete = False
@@ -287,7 +287,7 @@ def create_account(emailaddress, password, user_name):
         try:
             print(user_id)
             hashed_pass = hash.hash_pass(password, user_id)
-            cursor.execute("INSERT INTO users (user_id, user_name, mail_adress, password) " \
+            cursor.execute("INSERT INTO users (user_id, user_name, mail_address, password) " \
                             "VALUES (?, ?, ?, ?)", (user_id, user_name, emailaddress, hashed_pass))
             conn.commit()
         except sqlite3.Error as e:
@@ -301,9 +301,9 @@ def create_account(emailaddress, password, user_name):
     return complete
 
 def check_login(emailaddress, password):
-    conn = sqlite3.connect("project.db")
+    conn = sqlite3.connect("project.db", timeout=2.0)
     cursor = conn.cursor()
-    res = cursor.execute("SELECT password, user_id FROM users WHERE mail_adress = ?", (emailaddress,))
+    res = cursor.execute("SELECT password, user_id FROM users WHERE mail_address = ?", (emailaddress,))
     user_tuple = res.fetchone()
     cursor.close()
     conn.close()
@@ -315,9 +315,9 @@ def check_login(emailaddress, password):
         return {"message": "success"}
     
 def make_session(emailaddress):
-    conn = sqlite3.connect("project.db")
+    conn = sqlite3.connect("project.db", timeout=2.0)
     cursor = conn.cursor()
-    res = cursor.execute("SELECT user_id FROM users WHERE mail_adress = ?",(emailaddress,))
+    res = cursor.execute("SELECT user_id FROM users WHERE mail_address = ?",(emailaddress,))
     user_id = int(res.fetchone()[0])
     session_id = int(''.join(secrets.choice(string.digits) for _ in range(16)))
     complete = False
@@ -336,7 +336,7 @@ def make_session(emailaddress):
     return (complete, session_id)
 
 def get_username(user_id):
-    conn = sqlite3("project.db")
+    conn = sqlite3.connect("project.db", timeout=2.0)
     cursor = conn.cursor()
     res = cursor.execute("SELECT user_name FROM users WHERE user_id = ?", (user_id,))
     user_name_tuple = res.fetchone()
@@ -346,7 +346,7 @@ def get_username(user_id):
 
 # veryfy_loginに置き換えたから使われてない
 def check_session(session_id):
-    conn = sqlite3.connect("project.db")
+    conn = sqlite3.connect("project.db", timeout=2.0)
     cursor = conn.cursor()
     res = cursor.execute("SELECT session_create_time, session_last_access_time " \
                             "FROM sessions WHERE session_id = ?", (session_id,))
@@ -368,7 +368,7 @@ def check_session(session_id):
     return True
 
 def delete_session(session_id):
-    conn = sqlite3.connect("project.db")
+    conn = sqlite3.connect("project.db", timeout=2.0)
     cursor = conn.cursor()
     try:
         print(session_id + "wo kesuzo")
@@ -380,7 +380,7 @@ def delete_session(session_id):
     conn.close()
 
 def cleanup_session_tmpid():
-    conn = sqlite3.connect("project.db")
+    conn = sqlite3.connect("project.db", timeout=2.0)
     cursor = conn.cursor()
     cursor.execute("DELETE FROM sessions " \
                     "WHERE session_create_time < datetime('now', '-7 days') " \
@@ -451,7 +451,7 @@ def delete_circle_by_id(circle_id):
         return (False, f"予期せぬエラー: {e}")
 
 def reset():
-    conn = sqlite3.connect("project.db")
+    conn = sqlite3.connect("project.db", timeout=2.0)
     cursor = conn.cursor()
     cursor.execute("DELETE FROM users")
     cursor.execute("DELETE FROM edit_authorizations")

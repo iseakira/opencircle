@@ -8,9 +8,7 @@ import { AuthContext } from '../AuthStatus.jsx';
 import LoginOutButton from './LogInOutButton.jsx';
 import CircleLogo from '../conponents/CircleLogo.jsx';
 
-
-function Home() {
-  const navigate = useNavigate();
+function Home(){
   //バックエンドからの応答ステート（絞り込み結果を受け取る）
   const [response_data, setResponse_data] = useState(null);
   const [error, setError] = useState(null);
@@ -50,35 +48,6 @@ function Home() {
     catch_all_circles();
   }, []);
 
-  //サークルの項目をクリックしたときに行う処理
-  const to_circle_page = async(circle_id) => {
-    const json_circle_id = JSON.stringify({circle_id: circle_id})
-    console.log("取得したいサークルのid:", json_circle_id)
-    await send_Id(json_circle_id);
-    return;
-  };
-  //サークルページの表示に伴うサークル情報の取得及びCircle_Pageへの遷移
-  const send_Id = async (json_circle_id) => {
-    try{
-      const response = await fetch("http://localhost:5001/Circle_Page",{
-        method: "POST",
-        headers:{
-          'Content-Type': 'application/json',
-        },
-        body: json_circle_id,
-      });
-      const data = await response.json();
-      console.log("項目をクリックした時：",data);
-      const dataString = JSON.stringify(data);
-      //localStorage.setItem('circle_detail', dataString);
-      //navigate('/Circle_Page');
-      navigate('/Circle_Page', { state: { circleDetail: data } })
-    }catch{
-      console.error("サークルページへの遷移に失敗しました")
-      alert("サークルページへの遷移に失敗しました");
-    }
-  }
-
   return (
     <div>
       <header className="page-header">
@@ -108,26 +77,16 @@ function Home() {
           ) : response_data && response_data.items && response_data.items.length > 0 ? (
           <>
           {response_data.items.map((circle, index) => (
-            <Link to={`/Circle_Page/${circle.circle_id}`}>
-              <div key={circle.circle_id}  className="circle-info" style={{cursor: 'pointer'}}>
-                <img src={circle.circle_icon_path} className="circle_icon"/>
-                <p>サークル名: {circle.circle_name}</p>
-                <p>分野：{circle.field}</p>
-              </div>
-            </Link>
-            /*
-            <div key={index} className="circle-info" onClick={() => to_circle_page(circle.circle_id)} 
-            tabIndex="0"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                to_circle_page(circle.circle_id);
-              }
-            }}style={{cursor: 'pointer'}}>
-              <img src={circle.circle_icon_path} className="circle_icon"/>
-                <p>サークル名: {circle.circle_name}</p>
-                <p>分野：{circle.field}</p>
+            <div key={circle.circle_id}>
+              <Link to={`/Circle_Page/${circle.circle_id}`}>
+                <div className="circle-info" style={{cursor: 'pointer'}}>
+                  <img src={circle.circle_icon_path} className="circle_icon" alt='サークルのアイコン'/>
+                  <p>サークル名: {circle.circle_name}</p>
+                  <p>分野：{circle.field}</p>
+                </div>
+              </Link>
             </div>
-            */
+
           ))}
           <br />
           </>

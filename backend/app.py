@@ -13,6 +13,9 @@ from werkzeug.utils import secure_filename
 import threading
 import hash
 
+import init_db
+import insert_tag
+
 # --- ▼ 1. 画像アップロード設定 ▼ ---
 # 許可する拡張子
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -145,6 +148,9 @@ def check_session():
     #isLogin = dbop.check_session(session_id)
     #return jsonify({"isLogin": isLogin})
 
+    #init_db.create_database()
+    #insert_tag.it()
+
     user_id = verify_login()[0]
     user_name = ""
     is_login = not (user_id == None)
@@ -252,7 +258,6 @@ def add_circle():
     user_id = active_session.user_id
     active_session.session_last_access_time = datetime.utcnow()
     # --- ▲ 認証チェック完了 ▲ ---
-
 
     # --- ▼ 2. FormData からデータを取得 ▼ ---
     # (request.get_json() は使わない)
@@ -785,19 +790,3 @@ def delete_circle(circle_id):
         "deleted_circle_id": circle_id
     }), 200
 
-
-# データベース初期化コマンド
-@app.cli.command("initdb")
-def initdb():
-    #データベースを初期化
-    db.drop_all()
-    db.create_all()
-    print("Database initialized.")
-
-# アプリ起動設定
-if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-    app.run(host="0.0.0.0", port=5001, debug=True)
-
-#--- ここまでマイページ画面用のコード ---

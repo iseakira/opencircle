@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import '/app/src/css/EditCircle.css';
-
+import '../css/App.css'
 import Button from '../conponents/Button';
 import CircleDescription from '../conponents/CircleDescription';
 import CircleFee from '../conponents/CircleFee';
@@ -24,12 +24,12 @@ function CircleEdit() {
     number_of_female: "",
   });
 
-  const [selectedBunya, setSelectedBunya] = useState(null);
-  const [selectedFee, setSelectedFee] = useState(null);
-  const [selectedRatio, setSelectedRatio] = useState(null);
-  const [selectedPlace, setSelectedPlace] = useState(null);
-  const [selectedMood, setSelectedMood] = useState(null);
-  const [selectedActive, setSelectedActive] = useState(null);
+  const [selectedBunya, setSelectedBunya] = useState(0);
+  const [selectedFee, setSelectedFee] = useState(0);
+  const [selectedRatio, setSelectedRatio] = useState(0);
+  const [selectedPlace, setSelectedPlace] = useState(0);
+  const [selectedMood, setSelectedMood] = useState(0);
+  const [selectedActive, setSelectedActive] = useState(0);
   
   const [preview, setPreview] = useState(null);
   const [image, setImage] = useState(null); // (File オブジェクトがここに入る)
@@ -151,7 +151,7 @@ function CircleEdit() {
       }
 
       const responseData = await response.json();
-      alert(responseData.message || "サークル情報を更新しました！");
+      alert(responseData.message || "サークル情報をしました！");
       navigate("/mypage");
 
     } catch (error) {
@@ -201,10 +201,10 @@ function CircleEdit() {
         <h1>エラーが発生しました</h1>
         <p>{error}</p>
         <button 
-          onClick={() => navigate("/mypage")} 
+          onClick={() => navigate("/")} 
           className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"
         >
-          マイページに戻る
+          ホームに戻る
         </button>
       </div>
     );
@@ -273,7 +273,8 @@ return (
           </div>
 
           {/* 更新ボタン */}
-          <button type="submit" className="btn-update">
+          {/* <button type="submit" className="btn-update"> */}
+          <button type="submit" className='allbutton'>
             情報を更新する
           </button>
           
