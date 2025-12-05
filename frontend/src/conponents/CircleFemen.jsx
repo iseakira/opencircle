@@ -2,8 +2,11 @@ import React from 'react'
 
 export default function CircleFemen({value,onChange}) {
   return (
-    <div>
-      <p>サークル人数（女性）</p>
+    <div style={{ marginBottom: "20px" }}>
+      <label
+        htmlFor="Cmen"
+        style={{ display: "block" }} 
+      >サークル人数（女性）</label>
       <input type="number" onChange={onChange} value={value} id="Cfemen"/>
     </div>
   )

@@ -7,8 +7,11 @@ const ImageComponent = forwardRef(function Image({onChange,preview,image},ref){
 //   const [preview,setPreview]=useState(null);
 //   const [image,setImage]=useState(null);
     return (
-    <div>
-        <p>サークル画像</p>
+    <div style={{ marginBottom: "20px" }}>
+        <label
+          htmlFor="Cmen"
+          style={{ display: "block" }}
+        >サークル画像</label>
  <input type="file" 
  accept="image/*"
  onChange={onChange}
