@@ -1,5 +1,6 @@
 from flask import Flask
 from models import db
+import insert_tag
 import os
 
 def create_database():
@@ -19,6 +20,7 @@ def create_database():
         # 既存のテーブルがあってもエラーにならないよう作成
         db.create_all()
         print(f"データベースを作成しました: {db_path}")
+        insert_tag.it()
 
 if __name__ == '__main__':
     create_database()
