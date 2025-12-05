@@ -16,6 +16,7 @@ const ImageComponent = forwardRef(function Image({onChange,preview,image},ref){
  accept="image/*"
  onChange={onChange}
  ref={ref}
+ id="Cmen" 
  />     
  {preview&&(
      <div> 
