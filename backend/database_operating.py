@@ -219,7 +219,7 @@ def tmp_registration(mailaddress):
     if check_user_exist.fetchone() != None:
         cursor.close()
         conn.close()
-        return (False,)
+        return (False, None, None, "User_Duplication")
 
     auth_code = random.randint(100000, 999999)
     tmp_id = int(''.join(secrets.choice(string.digits) for _ in range(6)))
@@ -236,7 +236,7 @@ def tmp_registration(mailaddress):
             break
     cursor.close()
     conn.close()
-    return (complete, auth_code, tmp_id)
+    return (complete, auth_code, tmp_id, "Database_Time_Out")
     
 def check_auth_code(auth_code, tmp_id):
     conn = sqlite3.connect("project.db", timeout=2.0)

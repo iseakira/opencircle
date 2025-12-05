@@ -1,5 +1,10 @@
 import { createContext, useState, useEffect } from 'react';
 import AppRouter from './AppRouter';
+import './css/Toast.css';
+
+const ToastContext = createContext({
+    setToast: () => {}
+})
 
 const AuthContext = createContext({
     getLogin: () => {},
@@ -9,10 +14,27 @@ const AuthContext = createContext({
     setUserName: () => {},
 });
 
-function AuthProvider(){
+function ToastComponent({ text }){
+    if(text == ""){
+        return (
+            <></>
+        );
+    }else{
+        return (
+            <>
+                <div className="toast">
+                    {text}
+                </div>
+            </>
+        )
+    }
+}
+
+function AppProvider(){
     const [isLogin, setIsLogin] = useState(false);
     const [name, setName] = useState("")
     const [loading, setLoading] = useState(true);
+    const [toastText, setToastText] = useState("")
 
     async function session_check(){
         try{
@@ -68,6 +90,14 @@ function AuthProvider(){
     function setUserName(new_user_name){
         setName(new_user_name)
     }
+    
+    function setToast(text){
+        setToastText(text);
+        setTimeout(
+            () => {setToastText("");},
+            5000
+        );
+    }
 
     console.log("isLogin = " + isLogin)
 
@@ -80,11 +110,24 @@ function AuthProvider(){
     }else{
         return(
             <AuthContext.Provider value={{getLogin, setLogin, setLogout, getUserName, setUserName}}>
-                <AppRouter />
+                <ToastContext.Provider value={{setToast}}>
+                    <AppRouter />
+                    <ToastComponent text={toastText}/>
+                </ToastContext.Provider>
             </AuthContext.Provider>
         );
     }
 };
 
-export { AuthProvider };
+export { AppProvider };
 export { AuthContext };
+export { ToastContext };
+
+//ここからいったんトーストを書く
+//トースト実装->ContextのProviderを統一(多分)->名前を合わせる
+/*
+トーストでやらなきゃいけない処理
+・文字列を受け取る -> exportするのは文字列を受け取る関数
+・html要素をreturnする
+・時間経過で消す(setTimer(JavaScript標準機能)(visible=false)
+*/

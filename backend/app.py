@@ -117,14 +117,15 @@ def make_tmp_account():
     #json_dict のキーは {"emailaddress"}
     json_dict = request.get_json()
     emailaddress = json_dict["emailaddress"]
-    #data_tuple は (success, auth_code, tmp_id) の形
+    #data_tuple は (success, auth_code, tmp_id, error) の形
     data_tuple = dbop.tmp_registration(emailaddress)
-    if data_tuple[0]:
-        mail_thread = threading.Thread(target = sm.send_auth_code, args=(emailaddress, data_tuple[1]))
+    (success, auth_code, tmp_id, error) = data_tuple
+    if success:
+        mail_thread = threading.Thread(target = sm.send_auth_code, args=(emailaddress, auth_code))
         mail_thread.start()
-        return jsonify({"message": "success", "tmp_id": data_tuple[2]})
+        return jsonify({"message": "success", "tmp_id": tmp_id})
     else:
-        return jsonify({"message": "failure"})
+        return jsonify({"message": "failure", "error": error})
 
 @app.route("/create_account", methods=["POST"])
 def create_account():

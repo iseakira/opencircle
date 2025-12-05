@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import {useNavigate} from "react-router-dom";
 import React, { useState } from 'react';
 import headImage from '../images/head_image.png';
-import { AuthContext } from '../AuthStatus';
+import { AuthContext } from '../AppContext';
 import { useContext } from 'react'
 
 import CircleLogo from '../conponents/CircleLogo';
