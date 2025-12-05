@@ -3,11 +3,9 @@ import React from 'react'
 export default function CircleDescription({value,onChange,isError}) {
   return (
     <div>
-       <label
-       htmlFor="Cdes" 
-       style={{color:isError ? "red" : "black", display: "block"}}>
+       {/* <p style={{color:isError ? "red" : "black"}}>
         説明*<span style={{color:"red"}}></span>
-        </label>
+        </p> */}
       <textarea  onChange={onChange} value={value} id="Cdes"/>
     </div>
   )

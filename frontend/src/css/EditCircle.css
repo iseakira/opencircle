@@ -59,7 +59,6 @@
   box-sizing: border-box; /* 枠線を含めたサイズ計算 */
 }
 
-/* クリック（フォーカス）した時の「ぽわっ」とする青い光 */
 .form-group input:focus,
 .form-group textarea:focus {
   border-color: #3b82f6; /* 青色 */

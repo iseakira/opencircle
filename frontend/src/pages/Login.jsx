@@ -2,10 +2,15 @@ import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
 import headImage from '../images/head_image.png';
+<<<<<<< HEAD
 import { AuthContext } from '../AuthStatus';
 import { useContext } from 'react';
 import Footer from '../conponents/footer.jsx';
 import Header from '../conponents/Header.jsx';
+=======
+import { AuthContext } from '../AppContext';
+import { useContext } from 'react'
+>>>>>>> 5e78b606abf79bb5f95d10b6c68b926c7e6fcf14
 
 function Login() {
   const navigate = useNavigate();

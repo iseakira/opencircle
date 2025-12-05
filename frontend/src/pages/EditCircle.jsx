@@ -38,7 +38,12 @@ function CircleEdit() {
   const [loading, setLoading] = useState(true);
 
   // 既存データを読み込む useEffect
+<<<<<<< HEAD
   useEffect(() => {
+=======
+ // 1. データ取得処理を関数にする
+  const fetchCircleData = () => {
+>>>>>>> 5e78b606abf79bb5f95d10b6c68b926c7e6fcf14
     setLoading(true);
     setError(null);
 
@@ -47,6 +52,7 @@ function CircleEdit() {
     })
       .then((res) => {
         if (res.status === 401 || res.status === 403) {
+<<<<<<< HEAD
           throw new Error('このサークルを編集する権限がありません。');
         }
         if (res.status === 404) {
@@ -54,10 +60,19 @@ function CircleEdit() {
         }
         if (!res.ok) {
           throw new Error('サーバーエラーにより情報の取得に失敗しました');
+=======
+           throw new Error("このサークルを編集する権限がありません。");
+>>>>>>> 5e78b606abf79bb5f95d10b6c68b926c7e6fcf14
         }
+        if (!res.ok) throw new Error("情報の取得に失敗しました");
         return res.json();
       })
+<<<<<<< HEAD
       .then((data) => {
+=======
+      .then(data => {
+        // ステートを更新
+>>>>>>> 5e78b606abf79bb5f95d10b6c68b926c7e6fcf14
         setCircleData({
           circle_name: data.circle_name,
           circle_description: data.circle_description,
@@ -65,8 +80,14 @@ function CircleEdit() {
           number_of_male: data.number_of_male || 0,
           number_of_female: data.number_of_female || 0,
         });
+<<<<<<< HEAD
 
         setPreview(data.circle_icon_path);
+=======
+        
+        setPreview(data.circle_icon_path);
+        setImage(null); // 画像選択状態をクリア
+>>>>>>> 5e78b606abf79bb5f95d10b6c68b926c7e6fcf14
 
         if (data.tags && data.tags.length === 6) {
           setSelectedBunya(data.tags[0]);
@@ -78,12 +99,29 @@ function CircleEdit() {
         }
         setLoading(false);
       })
+<<<<<<< HEAD
       .catch((err) => {
         console.error('Fetch error:', err);
+=======
+      .catch(err => {
+        console.error(err);
+>>>>>>> 5e78b606abf79bb5f95d10b6c68b926c7e6fcf14
         setError(err.message);
         setLoading(false);
       });
+  };
+
+  // 2. 最初の読み込みでその関数を使う
+  useEffect(() => {
+    fetchCircleData();
   }, [circleId]);
+
+  // 3. リセットボタンが押された時の処理
+  const handleReset = () => {
+    if (window.confirm("変更を破棄して、元の状態に戻しますか？")) {
+      fetchCircleData(); // 再取得して上書き
+    }
+  };
 
   // --- onChange ハンドラ ---
   const NameChange = (e) =>
@@ -225,7 +263,18 @@ function CircleEdit() {
     <div className="edit-page-container">
       <Header />
       <div className="edit-card">
+<<<<<<< HEAD
         <form onSubmit={handleSubmit}>
+=======
+        
+        {/* ヘッダー */}
+        <div className="edit-header">
+          <h2>サークル情報の編集</h2>
+        </div>
+
+        <form onSubmit={handleSubmit}> 
+          
+>>>>>>> 5e78b606abf79bb5f95d10b6c68b926c7e6fcf14
           <div className="form-group">
             <label className="label-text">サークル名</label>
             <CircleName value={circleData.circle_name} onChange={NameChange} />
@@ -273,28 +322,38 @@ function CircleEdit() {
 
           <div className="form-group">
             <label className="label-text">タグ設定</label>
-            <Tag
-              onChangeBunya={setSelectedBunya}
-              onChangeFee={setSelectedFee}
-              onChangeRatio={setSelectedRatio}
-              onChangePlace={setSelectedPlace}
-              onChangeMood={setSelectedMood}
-              onChangeActive={setSelectedActive}
-              selectedBunya={selectedBunya}
-              selectedFee={selectedFee}
+            <Tag 
+              selectedBunya={selectedBunya} 
+              onChangeBunya={setSelectedBunya} 
+              selectedFee={selectedFee} 
+              onChangeFee={setSelectedFee} 
               selectedRatio={selectedRatio}
+              onChangeRatio={setSelectedRatio}
               selectedPlace={selectedPlace}
+              onChangePlace={setSelectedPlace}
               selectedMood={selectedMood}
+              onChangeMood={setSelectedMood}
               selectedActive={selectedActive}
+              onChangeActive={setSelectedActive}
             />
           </div>
 
+
+
+      
           {/* 更新ボタン */}
           {/* <button type="submit" className="btn-update"> */}
           <button type="submit" className="allbutton">
             情報を更新する
           </button>
 
+<<<<<<< HEAD
+=======
+          <p onClick={handleReset} className="clear-link" style={{textAlign:'center', cursor:'pointer', textDecoration:'underline', color:'#6b7280'}}>
+             変更を元に戻す
+          </p>
+          
+>>>>>>> 5e78b606abf79bb5f95d10b6c68b926c7e6fcf14
           {/* 削除エリア */}
           <div className="delete-section">
             <button type="button" onClick={handleDelete} className="btn-delete">
