@@ -107,7 +107,7 @@ function Mypage() {
           サークルを追加
         </button>
 
-        {/* owner のみ権限付与ボタン */}
+　　     {/* owner のみ権限付与ボタン */}
         {isOwner && (
           <div style={{ position: "absolute", top: "40px", right: "20px" }}>
             <button

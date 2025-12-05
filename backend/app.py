@@ -377,7 +377,7 @@ def get_circle(circle_id):
         if category:
             tag_map[category] = tag.tag_id
             
-    tags_id_list = [tag_map.get(category) for category in TAG_CATEGORY_ORDER]
+    tags_id_list = [tag_map.get(category, 0) for category in TAG_CATEGORY_ORDER]
     
     # --- ▼ 5. フロントに返すデータを構築 ▼ ---
     circle_data = {
@@ -575,7 +575,8 @@ def get_editable_circles():
 
     # 編集権限を取得
     auths = EditAuthorization.query.filter_by(user_id=user_id).all()
-    circle_ids = [a.circle_id for a in auths]
+    role_map = {a.circle_id: a.role for a in auths}
+    circle_ids = list(role_map.keys())
 
     # 編集できるサークルがない場合
     if not circle_ids:
@@ -590,6 +591,7 @@ def get_editable_circles():
             "circle_id": c.circle_id,
             "circle_name": c.circle_name,
             "circle_description": c.circle_description,
+            "role": role_map.get(c.circle_id)
         }
         for c in circles
     ]

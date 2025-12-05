@@ -12,6 +12,8 @@ const ImageComponent = forwardRef(function Image({onChange,preview,image},ref){
           htmlFor="Cmen"
           style={{ display: "block" }}
         >サークル画像</label>
+    <div>
+        {/* <p>サークル画像</p> */}
  <input type="file" 
  accept="image/*"
  onChange={onChange}
@@ -30,7 +32,8 @@ const ImageComponent = forwardRef(function Image({onChange,preview,image},ref){
          />
      </div>
  )}
-    </div>
+     </div>
+     </div>
   );
 });
 export default ImageComponent;

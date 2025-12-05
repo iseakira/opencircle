@@ -7,6 +7,8 @@ export default function CircleFee({value,onChange}) {
         htmlFor="Cmen"
         style={{ display: "block" }}
       >サークル費</label>
+    <div>
+      {/* <p>サークル費</p> */}
       <input type="number" onChange={onChange} value={value} id="Cfee"/>
     </div>
   )
