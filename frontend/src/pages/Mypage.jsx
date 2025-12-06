@@ -1,10 +1,12 @@
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useContext } from 'react';
 import '../css/App.css';
 import headImage from '../images/head_image.png';
 import Header from '../conponents/Header.jsx';
+import { AuthContext } from '../AppContext.jsx';
 
 function Mypage() {
+  const{ getUserName } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [circles, setCircles] = useState([]);
@@ -94,16 +96,16 @@ function Mypage() {
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh' }}>
-      <header className="page-header">
+      {/*<header className="page-header">
         <CircleLogo />
-      </header>
+      </header>*/}
 
       <main>
-        <h1>マイページ</h1>
+        <h1>{getUserName()}さんのマイページ</h1>
         <button onClick={() => navigate('/add_circle')} className="allbutton">
           サークルを追加
         </button>
-        　　 {/* owner のみ権限付与ボタン */}
+        {/* owner のみ権限付与ボタン */}
         {isOwner && (
           <div style={{ position: 'absolute', top: '40px', right: '20px' }}>
             <button

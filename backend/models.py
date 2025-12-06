@@ -73,12 +73,3 @@ class EditAuthorization(db.Model):
     role = db.Column(db.String(50), nullable=True)
     user = db.relationship("User", backref="edit_authorizations")
     circle = db.relationship("Circle", backref="edit_authorizations")
-
-
-
-
-
-
-
-
-

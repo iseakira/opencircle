@@ -1,11 +1,16 @@
 import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
-import React, { useState } from 'react';
+import { useNavigate} from 'react-router-dom';
+import React, { useState, useContext } from 'react';
 import headImage from '../images/head_image.png';
 import { AuthContext } from '../AppContext';
-import { useContext } from 'react';
+import { ToastContext } from '../AppContext';
+import Header from '../conponents/Header';
+import Footer from '../conponents/footer';
 
 function Login() {
+  const {setToast} = useContext(ToastContext);
+  const { setLogin, getUserName, setUserName } = useContext(AuthContext);
+
   const navigate = useNavigate();
   const [emailaddress, setEmailaddress] = useState('');
   const handleChange_email = (e) => {
@@ -15,7 +20,6 @@ function Login() {
   const handleChange_password = (e) => {
     setPassword(e.target.value);
   };
-  const { setLogin } = useContext(AuthContext);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -39,23 +43,35 @@ function Login() {
         body: json_email_pass,
         credentials: 'include',
       });
+
+      if(response.ok){
+        const response_obj = await response.json();
+        setLogin();
+        setUserName(response_obj.user_name);
+        setToast(response_obj.user_name + "さん、ようこそ。")
+        navigate('/mypage');  
+      }else{
+        const error_response_obj = await response.json();
+        setToast(error_response_obj.error);
+      }
+/*
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const result = await response.json();
-      console.log('サーバーからの応答：', result);
       if (result.message === 'success') {
         console.log('ログイン成功');
-        setLogin(); //大西さんが編集してるよ
+        setLogin();
         navigate('/mypage');
       } else {
         alert('もう一度入力してください');
-      }
+      }*/
     } catch (error) {
       console.error('メールアドレスの送信に失敗:', error);
       alert('通信に失敗しました');
     }
   };
+
 
   const handleCreateAccount = (e) => {
     e.preventDefault();

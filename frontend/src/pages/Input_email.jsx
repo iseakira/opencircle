@@ -1,10 +1,14 @@
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import headImage from '../images/head_image.png';
 import Footer from '../conponents/footer.jsx';
 import Header from '../conponents/Header.jsx';
+import { ToastContext } from '../AppContext.jsx';
+
 function Input_email() {
+
+  const { setToast } = useContext(ToastContext);
   //入力されたメールアドレスを保持するステート
   const [emailaddress, setEmailaddress] = useState('');
   const navigate = useNavigate();
@@ -38,7 +42,22 @@ function Input_email() {
         },
         body: json_stringemail,
       });
+
+      if(response.ok){
+        const response_obj = await response.json();
+        const to_Make_Account_data = JSON.stringify({
+          emailaddress: emailaddress,
+          tmp_id: response_obj.tmp_id,
+        });
+        localStorage.setItem('to_Make_Account', to_Make_Account_data);
+        navigate('/Make_Account');
+      }else{
+        const error_response_obj = await response.json();
+        setToast(error_response_obj.error)
+      }
+
       //応答の処理
+      /*
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -55,7 +74,7 @@ function Input_email() {
         navigate('/Make_Account');
       } else {
         alert('もう一度入力してください');
-      }
+      }*/
     } catch (error) {
       console.error('通信エラー', error);
       alert('通信に失敗しました');

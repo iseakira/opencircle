@@ -14,6 +14,27 @@ const AuthContext = createContext({
     setUserName: () => {},
 });
 
+function ErrorToText(receive){
+    let text = "";
+    switch(receive){
+        case "User_Duplication":
+            text = text + "既に使われているメールアドレスです。";
+            break;
+        case "Database_Time_Out":
+            text = text + "処理が込み合っています。時間を空けて再度送信してください。";
+            break;
+        default:
+            text = text + receive;
+    }
+    /*
+    コピペ用
+        case "":
+            text = text + "";
+            break;
+    */
+    return text;
+}
+
 function ToastComponent({ text }){
     if(text == ""){
         return (
@@ -48,10 +69,11 @@ function AppProvider(){
             )
             if(response.ok){
                 const login_obj = await response.json();
-                console.log("かえってきたやつは " + login_obj.isLogin)
-                if(login_obj.isLogin){
+                console.log("かえってきたやつ");
+                console.log(login_obj);
+                if(login_obj.is_login){
                     setIsLogin(true);
-                    setName(login_obj.user_name)
+                    setName(login_obj.user_name);
                 }else{
                     console.log("ログインしてない")
                     setIsLogin(false);
@@ -88,10 +110,11 @@ function AppProvider(){
     }
     
     function setUserName(new_user_name){
-        setName(new_user_name)
+        setName(new_user_name);
     }
     
-    function setToast(text){
+    function setToast(receive){
+        const text = ErrorToText(receive);
         setToastText(text);
         setTimeout(
             () => {setToastText("");},

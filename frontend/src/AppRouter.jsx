@@ -13,15 +13,15 @@ function AppRouter() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/input_email" element={<Input_email />} />
-        <Route path="/edit-circle/:circleId" element={<EditCircle />} />
-        <Route path="/mypage" element={<Mypage />} />
-        <Route path="/add_circle" element={<CircleAdd/>}/>
-        <Route path="/Make_Account" element={<Make_Account/>}/>
-        <Route path="/Circle_Page/:id" element={<Circle_Page />} />
-        <Route path="*" element={<NotFound />} />
+        <Route path="/"                       element={<Home />}        />
+        <Route path="/login"                  element={<Login />}       />
+        <Route path="/input_email"            element={<Input_email />} />
+        <Route path="/edit-circle/:circleId"  element={<EditCircle />}  />
+        <Route path="/mypage"                 element={<Mypage />}      />
+        <Route path="/add_circle"             element={<CircleAdd/>}    />
+        <Route path="/Make_Account"           element={<Make_Account/>} />
+        <Route path="/Circle_Page/:id"        element={<Circle_Page />} />
+        <Route path="*"                       element={<NotFound />}    />
       </Routes>
     </>
   );

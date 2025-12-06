@@ -10,6 +10,7 @@ from datetime import datetime, timedelta, timezone
 import uuid
 from werkzeug.utils import secure_filename
 import threading
+from flask_cors import CORS
 
 app = Flask(__name__)
 base_dir = os.path.abspath(os.path.dirname(__file__))
@@ -19,6 +20,10 @@ db_path = os.path.join(instance_dir, 'project.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
+CORS(app, 
+resources={r"/*": {"origins": "http://localhost:3000"}},  #変更クッキー関係
+supports_credentials=True
+)
 
 # --- ▼ 1. 画像アップロード設定 ▼ ---
 # 許可する拡張子
@@ -93,13 +98,13 @@ def make_tmp_account():
     emailaddress = json_dict["emailaddress"]
     #data_tuple は (success, auth_code, tmp_id, error) の形
     data_tuple = dbop.tmp_registration(emailaddress)
-    (success, auth_code, tmp_id, error) = data_tuple
+    (success, auth_code, tmp_id, error, http_status) = data_tuple
     if success:
         mail_thread = threading.Thread(target = sm.send_auth_code, args=(emailaddress, auth_code))
         mail_thread.start()
         return jsonify({"message": "success", "tmp_id": tmp_id})
     else:
-        return jsonify({"message": "failure", "error": error})
+        return jsonify({"message": "failure", "error": error}), http_status
 
 @app.route("/create_account", methods=["POST"])
 def create_account():
@@ -117,30 +122,24 @@ def create_account():
 # --- ここからログイン ---
 @app.route("/api/check_login", methods=["POST"])
 def check_session():
-    #session_id = request.cookies.get("session_id")
-    #if session_id == None:
-    #    return jsonify({"isLogin": False})
-    #isLogin = dbop.check_session(session_id)
-    #return jsonify({"isLogin": isLogin})
-
-    #init_db.create_database()
-    #insert_tag.it()
-
+    session_id = request.cookies.get("session_id")
+    if session_id == None:
+        return jsonify({"is_login": False})
     user_id = verify_login()[0]
     user_name = ""
     is_login = not (user_id == None)
     if is_login:
         user_name = dbop.get_username(user_id)
-    return jsonify({"isLogin": is_login, "userName": user_name})
+    return jsonify({"is_login": is_login, "user_name": user_name})
 
 @app.route("/login", methods=["POST"])
 def login():
     #json_dict のキーは {"emailaddress", "password"}
     json_dict = request.get_json()
 
-    checked_dict = dbop.check_login(json_dict["emailaddress"], json_dict["password"])
+    (checked_dict, http_status) = dbop.check_login(json_dict["emailaddress"], json_dict["password"])
     if checked_dict["message"] == "failure":
-        return jsonify(checked_dict)
+        return jsonify(checked_dict), http_status
     
     result_tuple = dbop.make_session(json_dict["emailaddress"])
     if not result_tuple[0]:
@@ -515,6 +514,9 @@ def verify_login():
         session_id = int(session_id_str)
     except ValueError:
         return None, jsonify({"error": "不正なセッション形式です"}), 401
+    
+    print(type(session_id))
+    print(session_id)
 
     active_session = db.session.get(Session, session_id)
     if not active_session:

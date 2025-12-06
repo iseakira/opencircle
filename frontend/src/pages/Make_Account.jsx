@@ -1,11 +1,14 @@
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import headImage from '../images/head_image.png';
 import Footer from '../conponents/footer.jsx';
 import Header from '../conponents/Header.jsx';
+import { ToastContext } from '../AppContext.jsx';
 
 function Make_Account() {
+  const { setToast } = useContext(ToastContext);
+
   //imput_email.jsxで入力されたメールアドレスとtmp_idを取得
   let initialEmail = '';
   let initialTmpId = '';
@@ -56,7 +59,7 @@ function Make_Account() {
     console.log(formData);
 
     if (password !== passwordConfirm) {
-      alert('パスワードが一致しません');
+      setToast("パスワードが一致していません。")
       return;
     }
     const dataToSend = {
@@ -78,13 +81,14 @@ function Make_Account() {
         console.log('受信したデータ：', data);
         if (data.message === 'success') {
           localStorage.removeItem('to_Make_Account');
-          alert('アカウントを作成しました!3秒後にホーム画面に遷移します!');
+          setToast("アカウントの作成に成功しました")
           setTimeout(() => {
             navigate('/');
           }, 3000);
         }
       } else {
-        alert(`アカウント作成に失敗しました：${response.status}`);
+        const error_response_obj = await response.json();
+        setToast(error_response_obj.error);
       }
     } catch (error) {
       console.error('通信に失敗', error);
