@@ -8,7 +8,7 @@
 .toast{
     /* 見た目 */
     height: auto;
-    width: auto;
+    width: 210px;
     display: flex;
     color: #FFFFFF;
     background: rgb(23, 108, 147);
