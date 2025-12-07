@@ -251,13 +251,13 @@ def check_auth_code(auth_code, tmp_id):
     if tmp_user_db == None:
         cursor.close()
         conn.close()
-        return {"message": "failure", "error_message": "セッション情報がありません。メールアドレスの入力からやり直してください。"}
+        return ({"message": "failure", "error": "No_Tmp_Account"}, 400)
     #回数制限を超えた場合
     if tmp_user_db[2] > 3:
         cursor.execute("DELETE FROM account_creates WHERE tmp_id = ?", (tmp_id,))
         cursor.close()
         conn.close()
-        return {"message": "failure", "error_message": "コードの入力の間違いが一定回数を越えました。メールアドレスの入力からやり直してください。"}
+        return ({"message": "failure", "error": "Exceed_Attempt_Count"}, 400)
     #期限が切れている場合
     if not datetime.datetime.strptime(tmp_user_db[1], '%Y-%m-%d %H:%M:%S') > datetime.datetime.now():
         print(tmp_user_db[1])
@@ -265,20 +265,20 @@ def check_auth_code(auth_code, tmp_id):
         cursor.execute("DELETE FROM account_creates WHERE tmp_id = ?", (tmp_id,))
         cursor.close()
         conn.close()
-        return {"message": "failure", "error_message": "認証コードの期限が過ぎています。メールアドレスの入力からやり直してください。"}
+        return ({"message": "failure", "error": "Expired_Tmp_Account"}, 400)
     #認証コードが間違っている場合
     if tmp_user_db[0] != auth_code:
-        cursor.execute("UPDATE account_creates SET attempt_count = attempt_count + 1 WHERE tmp_id = ?", (tmp_id,))
+        cursor.execute("UPDATE account_creates SET attempt_count = attempt_count + 1 WHERE tmp_id = ?", (tmp_id,)), 401
         conn.commit()
         cursor.close()
         conn.close()
-        return {"message": "failure", "error_message": "認証コードが間違っています。もう一度入力してください。"}
+        return ({"message": "failure", "error": "Wrong_Auth_Code"}, 401)
     #認証成功
     cursor.execute("DELETE FROM account_creates WHERE tmp_id = ?", (tmp_id,))
     conn.commit()
     cursor.close()
     conn.close()
-    return {"message": "success"}
+    return ({"message": "success"}, 200)
 
 def create_account(emailaddress, password, user_name):
     conn = sqlite3.connect(db_path, timeout=2.0)

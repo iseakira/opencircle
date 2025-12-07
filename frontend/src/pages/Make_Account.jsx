@@ -81,7 +81,7 @@ function Make_Account() {
         console.log('受信したデータ：', data);
         if (data.message === 'success') {
           localStorage.removeItem('to_Make_Account');
-          setToast("アカウントの作成に成功しました")
+          setToast("アカウントを作成しました。")
           setTimeout(() => {
             navigate('/');
           }, 3000);

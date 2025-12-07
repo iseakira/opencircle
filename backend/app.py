@@ -92,6 +92,7 @@ def circle_page():
 
 #--- ここからアカウント作成 ---
 @app.route('/add_account', methods=['POST'])
+#発生するエラー: User_Duplication, Database_Time_Out
 def make_tmp_account():
     #json_dict のキーは {"emailaddress"}
     json_dict = request.get_json()
@@ -107,15 +108,16 @@ def make_tmp_account():
         return jsonify({"message": "failure", "error": error}), http_status
 
 @app.route("/create_account", methods=["POST"])
+#発生するエラー: No_Tmp_Account, Exceed_Attempt_Count, Expired_Tmp_Account, Wrong_Auth_Code, Database_Time_Out
 def create_account():
     #json_dict のキーは {"auth_code", "tmp_id", "emailaddress", "password", "user_name"}
     json_dict = request.get_json()
-    checked_dict = dbop.check_auth_code(json_dict["auth_code"], json_dict["tmp_id"])
+    (checked_dict, http_status) = dbop.check_auth_code(json_dict["auth_code"], json_dict["tmp_id"])
     if checked_dict["message"] == "failure":
-        return jsonify(checked_dict)
+        return jsonify(checked_dict), http_status
     success = dbop.create_account(json_dict["emailaddress"], json_dict["password"], json_dict["user_name"])
     if not success:
-        return jsonify({"message": "failure", "error_message": "アカウント作成に失敗しました。もう一度入力してください。"})
+        return jsonify({"message": "failure", "error": "Database_Time_Out"}), 500
     return jsonify({"message": "success"})
 # --- ここまでアカウント作成---
 
@@ -133,6 +135,7 @@ def check_session():
     return jsonify({"is_login": is_login, "user_name": user_name})
 
 @app.route("/login", methods=["POST"])
+#発生するエラー: Wrong_Password, Database_Time_Out
 def login():
     #json_dict のキーは {"emailaddress", "password"}
     json_dict = request.get_json()
@@ -142,13 +145,15 @@ def login():
         return jsonify(checked_dict), http_status
     
     result_tuple = dbop.make_session(json_dict["emailaddress"])
-    if not result_tuple[0]:
+    (complete, session_id_int) = result_tuple
+    if not complete:
         checked_dict["message"] = "failure"
-        return jsonify(checked_dict)
+        checked_dict["error"] = "Database_Time_Out"
+        return jsonify(checked_dict), 500
     else:
         response = make_response(jsonify(checked_dict))
-        session_id = str(result_tuple[1])
-        response.set_cookie("session_id", session_id)
+        session_id_str = str(session_id_int)
+        response.set_cookie("session_id", session_id_str)
         return response
     
 @app.route("/api/logout", methods=["POST"])
@@ -312,8 +317,6 @@ def add_circle():
         "circle_id": new_circle.circle_id,
         "circle_icon_path": icon_path # 保存した画像のパスを返す
     }), 201
-
-
 
 # GET: 1件のサークル情報を取得する
 
@@ -498,9 +501,6 @@ def update_circle(circle_id):
 
 #サークル情報更新⇧
 
-
-
-
 #ここからマイページのコード
 
 #セッション
@@ -589,7 +589,6 @@ def prepare_new_circle():
         "message": "新しいサークル作成ページへ移動します。",
         "next": "/create-circle"
     }), 200
-
 
 # 編集権限の付与
 @app.route("/api/edit-authorization", methods=["POST"])
@@ -768,4 +767,3 @@ def delete_circle(circle_id):
         "message": f"サークル '{circle.circle_name}' を削除しました。",
         "deleted_circle_id": circle_id
     }), 200
-

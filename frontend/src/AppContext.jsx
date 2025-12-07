@@ -23,6 +23,21 @@ function ErrorToText(receive){
         case "Database_Time_Out":
             text = text + "処理が込み合っています。時間を空けて再度送信してください。";
             break;
+        case "No_Tmp_Account":
+            text = text + "セッション情報がありません。再度メールアドレスの入力からやり直してください。";
+            break;
+        case "Exceed_Attempt_Count":
+            text = text + "認証コードの入力回数が一定回数を越えています。再度メールアドレスの入力からやり直してください。";
+            break;
+        case "Expired_Tmp_Account":
+            text = text + "認証コードの期限が切れています。再度メールアドレスの入力からやり直してください";
+            break;
+        case "Wrong_Auth_Code":
+            text = text + "認証コードが間違っています。もう一度入力してください。";
+            break;
+        case "Wrong_Password":
+            text = text + "メールアドレスかパスワードが間違っています。";
+            break;
         default:
             text = text + receive;
     }
