@@ -93,6 +93,7 @@ function Home() {
             <p>サークル情報の取得に失敗しました</p>
           )}
         </div>
+        <br />
       </main>
       <Footer />
     </div>
