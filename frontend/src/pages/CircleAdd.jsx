@@ -190,6 +190,22 @@ function CircleAdd() {
       console.log(key, value);
     }
 
+  //     if (image) {
+  //   console.log("画像ファイル検証ログ:");
+  //   console.log("  name:", image.name);
+  //   console.log("  type:", image.type);
+  //   console.log("  size:", image.size, "bytes");
+  //   console.log("  File オブジェクトそのもの:", image);
+
+  //   const formImage = formData.get('circle_icon_file');
+  //   console.log("FormData に入っている circle_icon_file:", formImage);
+
+  //   if (formImage) {
+  //     console.log("  → 正常に FormData へ追加されています");
+  //   } else {
+  //     console.log("  → ❌ FormData への追加に失敗しています！");
+  //   }
+  // }
     await sendData(formData);
   };
 

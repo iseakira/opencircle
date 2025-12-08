@@ -190,6 +190,7 @@ def save_image_file(file_storage):
         ext = file_storage.filename.rsplit('.', 1)[1].lower()
         filename = f"{uuid.uuid4()}.{ext}"
         
+        
         # 保存先のフルパス
         save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         
