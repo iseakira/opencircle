@@ -9,7 +9,7 @@ const ImageComponent = forwardRef(function Image({onChange,preview,image},ref){
     return (
     <div style={{ marginBottom: "20px" }}>
         <label
-          htmlFor="Cmen"
+          htmlFor="Cicon"
           style={{ display: "block" }}
         >サークル画像</label>
     <div>
@@ -18,13 +18,13 @@ const ImageComponent = forwardRef(function Image({onChange,preview,image},ref){
  accept="image/*"
  onChange={onChange}
  ref={ref}
- id="Cmen" 
+ id="Cicon" 
  />     
  {preview&&(
      <div> 
        <p>プレビュー</p>
          <img src={preview} 
-         alt="" 
+         alt="アップロード画像のプレビュー" 
          style={{
           maxWidth:"300px",
           maxHeight:"300px",

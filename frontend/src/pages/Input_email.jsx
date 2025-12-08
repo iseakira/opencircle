@@ -85,23 +85,25 @@ function Input_email() {
     <div>
       <Header />
       <main>
-        <h3>登録したいメールアドレスを入力してください</h3>
+        <h1>アカウント作成</h1>
+        <p>登録したいメールアドレスを入力してください</p>
         <form onSubmit={email_processing}>
-          <label>メールアドレス：</label>
-          <input
-            type="text"
-            name="text"
-            placeholder="メールアドレス"
-            value={emailaddress}
-            onChange={retain_email}
-            required
-          />
-          <br />
+          <div style={{ marginBottom: '1rem' }}>
+            <label htmlFor="emailaddress">メールアドレス：</label>
+            <input
+              type="email"
+              name="emailaddress"
+              id="emailaddress"
+              placeholder="メールアドレス"
+              value={emailaddress}
+              onChange={retain_email}
+              required
+            />
+          </div>
           <button type="submit" className="exbutton">
             認証コードを送信する
           </button>
         </form>
-        <br />
       </main>
       <Footer />
     </div>
