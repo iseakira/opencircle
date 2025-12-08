@@ -260,7 +260,7 @@ function CircleAdd() {
 
         <form onSubmit={handleKey}>
           <div className="form-group">
-            <label className="label-text">サークル名 *</label>
+            <label htmlFor="Cname" className="label-text">サークル名 *</label>
             <CircleName
               value={circleData.circle_name}
               onChange={NameChange}
@@ -269,7 +269,7 @@ function CircleAdd() {
           </div>
 
           <div className="form-group">
-            <label className="label-text">活動内容・説明 *</label>
+            <label htmlFor="Cdes" className="label-text">活動内容・説明 *</label>
             <CircleDescription
               value={circleData.circle_description}
               onChange={DesChange}
@@ -280,14 +280,14 @@ function CircleAdd() {
           {/* 男女比を横並びに */}
           <div className="grid-row">
             <div className="grid-col form-group">
-              <label className="label-text">男子人数</label>
+              <label htmlFor="Cmen" className="label-text">男子人数</label>
               <CircleMen
                 value={circleData.number_of_male}
                 onChange={MemChange}
               />
             </div>
             <div className="grid-col form-group">
-              <label className="label-text">女子人数</label>
+              <label htmlFor="Cfemen" className="label-text">女子人数</label>
               <CircleFemen
                 value={circleData.number_of_female}
                 onChange={FememChange}
@@ -296,7 +296,7 @@ function CircleAdd() {
           </div>
 
           <div className="form-group">
-            <label className="label-text">会費（円）</label>
+            <label htmlFor="Cfee" className="label-text">会費（円）</label>
             <CircleFee value={circleData.circle_fee} onChange={FeeChange} />
           </div>
 
