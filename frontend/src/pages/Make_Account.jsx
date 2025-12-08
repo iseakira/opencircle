@@ -99,55 +99,65 @@ function Make_Account() {
     <div>
       <Header />
       <main>
-        <h3>
-          パスワードとメールアドレスに送信された認証コードとユーザー名を入力してください
-        </h3>
+        <h1>アカウント作成</h1>
+        <p>
+          パスワードとメールアドレスに送信された認証コード、ユーザー名を入力してください
+        </p>
         <form onSubmit={handleCreateAccount}>
-          <div>
-            <label>パスワード：</label>
+          <fieldset style={{ border: 'none', padding: 0, margin: 0 }}>
+            <legend style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>パスワード設定</legend>
+            <div style={{ marginBottom: '1rem' }}>
+              <label htmlFor="password">パスワード：</label>
+              <input
+                type="password"
+                name="password"
+                id="password"
+                value={formData.password}
+                placeholder="パスワード"
+                required
+                onChange={handleChange}
+              />
+            </div>
+            <div style={{ marginBottom: '1rem' }}>
+              <label htmlFor="passwordConfirm">パスワード確認：</label>
+              <input
+                type="password"
+                name="passwordConfirm"
+                id="passwordConfirm"
+                value={passwordConfirm}
+                placeholder="パスワード確認用"
+                required
+                onChange={(e) => setPasswordConfirm(e.target.value)}
+              />
+            </div>
+          </fieldset>
+          <div style={{ marginBottom: '1rem' }}>
+            <label htmlFor="auth_code">認証コード：</label>
             <input
-              type="password"
-              name="password"
-              value={formData.password}
-              placeholder="パスワード"
+              type="text"
+              name="auth_code"
+              id="auth_code"
+              value={formData.auth_code}
               required
               onChange={handleChange}
             />
-            <br />
+          </div>
+          <div style={{ marginBottom: '1rem' }}>
+            <label htmlFor="user_name">ユーザー名：</label>
             <input
-              type="password"
-              name="passwordConfirm"
-              value={passwordConfirm}
-              placeholder="パスワード確認用"
+              type="text"
+              name="user_name"
+              id="user_name"
+              value={formData.user_name}
               required
-              onChange={(e) => setPasswordConfirm(e.target.value)}
+              onChange={handleChange}
             />
           </div>
-          <br />
-          <label>認証コード：</label>
-          <input
-            type="text"
-            name="auth_code"
-            value={formData.auth_code}
-            required
-            onChange={handleChange}
-          />
-          <br />
-          <label>ユーザー名：</label>
-          <input
-            type="text"
-            name="user_name"
-            value={formData.user_name}
-            required
-            onChange={handleChange}
-          />
-          <br />
           <button type="submit" className="exbutton">
             アカウントを作成する
           </button>
         </form>
-        <br />
-        <div>
+        <div style={{ marginTop: '1rem' }}>
           {result && result.message && (
             <>
               <p>サーバー応答メッセージ: {result.message}</p>
