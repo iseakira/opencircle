@@ -1,150 +1,136 @@
-
-import '../css/App.css'
-import Button from '../conponents/Button'
-import CircleDescription from '../conponents/CircleDescription'
-import CircleFee from '../conponents/CircleFee'
-import CircleName from '../conponents/CircleName'
-// import AddCircle from '../pages/AddCircle'
-import React,{ useState,useRef} from 'react'
-// import '../index.css'
-// import Toggle from './Toggle'
-import Tag from '../conponents/Tag'
-// import { OPTIONS } from './conponents/option'
-import Image from '../conponents/Image'
-import { OPTIONS } from '../conponents/option'
-import CircleMen from '../conponents/CircleMen'
-import CircleFemen from '../conponents/CircleFemen'
+import '../css/App.css';
+import Button from '../conponents/Button';
+import CircleDescription from '../conponents/CircleDescription';
+import CircleFee from '../conponents/CircleFee';
+import CircleName from '../conponents/CircleName';
+import React, { useState, useRef } from 'react';
+import Tag from '../conponents/Tag';
+import Image from '../conponents/Image';
+import { OPTIONS } from '../conponents/option';
+import CircleMen from '../conponents/CircleMen';
+import CircleFemen from '../conponents/CircleFemen';
 import headImage from '../images/head_image.png';
 import { Link } from 'react-router-dom';
-import CircleLogo from '../conponents/CircleLogo'
+import Header from '../conponents/Header.jsx';
 import '../css/CircleAdd.css';
 function CircleAdd() {
-  // const [circleData,setCircleData]=useState({
-  //   circle_name:"",
-  //   circle_description:"",
-  //   circle_fee:"",
-  //   // circle_fee:0,
-  //   number_of_male:"",
-  //   // number_of_male:0,
-  //   number_of_female:"",
-  //   // number_of_female:0,
-  //   //circle_icon_path:"",
-  //   //tags:[],
-  // });
-  const initialCircleData={
-      circle_name:"",
-    circle_description:"",
-    circle_fee:"",
-    number_of_male:"",
-    number_of_female:"",
-  }
-  const [circleData,setCircleData] = useState(initialCircleData);
+  const initialCircleData = {
+    circle_name: '',
+    circle_description: '',
+    circle_fee: '',
+    number_of_male: '',
+    number_of_female: '',
+  };
+  const [circleData, setCircleData] = useState(initialCircleData);
 
-    const NameChange=(e)=>{
+  const NameChange = (e) => {
     setCircleData({
       ...circleData,
-      circle_name:e.target.value,
+      circle_name: e.target.value,
     });
-  }
-  const DesChange=(e)=>{
+  };
+  const DesChange = (e) => {
     setCircleData({
       ...circleData,
-     circle_description:e.target.value, 
-    })
-  }
-  const MemChange=(e)=>{
+      circle_description: e.target.value,
+    });
+  };
+  const MemChange = (e) => {
     setCircleData({
       ...circleData,
-     number_of_male:e.target.value, 
-    })
-  }
-  const FememChange=(e)=>{
+      number_of_male: e.target.value,
+    });
+  };
+  const FememChange = (e) => {
     setCircleData({
       ...circleData,
-     number_of_female:e.target.value, 
-    })
-  }
-  const FeeChange=(e)=>{
+      number_of_female: e.target.value,
+    });
+  };
+  const FeeChange = (e) => {
     setCircleData({
       ...circleData,
-     circle_fee:e.target.value, 
-    })
-  }
-
- 
-
-  
-    
-  const [tags,setCircleTags]=useState([]);
-const [errorFields,setErrorFields]=useState([]);
-  const handleKey=(e)=>{
-       e.preventDefault(); 
-       const errors =[];
-   const {circle_name,circle_description,circle_fee,number_of_male,number_of_female,circle_icon_path,tags}=circleData;
-   if(!circle_name){
-    errors.push("circle_name");
-   }
-   if(!circle_description){
-    errors.push("circle_description");
-   }
-   if(errors.length >0){
-    setErrorFields(errors);
-   }
-   if(!circle_name||!circle_description){
-      alert("*は必須項目です");
-    }else{
-    // alert(`サークルを追加しました`);
-     const result = window.confirm("サークルを追加しますか？");
-
-  if(result){
-       const selectedValues =[
-       selectedBunya,
-       selectedFee,
-       selectedRatio,
-       selectedPlace,
-       selectedMood,
-       selectedActive,
-     ];
-
-     setCircleTags({
-      ...circleData,
-      tags:selectedValues,
-     })
-    alert(`サークルを追加しました`);
-    setErrorFields([]);
-  }else{
-   // alert("キャンセルしました");
-  }
-  }
+      circle_fee: e.target.value,
+    });
   };
 
-  const [selectedBunya,setSelectedBunya]=useState(0);
-  const [selectedFee,setSelectedFee]=useState(0);
-  const [selectedRatio,setSelectedRatio]=useState(0);
-  const [selectedPlace,setSelectedPlace]=useState(0);
-  const [selectedMood,setSelectedMood]=useState(0);
-  const [selectedActive,setSelectedActive]=useState(0);
- 
+  const [tags, setCircleTags] = useState([]);
+  const [errorFields, setErrorFields] = useState([]);
+  const handleKey = (e) => {
+    e.preventDefault();
+    const errors = [];
+    const {
+      circle_name,
+      circle_description,
+      circle_fee,
+      number_of_male,
+      number_of_female,
+      circle_icon_path,
+      tags,
+    } = circleData;
+    if (!circle_name) {
+      errors.push('circle_name');
+    }
+    if (!circle_description) {
+      errors.push('circle_description');
+    }
+    if (errors.length > 0) {
+      setErrorFields(errors);
+    }
+    if (!circle_name || !circle_description) {
+      alert('*は必須項目です');
+    } else {
+      // alert(`サークルを追加しました`);
+      const result = window.confirm('サークルを追加しますか？');
+
+      if (result) {
+        const selectedValues = [
+          selectedBunya,
+          selectedFee,
+          selectedRatio,
+          selectedPlace,
+          selectedMood,
+          selectedActive,
+        ];
+
+        setCircleTags({
+          ...circleData,
+          tags: selectedValues,
+        });
+        alert(`サークルを追加しました`);
+        setErrorFields([]);
+      } else {
+        // alert("キャンセルしました");
+      }
+    }
+  };
+
+  const [selectedBunya, setSelectedBunya] = useState(0);
+  const [selectedFee, setSelectedFee] = useState(0);
+  const [selectedRatio, setSelectedRatio] = useState(0);
+  const [selectedPlace, setSelectedPlace] = useState(0);
+  const [selectedMood, setSelectedMood] = useState(0);
+  const [selectedActive, setSelectedActive] = useState(0);
 
   // const [preview,setPreview]=useState("");
-  const [preview,setPreview]=useState(null);
+  const [preview, setPreview] = useState(null);
 
-  const [image,setImage]=useState(null);
-  
-  const hadleImageChange=(e)=>{
-    const file=e.target.files[0];
-    if(file){
-        setImage(file);
-        setPreview(URL.createObjectURL(file));
-  // const reader = new FileReader();
-  // reader.onloadend = () => {
-    // const
-  // }
-      }
-  }
-  
+  const [image, setImage] = useState(null);
+
+  const hadleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
+      // const reader = new FileReader();
+      // reader.onloadend = () => {
+      // const
+      // }
+    }
+  };
+
   const fileInputRef = useRef(null);
-  const reloadData=()=>{
+  const reloadData = () => {
     setCircleData(initialCircleData);
     setSelectedBunya('');
     setSelectedFee('');
@@ -154,266 +140,209 @@ const [errorFields,setErrorFields]=useState([]);
     setSelectedActive('');
     setImage(null);
     setPreview(null);
-    if(fileInputRef.current){
-      fileInputRef.current.value='';
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
-  }
-  const get_jsontags = async() => {
+  };
+  const get_jsontags = async () => {
     // const dataTosend = {
-      // circle_name:circleData.circle_name,
-      // circle_description:circleData.circle_description,
-      // circle_fee:Number(circleData.circle_fee),
-      // number_of_male:Number(circleData.number_of_male),
-      // number_of_female:Number(circleData.number_of_female),
-      // circle_icon_path:preview,
-      // tags:circleData.selectedValues,
-     const tagList = [
-    Number(selectedBunya),
-    Number(selectedFee),
-    Number(selectedRatio),
-    Number(selectedPlace),
-    Number(selectedMood),
-    Number(selectedActive),
-  ];
+    // circle_name:circleData.circle_name,
+    // circle_description:circleData.circle_description,
+    // circle_fee:Number(circleData.circle_fee),
+    // number_of_male:Number(circleData.number_of_male),
+    // number_of_female:Number(circleData.number_of_female),
+    // circle_icon_path:preview,
+    // tags:circleData.selectedValues,
+    const tagList = [
+      Number(selectedBunya),
+      Number(selectedFee),
+      Number(selectedRatio),
+      Number(selectedPlace),
+      Number(selectedMood),
+      Number(selectedActive),
+    ];
     const formData = new FormData();
-  formData.append("circle_name", circleData.circle_name);
-  formData.append("circle_description", circleData.circle_description);
-  formData.append("circle_fee", circleData.circle_fee || "0");
-  formData.append("number_of_male", circleData.number_of_male || "0");
-  formData.append("number_of_female", circleData.number_of_female || "0");
-  formData.append("tags", JSON.stringify(tagList));
-  // tags:[
-        // Number(selectedBunya),
-      //  Number(selectedFee),
-      //  Number(selectedRatio),
-      //  Number(selectedPlace),
-      //  Number(selectedMood),
-      //  Number(selectedActive),
-      // ]
-     if(image){   
-//  formData.append("circle_icon",circleData.circle_icon);
- formData.append("circle_icon_file",image);
- }  
-   console.log("送信データ (FormData):");
-  for (const [key, value] of formData.entries()) {
-    console.log(key, value);
-  }
+    formData.append('circle_name', circleData.circle_name);
+    formData.append('circle_description', circleData.circle_description);
+    formData.append('circle_fee', circleData.circle_fee || '0');
+    formData.append('number_of_male', circleData.number_of_male || '0');
+    formData.append('number_of_female', circleData.number_of_female || '0');
+    formData.append('tags', JSON.stringify(tagList));
+    // tags:[
+    // Number(selectedBunya),
+    //  Number(selectedFee),
+    //  Number(selectedRatio),
+    //  Number(selectedPlace),
+    //  Number(selectedMood),
+    //  Number(selectedActive),
+    // ]
+    if (image) {
+      //  formData.append("circle_icon",circleData.circle_icon);
+      formData.append('circle_icon_file', image);
+    }
+    console.log('送信データ (FormData):');
+    for (const [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
 
-  await sendData(formData);
-    };
+    await sendData(formData);
+  };
 
+  // const formData = new FormData();
+  // formData.append("json_data",JSON.stringify(dataTosend));
 
-    // const formData = new FormData();
-    // formData.append("json_data",JSON.stringify(dataTosend));
-
- //   const json_stringdata = JSON.stringify(dataTosend);
-//  if(image){   
-//  formData.append("circle_icon",circleData.circle_icon);
-//  }  
-//  console.log('タグのjsonデータ:', json_stringdata);
-    // sendData(json_stringdata);
-    // return json_stringdata;
-// console.log("送信データ内容",dataTosend);
-// await sendData(formData);
-//   };
+  //   const json_stringdata = JSON.stringify(dataTosend);
+  //  if(image){
+  //  formData.append("circle_icon",circleData.circle_icon);
+  //  }
+  //  console.log('タグのjsonデータ:', json_stringdata);
+  // sendData(json_stringdata);
+  // return json_stringdata;
+  // console.log("送信データ内容",dataTosend);
+  // await sendData(formData);
+  //   };
   // const sendData = async (json_stringdata) => {
   const sendData = async (formData) => {
     // const sendData = async (formData) => {
     try {
-      const response = await fetch("http://localhost:5001/api/circles",{
-        method: "POST",
-        body:formData,
+      const response = await fetch('http://localhost:5001/api/circles', {
+        method: 'POST',
+        body: formData,
         // headers:{
-          // 'Content-Type': 'application/json',
+        // 'Content-Type': 'application/json',
         // },
         // body: json_stringdata,
-        credentials:"include",
+        credentials: 'include',
       });
 
-
-
-      if(!response.ok){
+      if (!response.ok) {
         // --- ▼ 3. 認証エラー(401)のハンドリングを追加 ▼ ---
         if (response.status === 401) {
-            // サーバーから '{"error": "..."}' が返ってくる
-            const errorResult = await response.json();
-            alert(`認証エラー: ${errorResult.error || 'ログインセッションが無効です'}`);
+          // サーバーから '{"error": "..."}' が返ってくる
+          const errorResult = await response.json();
+          alert(
+            `認証エラー: ${errorResult.error || 'ログインセッションが無効です'}`
+          );
         } else {
-            // その他のHTTPエラー
-            throw new Error(`HTTP error! status: ${response.status}`);
+          // その他のHTTPエラー
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
         return; // エラー時はここで停止
         // --- ▲ エラーハンドリング完了 ▲ ---
       }
 
-
       const result = await response.json();
-      console.log("サーバーからの応答:", result);
+      console.log('サーバーからの応答:', result);
       // if (receivedData_fb) {
-       // receivedData_fb(result);
+      // receivedData_fb(result);
       //}
-     // alert("データを送信しました")
-
-    }catch (error) {
-      console.error("通信エラー", error);
-    alert("通信に失敗しました");
+      // alert("データを送信しました")
+    } catch (error) {
+      console.error('通信エラー', error);
+      alert('通信に失敗しました');
     }
   };
 
+  const [response_data, setResponse_data] = useState(null);
+  const handleResponse = (data) => {
+    console.log('受信したデータ:', data);
+    setResponse_data(data);
+  };
 
-   const [response_data, setResponse_data] = useState(null);
-    const handleResponse = (data) => {
-      console.log("受信したデータ:", data);
-      setResponse_data(data);
-    };
-  
-//   return (
-
-//     <div>
-//       <header>
-//           {/* <Link to="/"> */}
-//             {/* <img className="logo" src={headImage} alt="アイコン" /> */}
-//           {/* </Link> */}
-//           <CircleLogo></CircleLogo>
-//       </header>
-      
-//       {/* <h1>東京理科大学サークル情報サイト</h1> */}
-//       <h3>追加したいサークルの情報を入力してください</h3>
-//       <p>※「*」の項目は必須</p>
-//       {/* <AddCircle></AddCircle> */}
-//       <form onSubmit={handleKey}> 
-//         <CircleName value={circleData.circle_name} onChange={NameChange} isError={errorFields.includes("circle_name")}></CircleName>
-//         <CircleDescription value={circleData.circle_description} onChange={DesChange} isError={errorFields.includes("circle_description")}></CircleDescription>
-//         <CircleMen value={circleData.number_of_male} onChange={MemChange}></CircleMen>
-//         <CircleFemen value={circleData.number_of_female} onChange={FememChange}></CircleFemen>
-//         <CircleFee value={circleData.circle_fee} onChange={FeeChange}></CircleFee>
-//         <Image onChange={hadleImageChange} preview={preview} image={image} ref={fileInputRef}/> 
-//         <Tag 
-//           selectedBunya={selectedBunya} 
-//           onChangeBunya={setSelectedBunya} 
-//           selectedFee={selectedFee} 
-//           onChangeFee={setSelectedFee} 
-//           selectedRatio={selectedRatio}
-//           onChangeRatio={setSelectedRatio}
-//           selectedPlace={selectedPlace}
-//           onChangePlace={setSelectedPlace}
-//           selectedMood={selectedMood}
-//           onChangeMood={setSelectedMood}
-//           selectedActive={selectedActive}
-//           onChangeActive={setSelectedActive}
-//         ></Tag>
-//        {/*<Tag onChangeBunya={setSelectedBunya} onChangeFee={setSelectedFee} onChangeRatio={setSelectedRatio} onChangePlace={setSelectedPlace} onChangeMood={setSelectedMood} onChangeActive={setSelectedActive} 
-//         //></Tag> 
-  
-//         {/* <Toggle></Toggle> */}
-//         {/* <Button type="submit" onClick={handleKey} ></Button> */}
-//         <p onClick={reloadData}>クリア</p>
-//         <Button type="submit" onClick={get_jsontags} ></Button>
-//         <Link to={"/mypage"} className='link'>マイページへ戻る</Link>
-    
-//       </form> 
-//     </div>
-  
-//   )
-// }
-
-
-return (
+  return (
     <div className="add-page-container">
       <div className="add-card">
-        
-        {/* ヘッダー部分 */}
         <div className="add-header">
-          <CircleLogo />
+          <Header />
           <h3>サークル情報の追加</h3>
           <p>※「*」の項目は必須です</p>
         </div>
 
         <form onSubmit={handleKey}>
-          
           <div className="form-group">
-            <label className="label-text">サークル名 *</label>
-            <CircleName 
-              value={circleData.circle_name} 
-              onChange={NameChange} 
-              isError={errorFields.includes("circle_name")} 
+            <label htmlFor="Cname" className="label-text">サークル名 *</label>
+            <CircleName
+              value={circleData.circle_name}
+              onChange={NameChange}
+              isError={errorFields.includes('circle_name')}
             />
           </div>
 
           <div className="form-group">
-            <label className="label-text">活動内容・説明 *</label>
-            <CircleDescription 
-              value={circleData.circle_description} 
-              onChange={DesChange} 
-              isError={errorFields.includes("circle_description")} 
+            <label htmlFor="Cdes" className="label-text">活動内容・説明 *</label>
+            <CircleDescription
+              value={circleData.circle_description}
+              onChange={DesChange}
+              isError={errorFields.includes('circle_description')}
             />
           </div>
 
           {/* 男女比を横並びに */}
           <div className="grid-row">
             <div className="grid-col form-group">
-              <label className="label-text">男子人数</label>
-              <CircleMen value={circleData.number_of_male} onChange={MemChange} />
+              <label htmlFor="Cmen" className="label-text">男子人数</label>
+              <CircleMen
+                value={circleData.number_of_male}
+                onChange={MemChange}
+              />
             </div>
             <div className="grid-col form-group">
-              <label className="label-text">女子人数</label>
-              <CircleFemen value={circleData.number_of_female} onChange={FememChange} />
+              <label htmlFor="Cfemen" className="label-text">女子人数</label>
+              <CircleFemen
+                value={circleData.number_of_female}
+                onChange={FememChange}
+              />
             </div>
           </div>
 
           <div className="form-group">
-            <label className="label-text">会費（円）</label>
+            <label htmlFor="Cfee" className="label-text">会費（円）</label>
             <CircleFee value={circleData.circle_fee} onChange={FeeChange} />
           </div>
 
           <div className="form-group">
             <label className="label-text">アイコン画像</label>
-            <Image 
-              onChange={hadleImageChange} 
-              preview={preview} 
-              image={image} 
+            <Image
+              onChange={hadleImageChange}
+              preview={preview}
+              image={image}
               ref={fileInputRef}
             />
           </div>
 
           <div className="form-group">
             <label className="label-text">タグ設定</label>
-            <Tag 
-              selectedBunya={selectedBunya} 
-              onChangeBunya={setSelectedBunya} 
-              selectedFee={selectedFee} 
-              onChangeFee={setSelectedFee} 
-              selectedRatio={selectedRatio} 
-              onChangeRatio={setSelectedRatio} 
-              selectedPlace={selectedPlace} 
-              onChangePlace={setSelectedPlace} 
-              selectedMood={selectedMood} 
-              onChangeMood={setSelectedMood} 
-              selectedActive={selectedActive} 
-              onChangeActive={setSelectedActive} 
+            <Tag
+              selectedBunya={selectedBunya}
+              onChangeBunya={setSelectedBunya}
+              selectedFee={selectedFee}
+              onChangeFee={setSelectedFee}
+              selectedRatio={selectedRatio}
+              onChangeRatio={setSelectedRatio}
+              selectedPlace={selectedPlace}
+              onChangePlace={setSelectedPlace}
+              selectedMood={selectedMood}
+              onChangeMood={setSelectedMood}
+              selectedActive={selectedActive}
+              onChangeActive={setSelectedActive}
             />
           </div>
 
-          {/* ボタン類 */}
-          <p onClick={reloadData} className="clear-link">入力をクリア</p>
-          
-          {/* 元のButtonコンポーネントを使う場合、classNameを渡せる作りになっているか確認が必要です。
-              もしButtonコンポーネントがclassNameを受け取らない場合、以下のように直接buttonタグを書くか、
-              divで囲む必要があります。ここでは直接書き換える例を載せます */}
-          
-          {/* <Button type="submit" onClick={get_jsontags} /> の代わり ↓ */}
-<button type="submit" className='allbutton'>
+          <p onClick={reloadData} className="clear-link">
+            入力をクリア
+          </p>
+          <button type="submit" className="allbutton">
             サークルを追加する
           </button>
-
         </form>
 
         <div className="back-link-container">
-          <Link to={"/mypage"} className="back-link">← マイページへ戻る</Link>
+          <Link to={'/mypage'} className="back-link">
+            ← マイページへ戻る
+          </Link>
         </div>
-
       </div>
     </div>
   );
 }
-export default CircleAdd
+export default CircleAdd;

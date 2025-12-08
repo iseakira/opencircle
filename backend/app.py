@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, make_response
-from flask_cors import CORS # ◀ flask_corsをインポート
-from flask import Flask, jsonify, make_response, request, send_from_directory, session
+from flask import Flask, jsonify, make_response, request, send_from_directory
 import json
 from  models import db, Circle, Tag, EditAuthorization, User, Session 
 import os
@@ -11,10 +10,20 @@ from datetime import datetime, timedelta, timezone
 import uuid
 from werkzeug.utils import secure_filename
 import threading
-import hash
+from flask_cors import CORS
 
-import init_db
-import insert_tag
+app = Flask(__name__)
+base_dir = os.path.abspath(os.path.dirname(__file__))
+instance_dir = os.path.join(base_dir, 'instance')
+os.makedirs(instance_dir, exist_ok=True)
+db_path = os.path.join(instance_dir, 'project.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
+CORS(app, 
+resources={r"/*": {"origins": "http://localhost:3000"}},  #変更クッキー関係
+supports_credentials=True
+)
 
 # --- ▼ 1. 画像アップロード設定 ▼ ---
 # 許可する拡張子
@@ -46,37 +55,7 @@ TAG_ID_TO_CATEGORY = {
     15: "active", 16: "active", 17: "active",
     # (ID: 0 の "未選択" はカテゴリがないのでここでは無視)
 }
-# --- ▲▲▲ 対応表の追加完了 ▲▲▲ ---
 
-def create_app():
-    app = Flask(__name__)
-
-    # DB の場所をプロジェクトの backend ディレクトリ内の project.db に設定
-    base_dir = os.path.dirname(__file__)
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(base_dir, "project.db")
-    
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-    upload_dir = os.path.join(base_dir, "uploads")
-    os.makedirs(upload_dir, exist_ok=True)
-    app.config["UPLOAD_FOLDER"] = upload_dir
-    print("UPLOAD_FOLDER 設定:", app.config["UPLOAD_FOLDER"]) 
-    # CORSを有効にする（これでフロントからの通信が許可される）
-    # origins=["http://localhost:3000"] のように限定することも可能
-    CORS(app, 
-     resources={r"/*": {"origins": "http://localhost:3000"}},  #変更クッキー関係
-     supports_credentials=True
-
-)
-    db.init_app(app)
-    
-    #定期的にデータベースの不要データを処理するスレッドを立てる
-    clean_thread = threading.Thread(target = dbop.cleanup_session_tmpid, daemon = True)
-    clean_thread.start()
-
-    return app
-
-app = create_app()
 
 @app.route('/home', methods=['POST'])
 def search():
@@ -113,68 +92,69 @@ def circle_page():
 
 #--- ここからアカウント作成 ---
 @app.route('/add_account', methods=['POST'])
+#発生するエラー: User_Duplication, Database_Time_Out
 def make_tmp_account():
     #json_dict のキーは {"emailaddress"}
     json_dict = request.get_json()
     emailaddress = json_dict["emailaddress"]
-    #data_tuple は (success, auth_code, tmp_id) の形
+    #data_tuple は (success, auth_code, tmp_id, error) の形
     data_tuple = dbop.tmp_registration(emailaddress)
-    if data_tuple[0]:
-        mail_thread = threading.Thread(target = sm.send_auth_code, args=(emailaddress, data_tuple[1]))
+    (success, auth_code, tmp_id, error, http_status) = data_tuple
+    if success:
+        mail_thread = threading.Thread(target = sm.send_auth_code, args=(emailaddress, auth_code))
         mail_thread.start()
-        return jsonify({"message": "success", "tmp_id": data_tuple[2]})
+        return jsonify({"message": "success", "tmp_id": tmp_id})
     else:
-        return jsonify({"message": "failure"})
+        return jsonify({"message": "failure", "error": error}), http_status
 
 @app.route("/create_account", methods=["POST"])
+#発生するエラー: No_Tmp_Account, Exceed_Attempt_Count, Expired_Tmp_Account, Wrong_Auth_Code, Database_Time_Out
 def create_account():
     #json_dict のキーは {"auth_code", "tmp_id", "emailaddress", "password", "user_name"}
     json_dict = request.get_json()
-    checked_dict = dbop.check_auth_code(json_dict["auth_code"], json_dict["tmp_id"])
+    (checked_dict, http_status) = dbop.check_auth_code(json_dict["auth_code"], json_dict["tmp_id"])
     if checked_dict["message"] == "failure":
-        return jsonify(checked_dict)
+        return jsonify(checked_dict), http_status
     success = dbop.create_account(json_dict["emailaddress"], json_dict["password"], json_dict["user_name"])
     if not success:
-        return jsonify({"message": "failure", "error_message": "アカウント作成に失敗しました。もう一度入力してください。"})
+        return jsonify({"message": "failure", "error": "Database_Time_Out"}), 500
     return jsonify({"message": "success"})
 # --- ここまでアカウント作成---
 
 # --- ここからログイン ---
 @app.route("/api/check_login", methods=["POST"])
 def check_session():
-    #session_id = request.cookies.get("session_id")
-    #if session_id == None:
-    #    return jsonify({"isLogin": False})
-    #isLogin = dbop.check_session(session_id)
-    #return jsonify({"isLogin": isLogin})
-
-    #init_db.create_database()
-    #insert_tag.it()
-
+    #dbop.reset()
+    session_id = request.cookies.get("session_id")
+    if session_id == None:
+        return jsonify({"is_login": False})
     user_id = verify_login()[0]
     user_name = ""
     is_login = not (user_id == None)
     if is_login:
         user_name = dbop.get_username(user_id)
-    return jsonify({"isLogin": is_login, "userName": user_name})
+    return jsonify({"is_login": is_login, "user_name": user_name})
 
 @app.route("/login", methods=["POST"])
+#発生するエラー: Wrong_Password, Database_Time_Out
 def login():
     #json_dict のキーは {"emailaddress", "password"}
     json_dict = request.get_json()
 
-    checked_dict = dbop.check_login(json_dict["emailaddress"], json_dict["password"])
+    (checked_dict, http_status) = dbop.check_login(json_dict["emailaddress"], json_dict["password"])
     if checked_dict["message"] == "failure":
-        return jsonify(checked_dict)
+        return jsonify(checked_dict), http_status
     
     result_tuple = dbop.make_session(json_dict["emailaddress"])
-    if not result_tuple[0]:
+    (complete, session_id_int) = result_tuple
+    if not complete:
         checked_dict["message"] = "failure"
-        return jsonify(checked_dict)
+        checked_dict["error"] = "Database_Time_Out"
+        return jsonify(checked_dict), 500
     else:
         response = make_response(jsonify(checked_dict))
-        session_id = str(result_tuple[1])
-        response.set_cookie("session_id", session_id)
+        session_id_str = str(session_id_int)
+        response.set_cookie("session_id", session_id_str)
         return response
     
 @app.route("/api/logout", methods=["POST"])
@@ -338,8 +318,6 @@ def add_circle():
         "circle_id": new_circle.circle_id,
         "circle_icon_path": icon_path # 保存した画像のパスを返す
     }), 201
-
-
 
 # GET: 1件のサークル情報を取得する
 
@@ -524,9 +502,6 @@ def update_circle(circle_id):
 
 #サークル情報更新⇧
 
-
-
-
 #ここからマイページのコード
 
 #セッション
@@ -540,6 +515,9 @@ def verify_login():
         session_id = int(session_id_str)
     except ValueError:
         return None, jsonify({"error": "不正なセッション形式です"}), 401
+    
+    print(type(session_id))
+    print(session_id)
 
     active_session = db.session.get(Session, session_id)
     if not active_session:
@@ -612,7 +590,6 @@ def prepare_new_circle():
         "message": "新しいサークル作成ページへ移動します。",
         "next": "/create-circle"
     }), 200
-
 
 # 編集権限の付与
 @app.route("/api/edit-authorization", methods=["POST"])
@@ -791,4 +768,3 @@ def delete_circle(circle_id):
         "message": f"サークル '{circle.circle_name}' を削除しました。",
         "deleted_circle_id": circle_id
     }), 200
-

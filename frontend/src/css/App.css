@@ -305,7 +305,9 @@ button[aria-expanded]:active {
 }
 
 a {
-  color: black;
+    color: black;
+  display: inline-block;
+  padding: 5px 5px;
 }
 
 .circleTitle{
