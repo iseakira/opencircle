@@ -100,7 +100,7 @@ function Mypage() {
       {/*<header className="page-header">
         <CircleLogo />
       </header>*/}
-      <Header />
+<Header></Header>
       <main>
         <h1>{getUserName()}さんのマイページ</h1>
         <button onClick={() => navigate('/add_circle')} className="allbutton">
@@ -108,7 +108,8 @@ function Mypage() {
         </button>
         {/* owner のみ権限付与ボタン */}
         {isOwner && (
-          <div style={{ position: 'absolute', top: '40px', right: '20px' }}>
+          // <div style={{ position: 'absolute', top: '40px', right: '20px' }}>
+          <div style={{textAlign:'center',marginTop:'40px'}}>
             <button
               onClick={() => setShowAuthForm(!showAuthForm)}
               style={{
@@ -125,7 +126,7 @@ function Mypage() {
               <fieldset
                 ref={authFormRef}
                 style={{
-                  marginTop: '10px',
+                  marginTop: '10px auto',
                   background: 'white',
                   padding: '15px',
                   borderRadius: '8px',
@@ -159,21 +160,17 @@ function Mypage() {
                   </select>
                 </div>
 
-                <div style={{ marginBottom: '10px' }}>
-                  <label htmlFor="targetEmail">ユーザーのメールアドレス</label>
-                  <input
-                    id="targetEmail"
-                    type="email"
-                    placeholder="example@example.com"
-                    value={targetUserEmail}
-                    onChange={(e) => setTargetUserEmail(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '6px',
-                      marginTop: '4px',
-                    }}
-                  />
-                </div>
+                <input
+                  type="email"
+                  placeholder="ユーザーのメールアドレス"
+                  value={targetUserEmail}
+                  onChange={(e) => setTargetUserEmail(e.target.value)}
+                  style={{
+                    width: '90%',
+                    padding: '6px',
+                    marginBottom: '10px',
+                  }}
+                />
 
                 <button
                   onClick={() => handleAddAuthorization('editor')}
@@ -183,6 +180,7 @@ function Mypage() {
                     color: 'white',
                     width: '100%',
                     marginBottom: '8px',
+                    
                   }}
                 >
                   editor 権限付与
