@@ -99,7 +99,7 @@ function Mypage() {
       {/*<header className="page-header">
         <CircleLogo />
       </header>*/}
-
+<Header></Header>
       <main>
         <h1>{getUserName()}さんのマイページ</h1>
         <button onClick={() => navigate('/add_circle')} className="allbutton">
@@ -107,7 +107,8 @@ function Mypage() {
         </button>
         {/* owner のみ権限付与ボタン */}
         {isOwner && (
-          <div style={{ position: 'absolute', top: '40px', right: '20px' }}>
+          // <div style={{ position: 'absolute', top: '40px', right: '20px' }}>
+          <div style={{textAlign:'center',marginTop:'40px'}}>
             <button
               onClick={() => setShowAuthForm(!showAuthForm)}
               style={{
@@ -124,7 +125,7 @@ function Mypage() {
               <div
                 ref={authFormRef}
                 style={{
-                  marginTop: '10px',
+                  marginTop: '10px auto',
                   background: 'white',
                   padding: '15px',
                   borderRadius: '8px',
@@ -159,7 +160,7 @@ function Mypage() {
                   value={targetUserEmail}
                   onChange={(e) => setTargetUserEmail(e.target.value)}
                   style={{
-                    width: '100%',
+                    width: '90%',
                     padding: '6px',
                     marginBottom: '10px',
                   }}
@@ -173,6 +174,7 @@ function Mypage() {
                     color: 'white',
                     width: '100%',
                     marginBottom: '8px',
+                    
                   }}
                 >
                   editor 権限付与

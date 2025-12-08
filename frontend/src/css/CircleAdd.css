@@ -4,10 +4,12 @@
 .add-page-container {
   background-color: #f2f1eb;
   min-height: 100vh;
-  display: flex;
+  /* width: 100%; */
+  display: grid;
+  /* grid-template-columns: 1fr 1fr 1fr; */
   justify-content: center;
   align-items: center;
-  padding: 40px 20px;
+  padding: 4px 20px;
   font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", sans-serif;
 }
 

@@ -235,6 +235,7 @@ function CircleEdit() {
     <div className="edit-page-container">
       <Header />
       <div className="edit-card">
+        <h3>サークル情報編集</h3>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="Cname" className="label-text">サークル名</label>

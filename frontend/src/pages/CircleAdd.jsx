@@ -10,7 +10,7 @@ import { OPTIONS } from '../conponents/option';
 import CircleMen from '../conponents/CircleMen';
 import CircleFemen from '../conponents/CircleFemen';
 import headImage from '../images/head_image.png';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate} from 'react-router-dom';
 import Header from '../conponents/Header.jsx';
 import '../css/CircleAdd.css';
 function CircleAdd() {
@@ -21,6 +21,7 @@ function CircleAdd() {
     number_of_male: '',
     number_of_female: '',
   };
+  const navigate =useNavigate();
   const [circleData, setCircleData] = useState(initialCircleData);
 
   const NameChange = (e) => {
@@ -81,9 +82,9 @@ function CircleAdd() {
       alert('*は必須項目です');
     } else {
       // alert(`サークルを追加しました`);
-      const result = window.confirm('サークルを追加しますか？');
+      // const result = window.confirm('サークルを追加しますか？');
 
-      if (result) {
+      // if (result) {
         const selectedValues = [
           selectedBunya,
           selectedFee,
@@ -97,11 +98,15 @@ function CircleAdd() {
           ...circleData,
           tags: selectedValues,
         });
-        alert(`サークルを追加しました`);
+        
+        // alert(`サークルを追加しました`);
         setErrorFields([]);
-      } else {
+        
+        get_jsontags();
+        navigate('/mypage');
+      // } else {
         // alert("キャンセルしました");
-      }
+      // }
     }
   };
 
@@ -250,10 +255,14 @@ function CircleAdd() {
   };
 
   return (
+
     <div className="add-page-container">
+      <Header></Header>
+     
       <div className="add-card">
+           
         <div className="add-header">
-          <Header />
+
           <h3>サークル情報の追加</h3>
           <p>※「*」の項目は必須です</p>
         </div>
