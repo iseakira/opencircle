@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useCallback } from 'react';
 import AppRouter from './AppRouter';
 import './css/Toast.css';
 
@@ -50,27 +50,26 @@ function ErrorToText(receive){
     return text;
 }
 
-function ToastComponent({ text }){
-    if(text == ""){
-        return (
-            <></>
-        );
-    }else{
-        return (
-            <>
-                <div className="toast">
-                    {text}
-                </div>
-            </>
-        )
-    }
+function ToastComponent({ id, text, remove }){
+    
+    useEffect(
+        ()=>{setTimeout(()=>{remove(id);},5000)}
+        ,[]
+    )
+
+    return(
+        <div className="toast">
+            {text}
+        </div>
+    );
 }
 
 function AppProvider(){
     const [isLogin, setIsLogin] = useState(false);
     const [name, setName] = useState("")
     const [loading, setLoading] = useState(true);
-    const [toastText, setToastText] = useState("")
+    const [toastList, setToastList] = useState([])
+    const [idCount, setIdCount] = useState(0)
 
     async function session_check(){
         try{
@@ -127,17 +126,29 @@ function AppProvider(){
     function setUserName(new_user_name){
         setName(new_user_name);
     }
-    
+
     function setToast(receive){
         const text = ErrorToText(receive);
-        setToastText(text);
-        setTimeout(
-            () => {setToastText("");},
-            5000
+        const buffer_list = toastList.concat();
+        buffer_list.push({id: idCount, text: text});
+        setIdCount(idCount+1);
+        setToastList(
+            (prevToastList)=>{
+                return [...prevToastList, {id: idCount, text: text}];
+            }
         );
     }
 
-    console.log("isLogin = " + isLogin)
+    const removeToast = 
+        useCallback((id)=>{
+            setToastList(
+                (prevToastList) => {
+                    const buffer_list = prevToastList.concat();
+                    const updated_list = buffer_list.filter((toast)=>{return toast.id != id;})
+                    return updated_list;
+                }
+            );
+        },[]);
 
     if(loading){
         return(
@@ -150,7 +161,15 @@ function AppProvider(){
             <AuthContext.Provider value={{getLogin, setLogin, setLogout, getUserName, setUserName}}>
                 <ToastContext.Provider value={{setToast}}>
                     <AppRouter />
-                    <ToastComponent text={toastText}/>
+                    <div className="toast_list">
+                        {toastList.map((toastItem)=>{
+                            return(
+                                <div key={toastItem.id}>
+                                    <ToastComponent id={toastItem.id} text={toastItem.text} remove={removeToast} />
+                                </div>
+                            );
+                        })}
+                    </div>
                 </ToastContext.Provider>
             </AuthContext.Provider>
         );

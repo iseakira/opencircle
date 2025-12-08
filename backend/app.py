@@ -124,6 +124,7 @@ def create_account():
 # --- ここからログイン ---
 @app.route("/api/check_login", methods=["POST"])
 def check_session():
+    #dbop.reset()
     session_id = request.cookies.get("session_id")
     if session_id == None:
         return jsonify({"is_login": False})

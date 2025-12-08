@@ -5,6 +5,15 @@
 ・文字周りに余白
 ・若干透過
 */
+.toast_list{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: fixed;
+    right: 20px;
+    bottom: 50px;
+}
+
 .toast{
     /* 見た目 */
     height: auto;
@@ -16,10 +25,10 @@
     border-radius: 8px;
     opacity: 0.7;
 
-    /* 位置 */
+    /* 位置 
     position: fixed;
     right: 0px;
-    bottom: 50px;
+    bottom: 50px;*/
 
     animation: slideIn 0.3s ease-out, fadeOut 0.3s 3s ease-in forwards;
 }
