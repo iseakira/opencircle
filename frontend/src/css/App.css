@@ -186,6 +186,13 @@ body {
   margin-bottom: 1rem;
 }
 
+.circle-link {
+  display: block;
+  width: 100%;
+  text-decoration: none;
+  padding: 0%;
+}
+
 .circle-info {
   display: flex;
   align-items: center;
@@ -225,7 +232,7 @@ button[aria-expanded] {
               border-color 0.3s ease,
               transform 0.3s ease,
               box-shadow 0.3s ease;
-  margin-top: 1rem;
+  margin: 1rem 0;
 }
 button[aria-expanded]:hover {
   background-color: var(--accent-color-white);
@@ -316,15 +323,21 @@ button[aria-expanded]:active {
 
 .descon{
   max-width: 500px;
+  width: 100%;
   margin: 0 auto;
-  }
+  box-sizing: border-box;
+}
 
 .row{
   display: grid;
- grid-template-columns: 120px 1fr;
- align-items: start;
- gap: 70px;
- padding: 4px 0;
+  grid-template-columns: minmax(120px, 200px) minmax(0, 1fr);
+  align-items: start;
+  gap: 16px;
+  padding: 4px 0;
+  width: 100%;
+  box-sizing: border-box;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .kou{
@@ -337,6 +350,8 @@ button[aria-expanded]:active {
   text-align: left;
   /* font-weight: bold; */
   /* margin-left: 30px; */
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 a {

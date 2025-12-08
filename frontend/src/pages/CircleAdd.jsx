@@ -310,7 +310,7 @@ function CircleAdd() {
           </div>
 
           <div className="form-group">
-            <label className="label-text">アイコン画像</label>
+            <label className="label-text" htmlFor="Cicon">アイコン画像</label>
             <Image
               onChange={hadleImageChange}
               preview={preview}
