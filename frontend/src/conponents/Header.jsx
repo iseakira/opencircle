@@ -13,6 +13,7 @@ export default function Header() {
   };
   return (
     <header className="page-header">
+      <a href="#main" className="skip-link">メインコンテンツへスキップ</a>
       <Link to="/">
         <img className="logo" src={headImage} alt="アイコン" />
       </Link>

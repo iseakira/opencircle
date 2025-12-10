@@ -41,13 +41,31 @@ body {
   transform: scale(0.8);
 }
 
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  background: #fff;
+  color: #000;
+  padding: 8px 12px;
+  z-index: 10000;
+  border: 2px solid #000;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+.skip-link:focus {
+  left: 8px;
+  top: 8px;
+  outline: 2px solid #333;
+}
+
 .mypage_button{
   display: inline-flex;
   align-items: center;
   position: fixed;
   right: 130px;
   top: 0.2rem;
-  z-index: 1000;
+  z-index: 1101;
   padding: 8px 18px;
   border-radius: 99px;
   height: 2em;
@@ -74,21 +92,28 @@ body {
 .login {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   position: fixed;
   right: 0;
   top: 0.2rem;
   z-index: 1000;
   padding: 8px 18px;
   border-radius: 99px;
-  height: 2em;
+  min-height: 2.5rem;
   width: auto;
   background-color: var(--accent-color);
   border: 2px solid var(--accent-color);
-  color:var(--base-color);
+  color: var(--base-color);
   font-weight: bold;
   font-size: 0.9rem;
+  font-family: inherit;
+  line-height: 2;
+  margin: 0;
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
   text-decoration: none;
-
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease,
               transform 0.15s ease, box-shadow 0.2s ease;

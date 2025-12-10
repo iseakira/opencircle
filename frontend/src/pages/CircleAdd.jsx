@@ -3,7 +3,7 @@ import Button from '../conponents/Button';
 import CircleDescription from '../conponents/CircleDescription';
 import CircleFee from '../conponents/CircleFee';
 import CircleName from '../conponents/CircleName';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Tag from '../conponents/Tag';
 import Image from '../conponents/Image';
 import { OPTIONS } from '../conponents/option';
@@ -14,6 +14,10 @@ import { Link,useNavigate} from 'react-router-dom';
 import Header from '../conponents/Header.jsx';
 import '../css/CircleAdd.css';
 function CircleAdd() {
+  useEffect(() => {
+    document.title = 'サークル追加 - 東京理科大学サークル情報サイト';
+  }, []);
+
   const initialCircleData = {
     circle_name: '',
     circle_description: '',
@@ -291,6 +295,11 @@ function CircleAdd() {
               onChange={NameChange}
               isError={errorFields.includes('circle_name')}
             />
+            {errorFields.includes('circle_name') && (
+              <p role="alert" style={{ color: 'red', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+                サークル名は必須項目です
+              </p>
+            )}
           </div>
 
           <div className="form-group">
@@ -300,6 +309,11 @@ function CircleAdd() {
               onChange={DesChange}
               isError={errorFields.includes('circle_description')}
             />
+            {errorFields.includes('circle_description') && (
+              <p role="alert" style={{ color: 'red', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+                活動内容・説明は必須項目です
+              </p>
+            )}
           </div>
 
           {/* 男女比を横並びに */}
@@ -353,9 +367,12 @@ function CircleAdd() {
             />
           </div>
 
-          <p onClick={reloadData} className="clear-link">
+          <button
+            onClick={reloadData}
+            className="clear-link"
+          >
             入力をクリア
-          </p>
+          </button>
           <button type="submit" className="allbutton">
             サークルを追加する
           </button>

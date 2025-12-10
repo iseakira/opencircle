@@ -23,6 +23,7 @@ function Mypage() {
 
   // マイページデータ取得
   useEffect(() => {
+    document.title = 'マイページ - 東京理科大学サークル情報サイト';
     fetch('http://localhost:5001/api/mypage', { credentials: 'include' })
       .then(async (res) => {
         if (!res.ok) throw new Error('データの取得に失敗しました');
