@@ -102,8 +102,8 @@ function CircleAdd() {
           ...circleData,
           tags: selectedValues,
         });
-        
-        // alert(`サークルを追加しました`);
+        get_jsontags();
+        alert(`サークルを追加しました`);
         setErrorFields([]);
         
         get_jsontags();
