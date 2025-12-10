@@ -83,7 +83,7 @@ function CircleAdd() {
       setErrorFields(errors);
     }
     if (!circle_name || !circle_description) {
-      alert('*は必須項目です');
+      // alert('*は必須項目です');
     } else {
       // alert(`サークルを追加しました`);
       // const result = window.confirm('サークルを追加しますか？');
@@ -102,8 +102,8 @@ function CircleAdd() {
           ...circleData,
           tags: selectedValues,
         });
-        
-        // alert(`サークルを追加しました`);
+        get_jsontags();
+        alert(`サークルを追加しました`);
         setErrorFields([]);
         
         get_jsontags();
@@ -139,7 +139,8 @@ function CircleAdd() {
   };
 
   const fileInputRef = useRef(null);
-  const reloadData = () => {
+  const reloadData = (e) => {
+    e.preventDefault();
     setCircleData(initialCircleData);
     setSelectedBunya('');
     setSelectedFee('');
@@ -194,6 +195,22 @@ function CircleAdd() {
       console.log(key, value);
     }
 
+  //     if (image) {
+  //   console.log("画像ファイル検証ログ:");
+  //   console.log("  name:", image.name);
+  //   console.log("  type:", image.type);
+  //   console.log("  size:", image.size, "bytes");
+  //   console.log("  File オブジェクトそのもの:", image);
+
+  //   const formImage = formData.get('circle_icon_file');
+  //   console.log("FormData に入っている circle_icon_file:", formImage);
+
+  //   if (formImage) {
+  //     console.log("  → 正常に FormData へ追加されています");
+  //   } else {
+  //     console.log("  → ❌ FormData への追加に失敗しています！");
+  //   }
+  // }
     await sendData(formData);
   };
 
@@ -248,7 +265,7 @@ function CircleAdd() {
       // alert("データを送信しました")
     } catch (error) {
       console.error('通信エラー', error);
-      alert('通信に失敗しました');
+      // alert('通信に失敗しました');
     }
   };
 
@@ -272,6 +289,7 @@ function CircleAdd() {
         </div>
 
         <form onSubmit={handleKey}>
+        
           <div className="form-group">
             <label htmlFor="Cname" className="label-text">サークル名 *</label>
             <CircleName
@@ -352,6 +370,7 @@ function CircleAdd() {
           </div>
 
           <button
+          type="button"
             onClick={reloadData}
             className="clear-link"
           >
