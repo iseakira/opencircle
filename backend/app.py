@@ -13,6 +13,7 @@ import threading
 from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app, origins=["http://localhost:3000"], supports_credentials=True)
 base_dir = os.path.abspath(os.path.dirname(__file__))
 instance_dir = os.path.join(base_dir, 'instance')
 os.makedirs(instance_dir, exist_ok=True)
@@ -20,10 +21,7 @@ db_path = os.path.join(instance_dir, 'project.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
-CORS(app, 
-resources={r"/*": {"origins": "http://localhost:3000"}},  #変更クッキー関係
-supports_credentials=True
-)
+
 
 # --- ▼ 1. 画像アップロード設定 ▼ ---
 # 許可する拡張子
