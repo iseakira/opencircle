@@ -6,7 +6,7 @@ import Toggle from './Toggle.jsx';
 import { useContext } from 'react';
 import { ToastContext } from '../AppContext.jsx';
 import LoginOutButton from './LogInOutButton.jsx';
-import Footer from '../conponents/footer.jsx';
+import Footer from '../conponents/Footer.jsx';
 import Header from '../conponents/Header.jsx';
 
 function Home() {

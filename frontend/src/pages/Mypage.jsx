@@ -4,7 +4,7 @@ import '../css/App.css';
 import headImage from '../images/head_image.png';
 import { AuthContext } from '../AppContext.jsx';
 import Header from '../conponents/Header.jsx';
-import Footer from '../conponents/footer';
+import Footer from '../conponents/Footer';
 
 function Mypage() {
   const{ getUserName } = useContext(AuthContext);
