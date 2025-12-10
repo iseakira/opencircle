@@ -616,7 +616,7 @@ def add_edit_authorization():
     ).first()
     if not owner_auth:
         return jsonify({"error": "このサークルに権限を付与する権限がありません"}), 403
-    target_user = User.query.filter_by(mail_adress=target_email).first()
+    target_user = User.query.filter_by(mail_address=target_email).first()
     if not target_user:
         return jsonify({"error": "指定したメールアドレスのユーザーが見つかりません"}), 404
     target_user_id = target_user.user_id
