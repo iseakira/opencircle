@@ -83,7 +83,7 @@ function CircleAdd() {
       setErrorFields(errors);
     }
     if (!circle_name || !circle_description) {
-      alert('*は必須項目です');
+      // alert('*は必須項目です');
     } else {
       // alert(`サークルを追加しました`);
       // const result = window.confirm('サークルを追加しますか？');
@@ -139,7 +139,8 @@ function CircleAdd() {
   };
 
   const fileInputRef = useRef(null);
-  const reloadData = () => {
+  const reloadData = (e) => {
+    e.preventDefault();
     setCircleData(initialCircleData);
     setSelectedBunya('');
     setSelectedFee('');
@@ -264,7 +265,7 @@ function CircleAdd() {
       // alert("データを送信しました")
     } catch (error) {
       console.error('通信エラー', error);
-      alert('通信に失敗しました');
+      // alert('通信に失敗しました');
     }
   };
 
@@ -288,6 +289,7 @@ function CircleAdd() {
         </div>
 
         <form onSubmit={handleKey}>
+        
           <div className="form-group">
             <label htmlFor="Cname" className="label-text">サークル名 *</label>
             <CircleName
@@ -368,6 +370,7 @@ function CircleAdd() {
           </div>
 
           <button
+          type="button"
             onClick={reloadData}
             className="clear-link"
           >

@@ -129,6 +129,7 @@ function CircleEdit() {
     }
     
     if (errors.length > 0) {
+    // if (errorFields.includes('circle_name')) {
       setErrorFields(errors);
       alert('サークル名と活動内容・説明は必須です');
       return;
