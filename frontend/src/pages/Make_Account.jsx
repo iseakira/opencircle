@@ -41,6 +41,7 @@ function Make_Account() {
     tmp_id: initialTmpId,
   });
   useEffect(() => {
+    document.title = 'アカウント作成 - 東京理科大学サークル情報サイト';
     localStorage.removeItem('to_Make_Account');
     console.log('localStorageを削除しました');
   }, []);

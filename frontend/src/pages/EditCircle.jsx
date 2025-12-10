@@ -86,6 +86,7 @@ function CircleEdit() {
 
   // 2. 最初の読み込みでその関数を使う
   useEffect(() => {
+    document.title = 'サークル編集 - 東京理科大学サークル情報サイト';
     fetchCircleData();
   }, [circleId]);
 

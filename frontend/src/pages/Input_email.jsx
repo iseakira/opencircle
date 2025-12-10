@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import headImage from '../images/head_image.png';
 import Footer from '../conponents/footer.jsx';
@@ -7,6 +7,9 @@ import Header from '../conponents/Header.jsx';
 import { ToastContext } from '../AppContext.jsx';
 
 function Input_email() {
+  useEffect(() => {
+    document.title = 'メールアドレス確認 - 東京理科大学サークル情報サイト';
+  }, []);
 
   const { setToast } = useContext(ToastContext);
   //入力されたメールアドレスを保持するステート

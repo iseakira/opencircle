@@ -3,7 +3,7 @@ import Button from '../conponents/Button';
 import CircleDescription from '../conponents/CircleDescription';
 import CircleFee from '../conponents/CircleFee';
 import CircleName from '../conponents/CircleName';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Tag from '../conponents/Tag';
 import Image from '../conponents/Image';
 import { OPTIONS } from '../conponents/option';
@@ -14,6 +14,10 @@ import { Link,useNavigate} from 'react-router-dom';
 import Header from '../conponents/Header.jsx';
 import '../css/CircleAdd.css';
 function CircleAdd() {
+  useEffect(() => {
+    document.title = 'サークル追加 - 東京理科大学サークル情報サイト';
+  }, []);
+
   const initialCircleData = {
     circle_name: '',
     circle_description: '',

@@ -32,6 +32,7 @@ function Circle_Page() {
   }
   console.log(id + ' ' + typeof id);
   useEffect(() => {
+    document.title = 'サークル詳細 - 東京理科大学サークル情報サイト';
     get_circle_data(id);
     setLoading(false);
   }, []);
