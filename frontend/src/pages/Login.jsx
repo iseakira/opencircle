@@ -8,6 +8,10 @@ import Header from '../conponents/Header';
 import Footer from '../conponents/footer';
 
 function Login() {
+  React.useEffect(() => {
+    document.title = 'ログイン - 東京理科大学サークル情報サイト';
+  }, []);
+
   const {setToast} = useContext(ToastContext);
   const { setLogin, getUserName, setUserName } = useContext(AuthContext);
 

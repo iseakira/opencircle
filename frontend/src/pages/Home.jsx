@@ -52,6 +52,7 @@ function Home() {
 
   useEffect(() => {
     catch_all_circles();
+    document.title = 'サークル一覧 - 東京理科大学サークル情報サイト';
   }, []);
 
   return (

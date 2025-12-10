@@ -1,4 +1,3 @@
-from flask import Flask, jsonify, make_response
 from flask import Flask, jsonify, make_response, request, send_from_directory
 import json
 from  models import db, Circle, Tag, EditAuthorization, User, Session 
