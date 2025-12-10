@@ -55,30 +55,18 @@ TAG_ID_TO_CATEGORY = {
     15: "active", 16: "active", 17: "active",
     # (ID: 0 の "未選択" はカテゴリがないのでここでは無視)
 }
-
-
 @app.route('/home', methods=['POST'])
-def search():
+def get_circles():
     try:
-        json_data = request.json 
-        if json_data is None:
-            print('search_circles error: Request body is empty or not JSON')
-            return jsonify({"error": "不正なデータ形式"}), 400
-        items = dbop.search_circles(json_data)
-        return jsonify({"items": items, "total": len(items)})
-    except Exception as e:
-        print('search_circles error:', e)
-        return jsonify({"error": "サーバーエラー"}), 500
+        json_data=request.get_json(silent=True)
 
-@app.route('/homestart', methods=['POST'])
-def initial_circles():
-    # DB から初期表示用のサークル一覧を取得して返す
-    try:
-        items = dbop.get_initial_circles()
-        return jsonify({"items": items, "total": len(items)})
+        if json_data and len(json_data) > 0:
+            items = dbop.search_circles(json_data)
+        else:
+            items = dbop.get_initial_circles()
+        return jsonify({"items":items, "total":len(items)})
     except Exception as e:
-        # エラー時はログ出力して 500 を返す
-        print('get_initial_circles error:', e)
+        print('get_circles error:', e)
         return jsonify({"error": "サーバーエラー"}), 500
 
 @app.route('/Circle_Page', methods=['POST'])

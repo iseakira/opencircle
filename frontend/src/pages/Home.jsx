@@ -25,9 +25,11 @@ function Home() {
     try {
       setIsLoading(true);
       setError(null);
-      const initial_response = await fetch('http://localhost:5001/homestart', {
+      const fetchbody = {};
+      const initial_response = await fetch('http://localhost:5001/home', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(fetchbody),
       });
       if (initial_response.ok) {
         const data = await initial_response.json();
@@ -72,10 +74,20 @@ function Home() {
           ) : response_data &&
             response_data.items &&
             response_data.items.length > 0 ? (
-            <ul style={{ listStyle: 'none', padding: 0, textAlign: 'left', width: 'auto' }}>
+            <ul
+              style={{
+                listStyle: 'none',
+                padding: 0,
+                textAlign: 'left',
+                width: 'auto',
+              }}
+            >
               {response_data.items.map((circle) => (
                 <li key={circle.circle_id}>
-                  <Link className="circle-link" to={`/Circle_Page/${circle.circle_id}`}>
+                  <Link
+                    className="circle-link"
+                    to={`/Circle_Page/${circle.circle_id}`}
+                  >
                     <div className="circle-info" style={{ cursor: 'pointer' }}>
                       <img
                         src={circle.circle_icon_path}
@@ -83,7 +95,7 @@ function Home() {
                         alt={`${circle.circle_name}のアイコン`}
                       />
                       <p>サークル名: {circle.circle_name}</p>
-                      <p>分野：{circle.field||'未設定'}</p>
+                      <p>分野：{circle.field || '未設定'}</p>
                     </div>
                   </Link>
                 </li>
