@@ -3,17 +3,21 @@ import Button from '../conponents/Button';
 import CircleDescription from '../conponents/CircleDescription';
 import CircleFee from '../conponents/CircleFee';
 import CircleName from '../conponents/CircleName';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Tag from '../conponents/Tag';
 import Image from '../conponents/Image';
 import { OPTIONS } from '../conponents/option';
 import CircleMen from '../conponents/CircleMen';
 import CircleFemen from '../conponents/CircleFemen';
 import headImage from '../images/head_image.png';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate} from 'react-router-dom';
 import Header from '../conponents/Header.jsx';
 import '../css/CircleAdd.css';
 function CircleAdd() {
+  useEffect(() => {
+    document.title = 'サークル追加 - 東京理科大学サークル情報サイト';
+  }, []);
+
   const initialCircleData = {
     circle_name: '',
     circle_description: '',
@@ -21,6 +25,7 @@ function CircleAdd() {
     number_of_male: '',
     number_of_female: '',
   };
+  const navigate =useNavigate();
   const [circleData, setCircleData] = useState(initialCircleData);
 
   const NameChange = (e) => {
@@ -81,9 +86,9 @@ function CircleAdd() {
       alert('*は必須項目です');
     } else {
       // alert(`サークルを追加しました`);
-      const result = window.confirm('サークルを追加しますか？');
+      // const result = window.confirm('サークルを追加しますか？');
 
-      if (result) {
+      // if (result) {
         const selectedValues = [
           selectedBunya,
           selectedFee,
@@ -100,9 +105,12 @@ function CircleAdd() {
         get_jsontags();
         alert(`サークルを追加しました`);
         setErrorFields([]);
-      } else {
+        
+        get_jsontags();
+        navigate('/mypage');
+      // } else {
         // alert("キャンセルしました");
-      }
+      // }
     }
   };
 
@@ -251,10 +259,14 @@ function CircleAdd() {
   };
 
   return (
+
     <div className="add-page-container">
+      <Header></Header>
+     
       <div className="add-card">
+           
         <div className="add-header">
-          <Header />
+
           <h3>サークル情報の追加</h3>
           <p>※「*」の項目は必須です</p>
         </div>
@@ -267,6 +279,11 @@ function CircleAdd() {
               onChange={NameChange}
               isError={errorFields.includes('circle_name')}
             />
+            {errorFields.includes('circle_name') && (
+              <p role="alert" style={{ color: 'red', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+                サークル名は必須項目です
+              </p>
+            )}
           </div>
 
           <div className="form-group">
@@ -276,6 +293,11 @@ function CircleAdd() {
               onChange={DesChange}
               isError={errorFields.includes('circle_description')}
             />
+            {errorFields.includes('circle_description') && (
+              <p role="alert" style={{ color: 'red', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+                活動内容・説明は必須項目です
+              </p>
+            )}
           </div>
 
           {/* 男女比を横並びに */}
@@ -302,7 +324,7 @@ function CircleAdd() {
           </div>
 
           <div className="form-group">
-            <label className="label-text">アイコン画像</label>
+            <label className="label-text" htmlFor="Cicon">アイコン画像</label>
             <Image
               onChange={hadleImageChange}
               preview={preview}
@@ -329,9 +351,12 @@ function CircleAdd() {
             />
           </div>
 
-          <p onClick={reloadData} className="clear-link">
+          <button
+            onClick={reloadData}
+            className="clear-link"
+          >
             入力をクリア
-          </p>
+          </button>
           <button type="submit" className="allbutton">
             サークルを追加する
           </button>

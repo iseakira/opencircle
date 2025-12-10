@@ -32,6 +32,7 @@ function Circle_Page() {
   }
   console.log(id + ' ' + typeof id);
   useEffect(() => {
+    document.title = 'サークル詳細 - 東京理科大学サークル情報サイト';
     get_circle_data(id);
     setLoading(false);
   }, []);
@@ -43,7 +44,7 @@ function Circle_Page() {
       <div>
         <Header />
         <LoginOutButton />
-        <main>
+        <main id="main">
           <h1>サークルページ</h1>
           <div>
             {responseData === null ? (
@@ -52,38 +53,38 @@ function Circle_Page() {
               <div>
                 <img
                   src={responseData.circle_icon}
-                  alt="サークルアイコン"
+                  alt={`${responseData.circle_name}のアイコン`}
                   className="circle_icon_page"
                 />
 
-                <div className="descon">
+                <dl className="descon">
                   <div className="row">
-                    <div className="kou">サークル名</div>
-                    <div className="data">{responseData.circle_name}</div>
+                    <dt className="kou">サークル名</dt>
+                    <dd className="data">{responseData.circle_name}</dd>
                   </div>
 
                   <div className="row">
-                    <div className="kou">サークル説明</div>
-                    <div className="data">
+                    <dt className="kou">サークル説明</dt>
+                    <dd className="data">
                       {responseData.circle_description}
-                    </div>
+                    </dd>
                   </div>
 
                   <div className="row">
-                    <div className="kou">費用</div>
-                    <div className="data">{responseData.circle_fee}円</div>
+                    <dt className="kou">費用</dt>
+                    <dd className="data">{responseData.circle_fee}円</dd>
                   </div>
 
                   <div className="row">
-                    <div className="kou">男性</div>
-                    <div className="data">{responseData.number_of_male}</div>
+                    <dt className="kou">男性</dt>
+                    <dd className="data">{responseData.number_of_male}</dd>
                   </div>
 
                   <div className="row">
-                    <div className="kou">女性</div>
-                    <div className="data">{responseData.number_of_female}</div>
+                    <dt className="kou">女性</dt>
+                    <dd className="data">{responseData.number_of_female}</dd>
                   </div>
-                </div>
+                </dl>
 
                 <div>
                   <Circleitems items={responseData.tags}></Circleitems>
@@ -93,11 +94,11 @@ function Circle_Page() {
               <p>サークル情報が読み込めませんでした</p>
             )}
           </div>
-          <h3>
+          <h2>
             <Link to="/" className="link">
               ホーム画面に戻る
             </Link>
-          </h3>
+          </h2>
         </main>
       </div>
     );

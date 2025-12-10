@@ -2,8 +2,9 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef, useContext } from 'react';
 import '../css/App.css';
 import headImage from '../images/head_image.png';
-import Header from '../conponents/Header.jsx';
 import { AuthContext } from '../AppContext.jsx';
+import Header from '../conponents/Header.jsx';
+import Footer from '../conponents/footer';
 
 function Mypage() {
   const{ getUserName } = useContext(AuthContext);
@@ -22,6 +23,7 @@ function Mypage() {
 
   // マイページデータ取得
   useEffect(() => {
+    document.title = 'マイページ - 東京理科大学サークル情報サイト';
     fetch('http://localhost:5001/api/mypage', { credentials: 'include' })
       .then(async (res) => {
         if (!res.ok) throw new Error('データの取得に失敗しました');
@@ -99,7 +101,7 @@ function Mypage() {
       {/*<header className="page-header">
         <CircleLogo />
       </header>*/}
-
+<Header></Header>
       <main>
         <h1>{getUserName()}さんのマイページ</h1>
         <button onClick={() => navigate('/add_circle')} className="allbutton">
@@ -107,7 +109,8 @@ function Mypage() {
         </button>
         {/* owner のみ権限付与ボタン */}
         {isOwner && (
-          <div style={{ position: 'absolute', top: '40px', right: '20px' }}>
+          // <div style={{ position: 'absolute', top: '40px', right: '20px' }}>
+          <div style={{textAlign:'center',marginTop:'40px'}}>
             <button
               onClick={() => setShowAuthForm(!showAuthForm)}
               style={{
@@ -121,37 +124,42 @@ function Mypage() {
             </button>
 
             {showAuthForm && (
-              <div
+              <fieldset
                 ref={authFormRef}
                 style={{
-                  marginTop: '10px',
+                  marginTop: '10px auto',
                   background: 'white',
                   padding: '15px',
                   borderRadius: '8px',
                   boxShadow: '0 0 6px rgba(0,0,0,0.15)',
                   width: '260px',
+                  border: '1px solid #ddd',
                 }}
               >
-                <h4>権限付与</h4>
+                <legend>権限付与</legend>
 
-                <select
-                  value={selectedCircleId}
-                  onChange={(e) => setSelectedCircleId(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '6px',
-                    marginBottom: '10px',
-                  }}
-                >
-                  <option value="">サークルを選択</option>
-                  {circles
-                    .filter((c) => (c.role || '').toLowerCase() === 'owner')
-                    .map((c) => (
-                      <option key={c.circle_id} value={c.circle_id}>
-                        {c.circle_name}
-                      </option>
-                    ))}
-                </select>
+                <div style={{ marginBottom: '10px' }}>
+                  <label htmlFor="selectCircle">サークルを選択</label>
+                  <select
+                    id="selectCircle"
+                    value={selectedCircleId}
+                    onChange={(e) => setSelectedCircleId(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '6px',
+                      marginTop: '4px',
+                    }}
+                  >
+                    <option value="">サークルを選択</option>
+                    {circles
+                      .filter((c) => (c.role || '').toLowerCase() === 'owner')
+                      .map((c) => (
+                        <option key={c.circle_id} value={c.circle_id}>
+                          {c.circle_name}
+                        </option>
+                      ))}
+                  </select>
+                </div>
 
                 <input
                   type="email"
@@ -159,7 +167,7 @@ function Mypage() {
                   value={targetUserEmail}
                   onChange={(e) => setTargetUserEmail(e.target.value)}
                   style={{
-                    width: '100%',
+                    width: '90%',
                     padding: '6px',
                     marginBottom: '10px',
                   }}
@@ -173,6 +181,7 @@ function Mypage() {
                     color: 'white',
                     width: '100%',
                     marginBottom: '8px',
+                    
                   }}
                 >
                   editor 権限付与
@@ -192,27 +201,41 @@ function Mypage() {
 
                 {message && <p style={{ color: 'green' }}>{message}</p>}
                 {error && <p style={{ color: 'red' }}>{error}</p>}
-              </div>
+              </fieldset>
             )}
           </div>
         )}
         <h2 style={{ marginTop: '40px' }}>編集できるサークル一覧</h2>
-        <div className="circle-list">
-          {circles.length > 0 ? (
-            circles.map((c) => (
-              <div
-                key={c.circle_id}
-                className="circle-info"
-                onClick={() => navigate(`/edit-circle/${c.circle_id}`)}
-              >
-                {c.circle_name}（{c.role}）
-              </div>
-            ))
-          ) : (
-            <p>編集できるサークルがありません。</p>
-          )}
-        </div>
+        {circles.length > 0 ? (
+          <ul className="circle-list" style={{ listStyle: 'none', padding: 0, width: 'auto' }}>
+            {circles.map((c) => (
+              <li key={c.circle_id}>
+                <button
+                  onClick={() => navigate(`/edit-circle/${c.circle_id}`)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: 0,
+                    width: '100%',
+                    textAlign: 'left',
+                  }}
+                >
+                  <div
+                    className="circle-info"
+                    style={{ cursor: 'pointer', margin: 0 }}
+                  >
+                    {c.circle_name}（{c.role}）
+                  </div>
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>編集できるサークルがありません。</p>
+        )}
       </main>
+      <Footer />
     </div>
   );
 }

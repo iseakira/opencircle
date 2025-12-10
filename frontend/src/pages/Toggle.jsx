@@ -1,5 +1,5 @@
 import { useState } from 'react';
-
+import '../css/App.css';
 function Toggle({receivedData_fb}) {
   //トグル操作
   const [visible, setVisible] = useState(false);
@@ -79,6 +79,7 @@ function Toggle({receivedData_fb}) {
 
   // const [selectRelord,setselectReload] =useState(null);
  const reloadSelect =()=> {
+  setSearch_term('');
   setField('');
   setCircle_fee('');
   setGender_ratio('');
@@ -97,9 +98,17 @@ function Toggle({receivedData_fb}) {
       {visible && (
         <div className="tag-select">
           <h4>キーワードを入力するかタグを選択してください</h4>       
-          <div className="tags">
-            キーワード検索:<input type="text" placeholder="キーワードを入力" value={search_term} onChange={change_search_term} />
-            <br/>
+
+<div className='search'>
+           <p> キーワード検索</p>
+           <div className='input-group'>
+           <input type="text" placeholder="キーワードを入力" value={search_term} onChange={change_search_term} />
+             <button onClick={reloadSelect} className='btn-clear'>クリア</button>
+</div>
+</div>
+            {/* <br/> */}
+            <div className="tags">
+            
             <label>分野</label>
             <select value={field} onChange={change_field}>
               <option value="">未選択</option>
@@ -149,8 +158,11 @@ function Toggle({receivedData_fb}) {
             <br />
           </div>
           {/* <br/> */}
-          <p onClick={reloadSelect}>クリア</p>
+          <div className='toggle-btn'>
+         
+          {/* <br /> */}
           <button onClick={get_jsontags} className='allbutton'>絞り込む</button>
+          </div>
         </div>
       )}
     </div>

@@ -8,6 +8,10 @@ import Header from '../conponents/Header';
 import Footer from '../conponents/footer';
 
 function Login() {
+  React.useEffect(() => {
+    document.title = 'ログイン - 東京理科大学サークル情報サイト';
+  }, []);
+
   const {setToast} = useContext(ToastContext);
   const { setLogin, getUserName, setUserName } = useContext(AuthContext);
 
@@ -82,40 +86,45 @@ function Login() {
       <Header />
 
       <main>
-        <h3>メールアドレスとパスワードを入力してください</h3>
+        <h1>ログイン</h1>
+        <p>メールアドレスとパスワードを入力してください</p>
         <form onSubmit={handleSubmit}>
-          <label>メールアドレス：</label>
-          <input
-            type="email"
-            name="email"
-            required
-            value={emailaddress}
-            onChange={handleChange_email}
-          />
-          <br />
-          <label>パスワード：</label>
-          <input
-            type="password"
-            name="password"
-            required
-            value={password}
-            onChange={handleChange_password}
-          />
-          <br />
+          <div style={{ marginBottom: '1rem' }}>
+            <label htmlFor="email">メールアドレス：</label>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              required
+              value={emailaddress}
+              onChange={handleChange_email}
+            />
+          </div>
+          <div style={{ marginBottom: '1rem' }}>
+            <label htmlFor="password">パスワード：</label>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              required
+              value={password}
+              onChange={handleChange_password}
+            />
+          </div>
           <button type="submit" className="allbutton">
             ログイン
           </button>
         </form>
-        <br />
-        <h3>
+        <div style={{ marginTop: '2rem' }}>
+          <p>アカウントをお持ちでない方</p>
           <button
-            type="submit"
+            type="button"
             onClick={handleCreateAccount}
             className="exbutton"
           >
             アカウント作成はこちら
           </button>
-        </h3>
+        </div>
       </main>
       <Footer />
     </div>

@@ -32,7 +32,7 @@ body {
   z-index: 1000;
 
 
-  height: 2em;
+  height: 3.5em;
   width: auto;
 
 }
@@ -41,13 +41,31 @@ body {
   transform: scale(0.8);
 }
 
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  background: #fff;
+  color: #000;
+  padding: 8px 12px;
+  z-index: 10000;
+  border: 2px solid #000;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+.skip-link:focus {
+  left: 8px;
+  top: 8px;
+  outline: 2px solid #333;
+}
+
 .mypage_button{
   display: inline-flex;
   align-items: center;
   position: fixed;
   right: 130px;
   top: 0.2rem;
-  z-index: 1000;
+  z-index: 1101;
   padding: 8px 18px;
   border-radius: 99px;
   height: 2em;
@@ -74,21 +92,28 @@ body {
 .login {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   position: fixed;
   right: 0;
   top: 0.2rem;
   z-index: 1000;
   padding: 8px 18px;
   border-radius: 99px;
-  height: 2em;
+  min-height: 2.5rem;
   width: auto;
   background-color: var(--accent-color);
   border: 2px solid var(--accent-color);
-  color:var(--base-color);
+  color: var(--base-color);
   font-weight: bold;
   font-size: 0.9rem;
+  font-family: inherit;
+  line-height: 2;
+  margin: 0;
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
   text-decoration: none;
-
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease,
               transform 0.15s ease, box-shadow 0.2s ease;
@@ -122,7 +147,6 @@ body {
 .tag-select {
   border: 1px solid gray;
   padding: 10px;
- 
   width: auto;
   margin-top: 30px;
   height: 450px;
@@ -135,8 +159,44 @@ body {
   gap: 10px;
   line-height: 2.0;
   border: none;
+  margin-bottom: 20px;
 }
 
+.search{
+  /* min-width: 500px; */ 
+  /* max-width: 600px; */
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  margin-bottom: 10px;
+  align-items: center;
+  /* max-width: 900px; */
+  margin-left: auto;
+  margin-right: auto;
+  /* padding: 0 150px 0 20px; */
+  padding-left: 20px;
+  padding-right: 10px;
+  justify-content: center;
+}
+.search p{
+  margin-right: 10px;
+  margin-left: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  flex-grow: 0;
+}
+.search input{
+  max-width: 350px;
+  flex-grow: 1;
+  width: 90%;
+  margin-right: 5px;
+  align-self: center;
+  /* flex-grow: 1; */
+}
+.input-group{
+  /* flex-grow: 1; */
+  display: flex;
+  /* grid-template-columns: 2fr 1fr; */
+}
 .circle_icon {
   height: 2em;
   width: auto;  
@@ -149,6 +209,13 @@ body {
   width: auto;
   border-radius: 50%;
   margin-bottom: 1rem;
+}
+
+.circle-link {
+  display: block;
+  width: 100%;
+  text-decoration: none;
+  padding: 0%;
 }
 
 .circle-info {
@@ -190,7 +257,7 @@ button[aria-expanded] {
               border-color 0.3s ease,
               transform 0.3s ease,
               box-shadow 0.3s ease;
-  margin-top: 1rem;
+  margin: 1rem 0;
 }
 button[aria-expanded]:hover {
   background-color: var(--accent-color-white);
@@ -281,15 +348,21 @@ button[aria-expanded]:active {
 
 .descon{
   max-width: 500px;
+  width: 100%;
   margin: 0 auto;
-  }
+  box-sizing: border-box;
+}
 
 .row{
   display: grid;
- grid-template-columns: 120px 1fr;
- align-items: start;
- gap: 70px;
- padding: 4px 0;
+  grid-template-columns: minmax(120px, 200px) minmax(0, 1fr);
+  align-items: start;
+  gap: 16px;
+  padding: 4px 0;
+  width: 100%;
+  box-sizing: border-box;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .kou{
@@ -302,6 +375,8 @@ button[aria-expanded]:active {
   text-align: left;
   /* font-weight: bold; */
   /* margin-left: 30px; */
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 a {
@@ -311,8 +386,31 @@ a {
 }
 
 .circleTitle{
-  font-size: 30px;
+   font-size: 30px;
 }
 
 
+.btn-clear {
+  /* background: transparent; */
+  background-color:var( --back-color);
+  color: #ef4444;
+  border: 1px solid #ef4444;
+  padding: 1px 2px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom:5px ;
+  margin-top: 5px;
+  white-space: nowrap;
+}
   
+.btn-clear:hover {
+    background-color: white;
+}
+
+.toggle-btn{
+  flex-direction: column;
+}
+
+

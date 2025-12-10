@@ -35,6 +35,9 @@ UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'upload
 UPLOAD_BASE_URL = "/api/uploads"
 # --- ▲ 画像アップロード設定 ▲ ---
 
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER  
+
+
 TAG_CATEGORY_ORDER = [
     "bunya", "fee", "ratio", "place", "mood", "active"
 ]
@@ -195,7 +198,12 @@ def save_image_file(file_storage):
         
         # ファイルを保存
         file_storage.save(save_path)
-        
+
+        # upload_dir = app.config['UPLOAD_FOLDER']
+
+        # if not os.path.exists(upload_dir):
+        #     os.makedirs(upload_dir)
+
         # フロントエンドがアクセスするためのURLパスを返す
         file_url = f"{UPLOAD_BASE_URL}/{filename}"
         return file_url, None
