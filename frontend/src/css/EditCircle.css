@@ -2,24 +2,31 @@
 
 /* --- 1. ページ全体の背景 --- */
 .edit-page-container {
-  background-color: #f2f1eb; /* 薄いグレーの背景 */
-  min-height: 100vh;
-  display: grid;
-  /* grid-template-columns: 1fr 1fr 1fr; */
-  justify-content: center;
-  align-items: center;
-  padding: 4px 20px;
+  /* ここから新しい設定 */
+  display: flex;            /* Flexboxでレイアウト */
+  justify-content: center;  /* 左右中央 */
+  align-items: center;      /* 上下中央 */
+  flex-direction: column;   /* 縦並び */
+  
+  padding: 20px;            /* 余白 */
+  box-sizing: border-box;   /* サイズ計算の修正 */
+  
+  background-color: #f2f1eb; /* 背景色 */
+  min-height: 100vh;        /* 画面いっぱいの高さ */
+  
   font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", sans-serif;
+  
+  /* ↓↓↓ ここにあった古い display: grid などの記述はすべて削除しました ↓↓↓ */
 }
 
 /* --- 2. 白いカード（入力フォームの土台） --- */
 .edit-card {
   background-color: #ffffff;
   width: 100%;
-  max-width: 600px; /* カードの最大幅 */
+  max-width: 600px; 
   padding: 40px;
-  border-radius: 20px; /* 角を丸く */
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); /* ふんわりした影 */
+  border-radius: 20px; 
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); 
 }
 
 /* ヘッダーロゴ周り */
