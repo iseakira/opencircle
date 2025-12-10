@@ -97,6 +97,7 @@ function CircleAdd() {
           ...circleData,
           tags: selectedValues,
         });
+        get_jsontags();
         alert(`サークルを追加しました`);
         setErrorFields([]);
       } else {
