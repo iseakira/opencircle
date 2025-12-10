@@ -36,6 +36,7 @@ function CircleEdit() {
 
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [errorFields, setErrorFields] = useState([]);
 
   // 既存データを読み込む useEffect
   // 1. データ取得処理を関数にする
@@ -118,10 +119,21 @@ function CircleEdit() {
     e.preventDefault();
 
     // 1. 必須項目チェック (if が抜けていたのを修正)
-    if (!circleData.circle_name || !circleData.circle_description) {
-      alert('サークル名とサークル説明は必須です');
+    const errors = [];
+    if (!circleData.circle_name) {
+      errors.push('circle_name');
+    }
+    if (!circleData.circle_description) {
+      errors.push('circle_description');
+    }
+    
+    if (errors.length > 0) {
+      setErrorFields(errors);
+      alert('サークル名と活動内容・説明は必須です');
       return;
     }
+    
+    setErrorFields([]);
 
     const result = window.confirm('サークルを更新しますか？');
     if (!result) return;
@@ -235,19 +247,29 @@ function CircleEdit() {
     <div className="edit-page-container">
       <Header />
       <div className="edit-card">
-        <h3>サークル情報編集</h3>
+        <h1>サークル情報の編集</h1>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="Cname" className="label-text">サークル名</label>
+            <label htmlFor="Cname" className="label-text">サークル名 *</label>
             <CircleName value={circleData.circle_name} onChange={NameChange} />
+            {errorFields.includes('circle_name') && (
+              <p role="alert" style={{ color: 'red', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+                サークル名は必須項目です
+              </p>
+            )}
           </div>
 
           <div className="form-group">
-            <label htmlFor="Cdes" className="label-text">活動内容・説明</label>
+            <label htmlFor="Cdes" className="label-text">活動内容・説明 *</label>
             <CircleDescription
               value={circleData.circle_description}
               onChange={DesChange}
             />
+            {errorFields.includes('circle_description') && (
+              <p role="alert" style={{ color: 'red', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+                活動内容・説明は必須項目です
+              </p>
+            )}
           </div>
 
           {/* 男女比を横並びに */}
@@ -306,18 +328,12 @@ function CircleEdit() {
             情報を更新する
           </button>
 
-          <p
+          <button
             onClick={handleReset}
             className="clear-link"
-            style={{
-              textAlign: 'center',
-              cursor: 'pointer',
-              textDecoration: 'underline',
-              color: '#6b7280',
-            }}
           >
             変更を元に戻す
-          </p>
+          </button>
 
           {/* 削除エリア */}
           <div className="delete-section">

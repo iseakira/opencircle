@@ -59,7 +59,7 @@ function Home() {
       <Header />
       <LoginOutButton />
 
-      <main>
+      <main id="main">
         <p>ここでは東京理科大学のサークル情報を掲載しています。</p>
         <h2>サークル一覧</h2>
         <Toggle receivedData_fb={handleResponse} />

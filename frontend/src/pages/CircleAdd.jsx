@@ -275,6 +275,11 @@ function CircleAdd() {
               onChange={NameChange}
               isError={errorFields.includes('circle_name')}
             />
+            {errorFields.includes('circle_name') && (
+              <p role="alert" style={{ color: 'red', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+                サークル名は必須項目です
+              </p>
+            )}
           </div>
 
           <div className="form-group">
@@ -284,6 +289,11 @@ function CircleAdd() {
               onChange={DesChange}
               isError={errorFields.includes('circle_description')}
             />
+            {errorFields.includes('circle_description') && (
+              <p role="alert" style={{ color: 'red', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+                活動内容・説明は必須項目です
+              </p>
+            )}
           </div>
 
           {/* 男女比を横並びに */}
@@ -337,9 +347,12 @@ function CircleAdd() {
             />
           </div>
 
-          <p onClick={reloadData} className="clear-link">
+          <button
+            onClick={reloadData}
+            className="clear-link"
+          >
             入力をクリア
-          </p>
+          </button>
           <button type="submit" className="allbutton">
             サークルを追加する
           </button>

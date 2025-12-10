@@ -43,7 +43,7 @@ function Circle_Page() {
       <div>
         <Header />
         <LoginOutButton />
-        <main>
+        <main id="main">
           <h1>サークルページ</h1>
           <div>
             {responseData === null ? (

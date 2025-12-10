@@ -35,12 +35,15 @@ function LoginOutButton(){
     }else{
         return (
             <>
-                <div className="login" onClick={() => logout()}>
-                    ログアウト
-                </div>
                 <Link to="/Mypage" className="mypage_button">
                     マイページ
                 </Link>
+                <button
+                  className="login"
+                  onClick={() => logout()}
+                >
+                  ログアウト
+                </button>
             </>
         )
     }
