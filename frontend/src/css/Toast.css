@@ -30,8 +30,14 @@
     right: 0px;
     bottom: 50px;*/
 
-    animation: slideIn 0.3s ease-out, fadeOut 0.3s 3s ease-in forwards;
+    animation: slideIn 0.3s ease-out, /*fadeOut 0.3s 3s ease-in forwards;*/
 }
+
+/*
+.toast.hiding{
+消えるときのは多分ここに書けばいいはず。てじよろ。
+}
+*/
 
 @keyframes slideIn {
     0% {

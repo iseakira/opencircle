@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useState, useEffect, useCallback, useRef } from 'react';
 import AppRouter from './AppRouter';
 import './css/Toast.css';
 
@@ -50,15 +50,39 @@ function ErrorToText(receive){
     return text;
 }
 
-function ToastComponent({ id, text, remove }){
+function ToastComponent({ id, text, remove, pouse, set_pouse }){
+    const [ isVisible, setIsVisible] = useState(true);
     
     useEffect(
-        ()=>{setTimeout(()=>{remove(id);},5000)}
-        ,[]
+        ()=>{
+            if(!pouse){
+                const timerId = setTimeout(()=>{
+                    setIsVisible(false);
+                    remove(id);
+                },5000);
+                return (
+                    ()=>{
+                        clearTimeout(timerId)
+                    }
+                )
+            }
+        }
+        ,[pouse]
     )
 
+    function focusOn(){
+        console.log("focus!!")
+        set_pouse(true);
+    }
+
+    function focusOff(){
+        set_pouse(false);
+    }
+
+    const className = `toast ${isVisible ? "" : "hiding"}`;
+
     return(
-        <div className="toast">
+        <div className={className} tabIndex="0" onMouseEnter={focusOn} onMouseLeave={focusOff} onFocus={focusOn} onBlur={focusOff}>
             {text}
         </div>
     );
@@ -69,7 +93,8 @@ function AppProvider(){
     const [name, setName] = useState("")
     const [loading, setLoading] = useState(true);
     const [toastList, setToastList] = useState([])
-    const [idCount, setIdCount] = useState(0)
+    const [idCount, setIdCount] = useState(0);
+    const [isPouse, setIsPouse] = useState(false);
 
     async function session_check(){
         try{
@@ -165,7 +190,7 @@ function AppProvider(){
                         {toastList.map((toastItem)=>{
                             return(
                                 <div key={toastItem.id}>
-                                    <ToastComponent id={toastItem.id} text={toastItem.text} remove={removeToast} />
+                                    <ToastComponent id={toastItem.id} text={toastItem.text} remove={removeToast} pouse={isPouse} set_pouse={setIsPouse}/>
                                 </div>
                             );
                         })}
@@ -179,12 +204,3 @@ function AppProvider(){
 export { AppProvider };
 export { AuthContext };
 export { ToastContext };
-
-//ここからいったんトーストを書く
-//トースト実装->ContextのProviderを統一(多分)->名前を合わせる
-/*
-トーストでやらなきゃいけない処理
-・文字列を受け取る -> exportするのは文字列を受け取る関数
-・html要素をreturnする
-・時間経過で消す(setTimer(JavaScript標準機能)(visible=false)
-*/
