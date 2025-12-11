@@ -56,6 +56,11 @@ function Home() {
     catch_all_circles();
     document.title = 'サークル一覧 - 東京理科大学サークル情報サイト';
   }, []);
+const wrapText = (text, length = 20) => {
+  return text.match(new RegExp(`.{1,${length}}`, "g")).join("\n");
+};
+
+
   return (
     <div>
       <Header />
@@ -101,10 +106,19 @@ function Home() {
                       />)
                       }
                       {/* <p>サークル名: {circle}</p> */}
-                      <p>サークル名: 
+                      {/* <div className='circlename-wrapper'> */}
+                      <p>サークル名: </p>
                         {circle.circle_name.length<=10
-                        ?circle.circle_name
-                      :circle.circle_name.slice(0,10)+"..."}</p>
+                        ?(circle.circle_name)
+                      :(
+                        <p>{circle.circle_name.slice(0,10)+"..."}</p>
+                      )}
+                      {circle.circle_name.length>10&&(
+                        <div className = "circlename-text">
+                        {wrapText(circle.circle_name)}
+                        </div>
+                      )}
+                      {/* </div> */}
                       <p>分野：{circle.field || '未設定'}</p>
                     </div>
                   </Link>
