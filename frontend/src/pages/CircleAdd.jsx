@@ -87,12 +87,7 @@ function CircleAdd() {
       setErrorFields(errors);
     }
     if (!circle_name || !circle_description) {
-      // alert('*は必須項目です');
     } else {
-      // alert(`サークルを追加しました`);
-      // const result = window.confirm('サークルを追加しますか？');
-
-      // if (result) {
         const selectedValues = [
           selectedBunya,
           selectedFee,
@@ -110,11 +105,7 @@ function CircleAdd() {
         setToast(`サークルを追加しました`);
         setErrorFields([]);
         
-        get_jsontags();
         navigate('/mypage');
-      // } else {
-        // alert("キャンセルしました");
-      // }
     }
   };
 
@@ -125,7 +116,6 @@ function CircleAdd() {
   const [selectedMood, setSelectedMood] = useState(0);
   const [selectedActive, setSelectedActive] = useState(0);
 
-  // const [preview,setPreview]=useState("");
   const [preview, setPreview] = useState(null);
 
   const [image, setImage] = useState(null);
@@ -135,10 +125,6 @@ function CircleAdd() {
     if (file) {
       setImage(file);
       setPreview(URL.createObjectURL(file));
-      // const reader = new FileReader();
-      // reader.onloadend = () => {
-      // const
-      // }
     }
   };
 
@@ -159,14 +145,6 @@ function CircleAdd() {
     }
   };
   const get_jsontags = async () => {
-    // const dataTosend = {
-    // circle_name:circleData.circle_name,
-    // circle_description:circleData.circle_description,
-    // circle_fee:Number(circleData.circle_fee),
-    // number_of_male:Number(circleData.number_of_male),
-    // number_of_female:Number(circleData.number_of_female),
-    // circle_icon_path:preview,
-    // tags:circleData.selectedValues,
     const tagList = [
       Number(selectedBunya),
       Number(selectedFee),
@@ -182,14 +160,6 @@ function CircleAdd() {
     formData.append('number_of_male', circleData.number_of_male || '0');
     formData.append('number_of_female', circleData.number_of_female || '0');
     formData.append('tags', JSON.stringify(tagList));
-    // tags:[
-    // Number(selectedBunya),
-    //  Number(selectedFee),
-    //  Number(selectedRatio),
-    //  Number(selectedPlace),
-    //  Number(selectedMood),
-    //  Number(selectedActive),
-    // ]
     if (image) {
       //  formData.append("circle_icon",circleData.circle_icon);
       formData.append('circle_icon_file', image);
@@ -198,50 +168,14 @@ function CircleAdd() {
     for (const [key, value] of formData.entries()) {
       console.log(key, value);
     }
-
-  //     if (image) {
-  //   console.log("画像ファイル検証ログ:");
-  //   console.log("  name:", image.name);
-  //   console.log("  type:", image.type);
-  //   console.log("  size:", image.size, "bytes");
-  //   console.log("  File オブジェクトそのもの:", image);
-
-  //   const formImage = formData.get('circle_icon_file');
-  //   console.log("FormData に入っている circle_icon_file:", formImage);
-
-  //   if (formImage) {
-  //     console.log("  → 正常に FormData へ追加されています");
-  //   } else {
-  //     console.log("  → ❌ FormData への追加に失敗しています！");
-  //   }
-  // }
     await sendData(formData);
   };
 
-  // const formData = new FormData();
-  // formData.append("json_data",JSON.stringify(dataTosend));
-
-  //   const json_stringdata = JSON.stringify(dataTosend);
-  //  if(image){
-  //  formData.append("circle_icon",circleData.circle_icon);
-  //  }
-  //  console.log('タグのjsonデータ:', json_stringdata);
-  // sendData(json_stringdata);
-  // return json_stringdata;
-  // console.log("送信データ内容",dataTosend);
-  // await sendData(formData);
-  //   };
-  // const sendData = async (json_stringdata) => {
   const sendData = async (formData) => {
-    // const sendData = async (formData) => {
     try {
       const response = await fetch('http://localhost:5001/api/circles', {
         method: 'POST',
         body: formData,
-        // headers:{
-        // 'Content-Type': 'application/json',
-        // },
-        // body: json_stringdata,
         credentials: 'include',
       });
 
@@ -263,13 +197,8 @@ function CircleAdd() {
 
       const result = await response.json();
       console.log('サーバーからの応答:', result);
-      // if (receivedData_fb) {
-      // receivedData_fb(result);
-      //}
-      // alert("データを送信しました")
     } catch (error) {
       console.error('通信エラー', error);
-      // alert('通信に失敗しました');
     }
   };
 
