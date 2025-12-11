@@ -219,6 +219,7 @@ body {
 }
 
 .circle-info {
+  position: relative;
   display: flex;
   align-items: center;
   border: 1px solid var(--main-color);
@@ -229,6 +230,27 @@ body {
   box-shadow: 2px 2px 5px rgba(255, 254, 254, 0.1);
   background: var(--main-color-sub);
   transition: background-color 0.3s ease;
+}
+
+.circlename-text{
+  position: absolute;
+  bottom: 100%;  
+  left: 5%;
+  background: var(--main-color);
+  color: black;
+  padding: 6px 10px;
+  border-radius: 6px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease;
+  z-index: 9999;
+  font-size: 14px;
+  white-space: pre-line;
+}
+
+.circle-info:hover .circlename-text{
+  visibility: visible;
+  opacity: 1;
 }
 
 .circle-info:hover {

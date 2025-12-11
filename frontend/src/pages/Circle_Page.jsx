@@ -6,6 +6,7 @@ import '../css/App.css';
 import LoginOutButton from './LogInOutButton';
 import Circleitems from '../conponents/Circleitems';
 import Header from '../conponents/Header.jsx';
+import circleDefImage from '../images/circleDefaultImage.png';
 
 function Circle_Page() {
   const { id } = useParams();
@@ -51,11 +52,18 @@ function Circle_Page() {
               <p>サークル情報を読み込み中です...</p>
             ) : responseData && typeof responseData === 'object' ? (
               <div>
+                {responseData.circle_icon?(
                 <img
                   src={responseData.circle_icon}
                   alt={`${responseData.circle_name}のアイコン`}
                   className="circle_icon_page"
-                />
+                />):(
+                  <img
+                  src={circleDefImage}
+                  alt="No image"
+                  className="circle_icon_page"
+                  /> 
+                )}
 
                 <dl className="descon">
                   <div className="row">

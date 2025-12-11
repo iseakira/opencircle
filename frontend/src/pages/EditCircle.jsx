@@ -331,6 +331,7 @@ function CircleEdit() {
           </button>
 
           <button
+          type='button'
             onClick={handleReset}
             className="clear-link"
           >

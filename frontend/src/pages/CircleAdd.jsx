@@ -102,9 +102,10 @@ function CircleAdd() {
           tags: selectedValues,
         });
         get_jsontags();
-        setToast(`サークルを追加しました`);
+        // alert(`サークルを追加しました`);
         setErrorFields([]);
         
+        // get_jsontags();
         navigate('/mypage');
     }
   };
@@ -199,6 +200,7 @@ function CircleAdd() {
       console.log('サーバーからの応答:', result);
     } catch (error) {
       console.error('通信エラー', error);
+      alert('通信に失敗しました');
     }
   };
 

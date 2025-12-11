@@ -8,7 +8,7 @@ import { ToastContext } from '../AppContext.jsx';
 import LoginOutButton from './LogInOutButton.jsx';
 import Footer from '../conponents/Footer.jsx';
 import Header from '../conponents/Header.jsx';
-
+import circleDefImage from '../images/circleDefaultImage.png';
 function Home() {
   //バックエンドからの応答ステート（絞り込み結果を受け取る）
   const [response_data, setResponse_data] = useState(null);
@@ -56,6 +56,10 @@ function Home() {
     catch_all_circles();
     document.title = 'サークル一覧 - 東京理科大学サークル情報サイト';
   }, []);
+const wrapText = (text, length = 20) => {
+  return text.match(new RegExp(`.{1,${length}}`, "g")).join("\n");
+};
+
 
   return (
     <div>
@@ -89,12 +93,32 @@ function Home() {
                     to={`/Circle_Page/${circle.circle_id}`}
                   >
                     <div className="circle-info" style={{ cursor: 'pointer' }}>
-                      <img
+                      {circle.circle_icon_path
+                      ?(<img
                         src={circle.circle_icon_path}
                         className="circle_icon"
-                        alt={`${circle.circle_name}のアイコン`}
-                      />
-                      <p>サークル名: {circle.circle_name}</p>
+                        alt={`no image`}
+                        // alt={`${circle.circle_name}のアイコン`}
+                      />):(<img
+                      className='circle_icon'
+                      src={circleDefImage}
+                      alt={'no image'}
+                      />)
+                      }
+                      {/* <p>サークル名: {circle}</p> */}
+                      {/* <div className='circlename-wrapper'> */}
+                      <p>サークル名: </p>
+                        {circle.circle_name.length<=10
+                        ?(circle.circle_name)
+                      :(
+                        <p>{circle.circle_name.slice(0,10)+"..."}</p>
+                      )}
+                      {circle.circle_name.length>10&&(
+                        <div className = "circlename-text">
+                        {wrapText(circle.circle_name)}
+                        </div>
+                      )}
+                      {/* </div> */}
                       <p>分野：{circle.field || '未設定'}</p>
                     </div>
                   </Link>
