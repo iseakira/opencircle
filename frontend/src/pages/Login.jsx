@@ -5,14 +5,14 @@ import headImage from '../images/head_image.png';
 import { AuthContext } from '../AppContext';
 import { ToastContext } from '../AppContext';
 import Header from '../conponents/Header';
-import Footer from '../conponents/footer';
+import Footer from '../conponents/Footer';
 
 function Login() {
   React.useEffect(() => {
     document.title = 'ログイン - 東京理科大学サークル情報サイト';
   }, []);
 
-  const {setToast} = useContext(ToastContext);
+  const { setToast } = useContext(ToastContext);
   const { setLogin, getUserName, setUserName } = useContext(AuthContext);
 
   const navigate = useNavigate();

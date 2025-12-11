@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import headImage from '../images/head_image.png';
-import Footer from '../conponents/footer.jsx';
+import Footer from '../conponents/Footer.jsx';
 import Header from '../conponents/Header.jsx';
 import { ToastContext } from '../AppContext.jsx';
 

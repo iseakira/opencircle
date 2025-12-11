@@ -55,30 +55,18 @@ TAG_ID_TO_CATEGORY = {
     15: "active", 16: "active", 17: "active",
     # (ID: 0 の "未選択" はカテゴリがないのでここでは無視)
 }
-
-
 @app.route('/home', methods=['POST'])
-def search():
+def get_circles():
     try:
-        json_data = request.json 
-        if json_data is None:
-            print('search_circles error: Request body is empty or not JSON')
-            return jsonify({"error": "不正なデータ形式"}), 400
-        items = dbop.search_circles(json_data)
-        return jsonify({"items": items, "total": len(items)})
-    except Exception as e:
-        print('search_circles error:', e)
-        return jsonify({"error": "サーバーエラー"}), 500
+        json_data=request.get_json(silent=True)
 
-@app.route('/homestart', methods=['POST'])
-def initial_circles():
-    # DB から初期表示用のサークル一覧を取得して返す
-    try:
-        items = dbop.get_initial_circles()
-        return jsonify({"items": items, "total": len(items)})
+        if json_data and len(json_data) > 0:
+            items = dbop.search_circles(json_data)
+        else:
+            items = dbop.get_initial_circles()
+        return jsonify({"items":items, "total":len(items)})
     except Exception as e:
-        # エラー時はログ出力して 500 を返す
-        print('get_initial_circles error:', e)
+        print('get_circles error:', e)
         return jsonify({"error": "サーバーエラー"}), 500
 
 @app.route('/Circle_Page', methods=['POST'])
@@ -90,14 +78,10 @@ def circle_page():
         return jsonify({"message": f"サークルID {circle_id} の詳細情報の取得失敗"}), 404
     return jsonify(circle_detail)
 
-#--- ここからアカウント作成 ---
 @app.route('/add_account', methods=['POST'])
-#発生するエラー: User_Duplication, Database_Time_Out
 def make_tmp_account():
-    #json_dict のキーは {"emailaddress"}
     json_dict = request.get_json()
     emailaddress = json_dict["emailaddress"]
-    #data_tuple は (success, auth_code, tmp_id, error) の形
     data_tuple = dbop.tmp_registration(emailaddress)
     (success, auth_code, tmp_id, error, http_status) = data_tuple
     if success:
@@ -108,9 +92,7 @@ def make_tmp_account():
         return jsonify({"message": "failure", "error": error}), http_status
 
 @app.route("/create_account", methods=["POST"])
-#発生するエラー: No_Tmp_Account, Exceed_Attempt_Count, Expired_Tmp_Account, Wrong_Auth_Code, Database_Time_Out
 def create_account():
-    #json_dict のキーは {"auth_code", "tmp_id", "emailaddress", "password", "user_name"}
     json_dict = request.get_json()
     (checked_dict, http_status) = dbop.check_auth_code(json_dict["auth_code"], json_dict["tmp_id"])
     if checked_dict["message"] == "failure":
@@ -118,12 +100,20 @@ def create_account():
     success = dbop.create_account(json_dict["emailaddress"], json_dict["password"], json_dict["user_name"])
     if not success:
         return jsonify({"message": "failure", "error": "Database_Time_Out"}), 500
-    return jsonify({"message": "success"})
-# --- ここまでアカウント作成---
+    #ログイン処理
+    result_tuple = dbop.make_session(json_dict["emailaddress"])
+    (complete, session_id_int) = result_tuple
+    if not complete:
+        return jsonify({"message": "failure", "error": "Database_Time_Out"}), 500
+    else:
+        response = make_response(jsonify({"message": "success", "user_name": json_dict["user_name"]}))
+        session_id_str = str(session_id_int)
+        response.set_cookie("session_id", session_id_str)
+        return response
 
-# --- ここからログイン ---
 @app.route("/api/check_login", methods=["POST"])
 def check_session():
+    #データベースをリセットしたいときはコメントアウトを外してページにアクセスして
     #dbop.reset()
     session_id = request.cookies.get("session_id")
     if session_id == None:
@@ -136,11 +126,9 @@ def check_session():
     return jsonify({"is_login": is_login, "user_name": user_name})
 
 @app.route("/login", methods=["POST"])
-#発生するエラー: Wrong_Password, Database_Time_Out
 def login():
     #json_dict のキーは {"emailaddress", "password"}
     json_dict = request.get_json()
-
     (checked_dict, http_status) = dbop.check_login(json_dict["emailaddress"], json_dict["password"])
     if checked_dict["message"] == "failure":
         return jsonify(checked_dict), http_status
@@ -186,23 +174,10 @@ def save_image_file(file_storage):
         return None, "許可されていないファイル形式です"
 
     try:
-        # ファイル名を安全なものに変更 (例: image.png -> <uuid>.png)
         ext = file_storage.filename.rsplit('.', 1)[1].lower()
         filename = f"{uuid.uuid4()}.{ext}"
-        
-        
-        # 保存先のフルパス
         save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        
-        # ファイルを保存
         file_storage.save(save_path)
-
-        # upload_dir = app.config['UPLOAD_FOLDER']
-
-        # if not os.path.exists(upload_dir):
-        #     os.makedirs(upload_dir)
-
-        # フロントエンドがアクセスするためのURLパスを返す
         file_url = f"{UPLOAD_BASE_URL}/{filename}"
         return file_url, None
 
@@ -219,8 +194,6 @@ def uploaded_file(filename):
 
 @app.route('/api/circles', methods=['POST'])
 def add_circle():
-
-    # --- ▼ 1. Cookieによるログイン認証チェック ▼ ---
     session_id_str = request.cookies.get("session_id")
     if not session_id_str:
         return jsonify({"error": "認証されていません (Cookieが見つかりません)"}), 401
@@ -692,39 +665,6 @@ def transfer_ownership():
         "new_owner_email": new_owner_email,
         "new_owner_id": new_owner_id
     }), 200
-
-# サークル削除API
-#@app.route("/api/circle/<int:circle_id>", methods=["DELETE"])
-# def delete_circle(circle_id):
-#     # ログイン確認
-#     user_id, err, code = verify_login()
-#     if err:
-#         return err, code
-
-#     # サークルの存在確認
-#     circle = Circle.query.get(circle_id)
-#     if not circle:
-#         return jsonify({"error": "指定されたサークルが存在しません"}), 404
-
-#     # 権限確認
-#     owner_auth = EditAuthorization.query.filter_by(
-#         user_id=user_id, circle_id=circle_id, role="owner"
-#     ).first()
-#     if not owner_auth:
-#         return jsonify({"error": "削除権限がありません（オーナーではありません）"}), 403
-
-#     # 関連する編集権限をすべて削除
-#     EditAuthorization.query.filter_by(circle_id=circle_id).delete()
-
-#     # サークル自体を削除
-#     db.session.delete(circle)
-#     db.session.commit()
-
-#     return jsonify({
-#         "message": f"サークル '{circle.circle_name}' を削除しました。",
-#         "deleted_circle_id": circle_id
-#     }), 200
-
 
 @app.route("/api/circle/<int:circle_id>", methods=["DELETE"])
 def delete_circle(circle_id):

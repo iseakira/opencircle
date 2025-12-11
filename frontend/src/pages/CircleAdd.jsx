@@ -3,7 +3,7 @@ import Button from '../conponents/Button';
 import CircleDescription from '../conponents/CircleDescription';
 import CircleFee from '../conponents/CircleFee';
 import CircleName from '../conponents/CircleName';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import Tag from '../conponents/Tag';
 import Image from '../conponents/Image';
 import { OPTIONS } from '../conponents/option';
@@ -13,7 +13,11 @@ import headImage from '../images/head_image.png';
 import { Link,useNavigate} from 'react-router-dom';
 import Header from '../conponents/Header.jsx';
 import '../css/CircleAdd.css';
+import { ToastContext } from '../AppContext.jsx';
+
 function CircleAdd() {
+  const { setToast } = useContext(ToastContext);
+
   useEffect(() => {
     document.title = 'サークル追加 - 東京理科大学サークル情報サイト';
   }, []);
@@ -265,7 +269,7 @@ function CircleAdd() {
       // alert("データを送信しました")
     } catch (error) {
       console.error('通信エラー', error);
-      // alert('通信に失敗しました');
+      alert('通信に失敗しました');
     }
   };
 

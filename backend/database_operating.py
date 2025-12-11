@@ -309,10 +309,12 @@ def check_login(emailaddress, password):
     user_tuple = res.fetchone()
     cursor.close()
     conn.close()
+    if user_tuple == None:
+        return ({"message": "failure", "error": "Wrong_Password"}, 401)
     user_id = user_tuple[1]
     hashed_pass = hash.hash_pass(password, user_id)
     user_name = user_tuple[2]
-    if user_tuple == None or hashed_pass != user_tuple[0]:
+    if hashed_pass != user_tuple[0]:
         return ({"message": "failure", "error": "Wrong_Password"}, 401)
     else:
         return ({"message": "success", "user_name": user_name}, 200)
