@@ -105,10 +105,7 @@ function CircleAdd() {
         // alert(`サークルを追加しました`);
         setErrorFields([]);
         
-<<<<<<< HEAD
         // get_jsontags();
-=======
->>>>>>> 3df1d212dd6e49428bafc8550dfc8c29f37cafde
         navigate('/mypage');
     }
   };
@@ -203,10 +200,7 @@ function CircleAdd() {
       console.log('サーバーからの応答:', result);
     } catch (error) {
       console.error('通信エラー', error);
-<<<<<<< HEAD
       alert('通信に失敗しました');
-=======
->>>>>>> 3df1d212dd6e49428bafc8550dfc8c29f37cafde
     }
   };
 
