@@ -103,10 +103,10 @@ function CircleAdd() {
           tags: selectedValues,
         });
         get_jsontags();
-        alert(`サークルを追加しました`);
+        // alert(`サークルを追加しました`);
         setErrorFields([]);
         
-        get_jsontags();
+        // get_jsontags();
         navigate('/mypage');
       // } else {
         // alert("キャンセルしました");
