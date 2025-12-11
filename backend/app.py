@@ -100,10 +100,21 @@ def create_account():
     success = dbop.create_account(json_dict["emailaddress"], json_dict["password"], json_dict["user_name"])
     if not success:
         return jsonify({"message": "failure", "error": "Database_Time_Out"}), 500
-    return jsonify({"message": "success"})
+    #ログイン処理
+    result_tuple = dbop.make_session(json_dict["emailaddress"])
+    (complete, session_id_int) = result_tuple
+    if not complete:
+        return jsonify({"message": "failure", "error": "Database_Time_Out"}), 500
+    else:
+        response = make_response(jsonify({"message": "success", "user_name": json_dict["user_name"]}))
+        session_id_str = str(session_id_int)
+        response.set_cookie("session_id", session_id_str)
+        return response
 
 @app.route("/api/check_login", methods=["POST"])
 def check_session():
+    #データベースをリセットしたいときはコメントアウトを外してページにアクセスして
+    #dbop.reset()
     session_id = request.cookies.get("session_id")
     if session_id == None:
         return jsonify({"is_login": False})
@@ -116,6 +127,7 @@ def check_session():
 
 @app.route("/login", methods=["POST"])
 def login():
+    #json_dict のキーは {"emailaddress", "password"}
     json_dict = request.get_json()
     (checked_dict, http_status) = dbop.check_login(json_dict["emailaddress"], json_dict["password"])
     if checked_dict["message"] == "failure":

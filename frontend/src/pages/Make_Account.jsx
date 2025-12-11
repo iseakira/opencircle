@@ -2,12 +2,13 @@ import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useContext } from 'react';
 import headImage from '../images/head_image.png';
-import Footer from '../conponents/footer.jsx';
+import Footer from '../conponents/Footer.jsx';
 import Header from '../conponents/Header.jsx';
-import { ToastContext } from '../AppContext.jsx';
+import { AuthContext, ToastContext } from '../AppContext.jsx';
 
 function Make_Account() {
   const { setToast } = useContext(ToastContext);
+  const { setLogin } = useContext(AuthContext);
 
   //imput_email.jsxで入力されたメールアドレスとtmp_idを取得
   let initialEmail = '';
@@ -75,6 +76,7 @@ function Make_Account() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dataToSend),
+        credentials: 'include',
       });
       if (response.ok) {
         const data = await response.json();
@@ -83,9 +85,8 @@ function Make_Account() {
         if (data.message === 'success') {
           localStorage.removeItem('to_Make_Account');
           setToast("アカウントを作成しました。")
-          setTimeout(() => {
-            navigate('/');
-          }, 3000);
+          setLogin()
+          navigate('/');
         }
       } else {
         const error_response_obj = await response.json();
