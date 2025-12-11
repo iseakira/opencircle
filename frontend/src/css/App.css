@@ -202,6 +202,7 @@ body {
   width: auto;  
   border-radius: 50%;
   object-fit: cover;
+  /* font-size: 2px; */
 }
 
 .circle_icon_page {
