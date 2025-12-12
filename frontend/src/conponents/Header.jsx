@@ -14,7 +14,7 @@ export default function Header() {
   return (
     <header className="page-header">
       <a href="#main" className="skip-link">メインコンテンツへスキップ</a>
-      <Link to="/">
+      <Link to="/" tabIndex={-1}>
         <img className="logo" src={headImage} alt="アイコン" />
       </Link>
       <h1 className="circleTitle">東京理科大学サークル情報サイト</h1>
