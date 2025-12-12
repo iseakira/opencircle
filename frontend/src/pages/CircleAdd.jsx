@@ -214,7 +214,7 @@ function CircleAdd() {
 
     <div className="add-page-container">
       <Header></Header>
-     
+      <main id="main">
       <div className="add-card">
            
         <div className="add-header">
@@ -322,6 +322,7 @@ function CircleAdd() {
           </Link>
         </div>
       </div>
+      </main>
     </div>
   );
 }

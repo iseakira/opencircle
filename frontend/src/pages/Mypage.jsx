@@ -102,7 +102,7 @@ function Mypage() {
         <CircleLogo />
       </header>*/}
 <Header></Header>
-      <main>
+      <main id="main">
         <h1>{getUserName()}さんのマイページ</h1>
         <button onClick={() => navigate('/add_circle')} className="allbutton">
           サークルを追加

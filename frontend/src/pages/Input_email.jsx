@@ -87,7 +87,7 @@ function Input_email() {
   return (
     <div>
       <Header />
-      <main>
+      <main id="main">
         <h1>アカウント作成</h1>
         <p>登録したいメールアドレスを入力してください</p>
         <form onSubmit={email_processing}>

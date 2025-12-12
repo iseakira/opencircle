@@ -33,6 +33,15 @@
     animation: slideIn 0.3s ease-out, /*fadeOut 0.3s 3s ease-in forwards;*/
 }
 
+.toast:hover {
+    opacity: 1;           /* 透明度をなくしてハッキリ見せる */
+    transform: scale(1.02); /* ほんの少しだけ大きくして「触ってる感」を出す */
+    cursor: default;      /* カーソルを矢印のままにする（または text で文字選択用にする） */
+    
+    /* 影をつけて浮かせる演出を入れるなら */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
 /*
 .toast.hiding{
 消えるときのは多分ここに書けばいいはず。てじよろ。

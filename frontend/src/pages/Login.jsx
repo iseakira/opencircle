@@ -85,7 +85,7 @@ function Login() {
     <div>
       <Header />
 
-      <main>
+      <main id="main">
         <h1>ログイン</h1>
         <p>メールアドレスとパスワードを入力してください</p>
         <form onSubmit={handleSubmit}>

@@ -100,7 +100,7 @@ function Make_Account() {
   return (
     <div>
       <Header />
-      <main>
+      <main id="main">
         <h1>アカウント作成</h1>
         <p>
           パスワードとメールアドレスに送信された認証コード、ユーザー名を入力してください

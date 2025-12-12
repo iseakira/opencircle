@@ -248,6 +248,7 @@ function CircleEdit() {
   return (
     <div className="edit-page-container">
       <Header />
+      <main id="main">
       <div className="edit-card">
         <h1>サークル情報の編集</h1>
         <form onSubmit={handleSubmit}>
@@ -352,6 +353,7 @@ function CircleEdit() {
           </Link>
         </div>
       </div>
+      </main>
     </div>
   );
 }
