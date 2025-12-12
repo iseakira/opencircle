@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef} from 'react';
+import { useParams, useNavigate,Link } from 'react-router-dom';
 import '/app/src/css/EditCircle.css';
 import '../css/App.css';
 import Button from '../conponents/Button';
@@ -11,7 +11,7 @@ import Image from '../conponents/Image';
 import CircleMen from '../conponents/CircleMen';
 import CircleFemen from '../conponents/CircleFemen';
 import Header from '../conponents/Header.jsx';
-
+import DefoImage from '../images/circleDefaultImage.png';
 function CircleEdit() {
   const { circleId } = useParams();
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ function CircleEdit() {
     number_of_male: '',
     number_of_female: '',
   });
-
+const defaultImage={DefoImage}
   const [selectedBunya, setSelectedBunya] = useState(0);
   const [selectedFee, setSelectedFee] = useState(0);
   const [selectedRatio, setSelectedRatio] = useState(0);
@@ -90,6 +90,15 @@ function CircleEdit() {
     fetchCircleData();
   }, [circleId]);
 
+  const fileInputRef = useRef(null);
+
+  const resetImage =(e)=>{
+    setImage(null);
+    setPreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }
   // 3. リセットボタンが押された時の処理
   const handleReset = () => {
     if (window.confirm('変更を破棄して、元の状態に戻しますか？')) {
@@ -136,7 +145,6 @@ function CircleEdit() {
     }
     
     setErrorFields([]);
-
     const result = window.confirm('サークルを更新しますか？');
     if (!result) return;
 
@@ -304,6 +312,7 @@ function CircleEdit() {
               onChange={hadleImageChange}
               preview={preview}
               image={image}
+              ref={fileInputRef}
             />
           </div>
 
@@ -338,7 +347,9 @@ function CircleEdit() {
           >
             変更を元に戻す
           </button>
-
+<button type='button' onClick={resetImage} className='clear-link'>
+画像を削除
+</button>
           {/* 削除エリア */}
           <div className="delete-section">
             <button type="button" onClick={handleDelete} className="btn-delete">

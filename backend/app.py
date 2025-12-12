@@ -437,12 +437,12 @@ def update_circle(circle_id):
                 if os.path.exists(old_file_physical_path):
                     os.remove(old_file_physical_path)
                     print(f"古い画像ファイルを削除しました: {old_file_physical_path}")
-                
+           
             except Exception as e:
                 # (削除に失敗しても、更新処理自体は続行する)
                 print(f"古い画像ファイルの削除に失敗: {e}")
         
-    
+
     
     # --- ▼ 6. テキスト情報の更新 ▼ ---
     circle_to_update.circle_name = data_name
