@@ -281,8 +281,7 @@ const defaultImage={DefoImage}
             <label htmlFor="Cdes" className="label-text">活動内容・説明 *</label>
             <CircleDescription
               value={circleData.circle_description}
-              onChange={DesChange}
-            />
+              onChange={DesChange} />
             {errorFields.includes('circle_description') && (
               <p role="alert" style={{ color: 'red', fontSize: '0.9rem', marginTop: '0.5rem' }}>
                 活動内容・説明は必須項目です
