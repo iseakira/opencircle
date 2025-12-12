@@ -3,7 +3,7 @@ import { AuthContext } from '../AppContext';
 import { Link } from 'react-router-dom';
 
 function LoginOutButton(){
-    const { getLogin, setLogin, setLogout } = useContext(AuthContext);
+    const { getLogin, setLogin, setLogout, setUserName } = useContext(AuthContext);
 
     async function logout(){
         try{
@@ -15,6 +15,7 @@ function LoginOutButton(){
             console.log(result.message)
             if(response.ok){
                 console.log("success")
+                setUserName("")
                 setLogout()
             }else{
                 console.log("failure")

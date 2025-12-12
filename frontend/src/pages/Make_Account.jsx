@@ -8,7 +8,7 @@ import { AuthContext, ToastContext } from '../AppContext.jsx';
 
 function Make_Account() {
   const { setToast } = useContext(ToastContext);
-  const { setLogin } = useContext(AuthContext);
+  const { setLogin, setUserName } = useContext(AuthContext);
 
   //imput_email.jsxで入力されたメールアドレスとtmp_idを取得
   let initialEmail = '';
@@ -85,6 +85,7 @@ function Make_Account() {
         if (data.message === 'success') {
           localStorage.removeItem('to_Make_Account');
           setToast("アカウントを作成しました。")
+          setUserName(data.user_name)
           setLogin()
           navigate('/');
         }
