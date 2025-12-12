@@ -51,14 +51,17 @@ function ErrorToText(receive){
 }
 
 function ToastComponent({ id, text, remove, pouse, set_pouse }){
-    const [ isVisible, setIsVisible] = useState(true);
+    const [isVisible, setIsVisible] = useState(true);
     
     useEffect(
         ()=>{
             if(!pouse){
                 const timerId = setTimeout(()=>{
                     setIsVisible(false);
-                    remove(id);
+                    // アニメーション時間（0.3s）後にDOMから削除
+                    setTimeout(() => {
+                        remove(id);
+                    }, 300);
                 },5000);
                 return (
                     ()=>{
@@ -82,7 +85,14 @@ function ToastComponent({ id, text, remove, pouse, set_pouse }){
     const className = `toast ${isVisible ? "" : "hiding"}`;
 
     return(
-        <div className={className} tabIndex="0" onMouseEnter={focusOn} onMouseLeave={focusOff} onFocus={focusOn} onBlur={focusOff}>
+        <div 
+            className={className}
+            tabIndex="0"
+            onMouseEnter={focusOn}
+            onMouseLeave={focusOff}
+            onFocus={focusOn}
+            onBlur={focusOff}
+        >
             {text}
         </div>
     );
@@ -190,7 +200,13 @@ function AppProvider(){
                         {toastList.map((toastItem)=>{
                             return(
                                 <div key={toastItem.id}>
-                                    <ToastComponent id={toastItem.id} text={toastItem.text} remove={removeToast} pouse={isPouse} set_pouse={setIsPouse}/>
+                                    <ToastComponent
+                                        id={toastItem.id}
+                                        text={toastItem.text}
+                                        remove={removeToast}
+                                        pouse={isPouse}
+                                        set_pouse={setIsPouse}
+                                    />
                                 </div>
                             );
                         })}
