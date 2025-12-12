@@ -91,12 +91,12 @@ const defaultImage={DefoImage}
   }, [circleId]);
 
   const fileInputRef = useRef(null);
-
+  
   const resetImage =(e)=>{
     setImage(null);
     setPreview(null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   }
   // 3. リセットボタンが押された時の処理
@@ -173,7 +173,6 @@ const defaultImage={DefoImage}
     if (image) {
       formData.append('circle_icon_file', image);
     }
-
     // 6. サーバーへ送信 (try...catch が抜けていたのを修正)
     try {
       const response = await fetch(
