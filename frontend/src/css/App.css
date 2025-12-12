@@ -253,6 +253,10 @@ body {
   opacity: 1;
 }
 
+.circle-info:focus-visible .circlename-text{
+  visibility: visible;
+  opacity: 1;
+}
 .circle-info:hover {
   background: var(--main-color-white);
   transform: scale(1.02);

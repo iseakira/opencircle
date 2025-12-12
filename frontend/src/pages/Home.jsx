@@ -90,9 +90,10 @@ const wrapText = (text, length = 20) => {
                 <li key={circle.circle_id}>
                   <Link
                     className="circle-link"
+                    tabIndex={-1}
                     to={`/Circle_Page/${circle.circle_id}`}
                   >
-                    <div className="circle-info" style={{ cursor: 'pointer' }}>
+                    <div className="circle-info" tabIndex={0} style={{ cursor: 'pointer' }}>
                       {circle.circle_icon_path
                       ?(<img
                         src={circle.circle_icon_path}
