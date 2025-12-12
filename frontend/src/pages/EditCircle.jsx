@@ -37,6 +37,7 @@ const defaultImage={DefoImage}
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [errorFields, setErrorFields] = useState([]);
+  const [useDefault, setUseDefault] = useState(false);
 
   // 既存データを読み込む useEffect
   // 1. データ取得処理を関数にする
@@ -94,6 +95,7 @@ const defaultImage={DefoImage}
 
   const resetImage =(e)=>{
     setImage(null);
+    setUseDefault(true);
     setPreview(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -122,6 +124,7 @@ const defaultImage={DefoImage}
     if (file) {
       setImage(file); // (File オブジェクトを state に保存)
       setPreview(URL.createObjectURL(file)); // (プレビューを更新)
+      setUseDefault(false);
     }
   };
 
@@ -172,8 +175,12 @@ const defaultImage={DefoImage}
     // 5. 画像ファイルを追加 (image state に File があれば)
     if (image) {
       formData.append('circle_icon_file', image);
+    }else {
+      const defo = await fetch(DefoImage)
+      const blob = await defo.blob();
+      const file = new File([blob], 'circleDefaultImage.png', { type: blob.type });
+      formData.append('circle_icon_file', file);
     }
-
     // 6. サーバーへ送信 (try...catch が抜けていたのを修正)
     try {
       const response = await fetch(
