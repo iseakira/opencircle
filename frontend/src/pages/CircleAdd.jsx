@@ -105,7 +105,10 @@ function CircleAdd() {
         // alert(`サークルを追加しました`);
         setErrorFields([]);
         
+<<<<<<< HEAD
         // get_jsontags();
+=======
+>>>>>>> 27d4b419d00ad24ca2f7adf61fa1eb2b593f9151
         navigate('/mypage');
     }
   };
