@@ -637,7 +637,7 @@ def transfer_ownership():
         return jsonify({"error": "オーナーのみが譲渡できます"}), 403
     
     #メールアドレスからユーザー検索
-    candidate_user = User.query.filter_by(mail_adress=new_owner_email).first()
+    candidate_user = User.query.filter_by(mail_address=new_owner_email).first()
     if not candidate_user:
         return jsonify({"error": "指定したメールアドレスのユーザーが存在しません"}), 404
     new_owner_id = candidate_user.user_id
