@@ -92,13 +92,13 @@ const defaultImage={DefoImage}
   }, [circleId]);
 
   const fileInputRef = useRef(null);
-
+  
   const resetImage =(e)=>{
     setImage(null);
     setUseDefault(true);
     setPreview(null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   }
   // 3. リセットボタンが押された時の処理

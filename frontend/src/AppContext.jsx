@@ -92,6 +92,9 @@ function ToastComponent({ id, text, remove, pouse, set_pouse }){
             onMouseLeave={focusOff}
             onFocus={focusOn}
             onBlur={focusOff}
+            aria-live="assertive"
+            aria-atomic="true"
+            role="alert"
         >
             {text}
         </div>
@@ -206,6 +209,7 @@ function AppProvider(){
                                         remove={removeToast}
                                         pouse={isPouse}
                                         set_pouse={setIsPouse}
+                                        tabIndex={1}
                                     />
                                 </div>
                             );

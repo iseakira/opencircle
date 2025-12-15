@@ -27,6 +27,11 @@
   padding: 40px;
   border-radius: 20px; 
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); 
+  margin: 0 auto;
+}
+
+#main {
+  width: 100%;
 }
 
 /* ヘッダーロゴ周り */

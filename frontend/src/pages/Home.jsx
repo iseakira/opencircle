@@ -56,7 +56,7 @@ function Home() {
     catch_all_circles();
     document.title = 'サークル一覧 - 東京理科大学サークル情報サイト';
   }, []);
-const wrapText = (text, length = 20) => {
+const wrapText = (text, length = 50) => {
   return text.match(new RegExp(`.{1,${length}}`, "g")).join("\n");
 };
 
@@ -93,7 +93,9 @@ const wrapText = (text, length = 20) => {
                     tabIndex={-1}
                     to={`/Circle_Page/${circle.circle_id}`}
                   >
+                  
                     <div className="circle-info" tabIndex={0} style={{ cursor: 'pointer' }}>
+                     
                       {circle.circle_icon_path
                       ?(<img
                         src={circle.circle_icon_path}
@@ -114,13 +116,13 @@ const wrapText = (text, length = 20) => {
                       :(
                         <p>{circle.circle_name.slice(0,10)+"..."}</p>
                       )}
+                      
+                      <p>分野：{circle.field || '未設定'}</p>
                       {circle.circle_name.length>10&&(
                         <div className = "circlename-text">
                         {wrapText(circle.circle_name)}
                         </div>
                       )}
-                      {/* </div> */}
-                      <p>分野：{circle.field || '未設定'}</p>
                     </div>
                   </Link>
                 </li>

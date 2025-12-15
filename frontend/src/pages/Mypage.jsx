@@ -83,6 +83,9 @@ function Mypage() {
     }
   };
 
+  const wrapText = (text, length = 20) => {
+  return text.match(new RegExp(`.{1,${length}}`, "g")).join("\n");
+};
   return (
     <div className="mypage-container">
       <Header />
@@ -104,7 +107,7 @@ function Mypage() {
               className={`toggle-button ${isAuthFormOpen ? 'open' : ''}`}
               onClick={() => setIsAuthFormOpen(!isAuthFormOpen)}
             >
-              {isAuthFormOpen ? '▲ 権限付与パネルを閉じる' : '▼ 権限付与（owner）を開く'}
+              {isAuthFormOpen ? '▲ 権限付与窓を閉じる' : '▼ 権限付与窓を開く'}
             </button>
 
             {/* ★展開されるフォームエリア */}
@@ -117,6 +120,7 @@ function Mypage() {
                   <select
                     value={selectedCircleId}
                     onChange={(e) => setSelectedCircleId(e.target.value)}
+        
                     className="input-box"
                   >
                     <option value="">サークルを選択</option>
@@ -124,10 +128,51 @@ function Mypage() {
                       .filter((c) => (c.role || '').toLowerCase() === 'owner')
                       .map((c) => (
                         <option key={c.circle_id} value={c.circle_id}>
+                          {/* {c.circle_name.length<20&&( */}
+                          <div>
                           {c.circle_name}
+                          </div>
+                          {/* ) */}
+                          {/* } */}
+                          {/* {c.circle_name.length>30&&(  
+                    <div className='circlename-text-input'>
+                    {wrapText(c.circle_name)}
+                    </div>
+                    )  
+                  } */}
                         </option>
                       ))}
                   </select>
+                 
+                 
+                  {/* <select
+                    value={selectedCircleId}
+                    onChange={(e) => setSelectedCircleId(e.target.value)}
+                    className="input-box"
+                  >
+                    <option value="">サークルを選択</option>
+                    {circles
+                      .filter((c) => (c.role || '').toLowerCase() === 'owner')
+                      .map((c) => (
+                        <option key={c.circle_id} value={c.circle_id}>
+                          {c.circle_name.length<20?(
+                          <div>
+                          {c.circle_name}
+                          </div>
+                          ):(
+                          <div>
+                          {c.circle_name.slice(0,20)+"..."}
+                          </div>
+                          )}
+                          {c.circle_name.length>30&&(  
+                    <div className='circlename-text-input'>
+                    {wrapText(c.circle_name)}
+                    </div>
+                    )  
+                  }
+                        </option>
+                      ))}
+                  </select> */}
                 </div>
 
                 <div className="form-group">
@@ -186,7 +231,18 @@ function Mypage() {
                     className="circle-info"
                     style={{ cursor: 'pointer', margin: 0 }}
                   >
-                    {c.circle_name}（{c.role}）
+                     {c.circle_name.length<=30
+                        ?(c.circle_name)
+                      :(
+                        <p>{c.circle_name.slice(0,30)+"..."}</p>
+                      )}
+                    {c.circle_name.length>30&&(  
+                    <div className='circlename-text'>
+                    {wrapText(c.circle_name)}
+                    </div>
+                    )  
+                  }
+                    （{c.role}）
                   </div>
                 </button>
               </li>
