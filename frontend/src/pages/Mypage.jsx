@@ -4,9 +4,10 @@ import '../css/App.css';
 import { AuthContext } from '../AppContext.jsx';
 import Header from '../conponents/Header.jsx';
 import Footer from '../conponents/Footer.jsx';
+import LoginOutButton from './LogInOutButton.jsx';
 
 function Mypage() {
-  const { getUserName } = useContext(AuthContext);
+  const { getUserName, getLogin } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [circles, setCircles] = useState([]);
@@ -19,6 +20,12 @@ function Mypage() {
   const [targetUserEmail, setTargetUserEmail] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+
+  useEffect(()=>{
+    if(!getLogin()){
+      navigate('/');
+    }
+  },[getLogin()])
 
   // データ取得
   useEffect(() => {
@@ -89,6 +96,7 @@ function Mypage() {
   return (
     <div className="mypage-container">
       <Header />
+      <LoginOutButton />
 
       <main id="main" className="main-content">
         <h1>{getUserName()}さんのマイページ</h1>

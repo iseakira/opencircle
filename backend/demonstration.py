@@ -8,7 +8,7 @@ def demonstration():
     conn = sqlite3.connect("./instance/project.db")
     cursor = conn.cursor()
     user1 = (153156, "てじ", "6323080@ed.tus.ac.jp", hash.hash_pass("ad", 153156))
-    user2 = (744332, "にも", "6323022@ed.tus.ac.jp", hash.hash_pass("as", 744332))
+    user2 = (744332, "しら", "6323058@ed.tus.ac.jp", hash.hash_pass("as", 744332))
 
     conn.execute("INSERT INTO users (user_id, user_name, mail_address, password)" \
                     "VALUES (?, ?, ?, ?)",user1)
