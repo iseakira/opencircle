@@ -439,4 +439,251 @@ a {
   flex-direction: column;
 }
 
+/* --- マイページ権限付与トグルエリア --- */
+
+/* フォーム全体を囲むボックス（ホーム画面の絞り込みエリア風） */
+.auth-toggle-box {
+  background-color: #f9f9f9; /* 薄いグレー背景 */
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 30px;
+  margin: 10px auto; /* 中央寄せ */
+  max-width: 600px;  /* 幅を制限 */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 内部のレイアウト調整 */
+.auth-form-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* 要素間の隙間 */
+  align-items: center; /* 中身を中央揃え */
+}
+
+/* 入力エリアのグループ */
+.form-group {
+  width: 100%;
+  text-align: left; /* ラベルは左寄せが見やすい */
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+/* 入力欄の幅調整 */
+.auth-form-inner .input-box {
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+/* ボタンを横並びにするコンテナ */
+.button-row {
+  display: flex;
+  justify-content: center;
+  gap: 20px; /* ボタン間の隙間 */
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* ボタンの共通スタイル上書き（統一感のため） */
+.action-btn {
+  width: 180px; /* 幅を固定して統一 */
+  padding: 10px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  border: none;
+  color: white;
+}
+
+/* 色分けが必要ならここで行う（allbuttonなどは既存定義を使用） */
+/* もし完全に同じ色にしたいなら、jsx側で両方とも className="allbutton action-btn" にしてください */
+
+/* --- マイページ全体のレイアウト --- */
+.mypage-container {
+  text-align: center; /* 全体を中央寄せ */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px;
+  max-width: 800px; /* コンテンツ幅を制限して見やすく */
+  margin: 0 auto;   /* 画面中央に配置 */
+  width: 100%;
+}
+
+.center-button-area {
+  margin-bottom: 30px;
+}
+
+.action-trigger-btn {
+  /* 既存のallbuttonのデザインを引き継ぎつつ調整が必要ならここに記述 */
+  padding: 10px 30px;
+  font-size: 1.1rem;
+}
+
+/* --- 権限付与トグルセクション --- */
+.auth-section {
+  margin-bottom: 40px;
+}
+
+/* トグルボタン（開閉ボタン） */
+.toggle-button {
+  background-color: #e0ce00; /* 黄色っぽい色（サイトのテーマに合わせて調整） */
+  color: #333;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px; /* 丸みのあるボタン */
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 15px;
+  transition: background-color 0.3s;
+}
+
+.toggle-button:hover {
+  background-color: #d4c200;
+}
+
+/* --- フォームカード（白い枠の部分） --- */
+.auth-form-card {
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 30px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* ほんのり影 */
+  text-align: left; /* 入力欄などは左寄せが見やすい */
+  max-width: 500px;
+  margin: 0 auto; /* カード自体を中央配置 */
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.auth-form-card h3 {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #555;
+}
+
+.input-box {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box; /* paddingを含めた幅計算 */
+  font-size: 1rem;
+}
+
+/* --- ボタン統一エリア --- */
+.auth-buttons-row {
+  display: flex;
+  justify-content: center; /* ボタンを中央揃え */
+  gap: 15px; /* ボタン間の隙間 */
+  margin-top: 25px;
+}
+
+/* 共通ボタンスタイル */
+.auth-action-btn {
+  flex: 1; /* 横幅を均等にする */
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: opacity 0.2s;
+}
+
+.auth-action-btn:hover {
+  opacity: 0.8;
+}
+
+/* エディター付与ボタン（黄色） */
+.editor-btn {
+  background-color: #e0ce00;
+  color: #333;
+}
+
+/* オーナー譲渡ボタン（グレーまたは赤） */
+.owner-btn {
+  background-color: #ddd; /* 控えめな色にする場合 */
+  color: #333;
+  /* もし危険色にしたいなら以下 */
+  /* background-color: #d9534f; color: white; */
+}
+
+/* --- サークル一覧 --- */
+.circle-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.circle-list-item {
+  width: 100%;
+  background-color: #f5f5f5;
+  border: none;
+  border-radius: 8px;
+  padding: 15px 20px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between; /* 名前とロールを左右に配置 */
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.circle-list-item:hover {
+  background-color: #eaeaea;
+}
+
+.circle-name {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.circle-role {
+  font-size: 0.9rem;
+  color: #666;
+  background: #ddd;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.message-area {
+    margin-top: 15px;
+    text-align: center;
+}
+.success-text { color: green; }
+.error-text { color: red; }
 

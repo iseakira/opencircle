@@ -1,27 +1,26 @@
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState, useRef, useContext } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import '../css/App.css';
-import headImage from '../images/head_image.png';
 import { AuthContext } from '../AppContext.jsx';
 import Header from '../conponents/Header.jsx';
-import Footer from '../conponents/Footer';
+import Footer from '../conponents/Footer.jsx';
 
 function Mypage() {
-  const{ getUserName } = useContext(AuthContext);
+  const { getUserName } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [circles, setCircles] = useState([]);
-  const [userId, setUserId] = useState(null);
-  const [showAuthForm, setShowAuthForm] = useState(false);
-  const authFormRef = useRef(null);
+  
+  // ★フォームの開閉状態を管理
+  const [isAuthFormOpen, setIsAuthFormOpen] = useState(false);
 
-  // 権限付与フォーム
+  // フォーム用ステート
   const [selectedCircleId, setSelectedCircleId] = useState('');
   const [targetUserEmail, setTargetUserEmail] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
-  // マイページデータ取得
+  // データ取得
   useEffect(() => {
     document.title = 'マイページ - 東京理科大学サークル情報サイト';
     fetch('http://localhost:5001/api/mypage', { credentials: 'include' })
@@ -31,28 +30,13 @@ function Mypage() {
       })
       .then((data) => {
         setCircles(data.items || []);
-        setUserId(data.user_id || null);
       })
       .catch((err) => console.error('データ取得失敗:', err));
   }, []);
 
-  // owner 判定（role が undefined の場合落ちないようにする）
   const isOwner = circles.some((c) => (c.role || '').toLowerCase() === 'owner');
 
-  // クリック外で権限フォームを閉じる
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (authFormRef.current && !authFormRef.current.contains(e.target)) {
-        setShowAuthForm(false);
-      }
-    };
-    if (showAuthForm)
-      document.addEventListener('mousedown', handleClickOutside);
-
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showAuthForm]);
-
-  // editor / owner 付与
+  // 権限付与処理
   const handleAddAuthorization = async (roleType) => {
     setMessage('');
     setError('');
@@ -62,15 +46,20 @@ function Mypage() {
       return;
     }
 
-    const url =
-      roleType === 'editor'
+    // 最終確認 (owner譲渡の場合のみ)
+    if (roleType === 'owner') {
+        if (!window.confirm('本当にオーナー権限を譲渡しますか？\nあなたはこのサークルのオーナーではなくなります。')) {
+            return;
+        }
+    }
+
+    const url = roleType === 'editor'
         ? 'http://localhost:5001/api/edit-authorization'
         : 'http://localhost:5001/api/transfer-ownership';
 
-    const body =
-      roleType === 'editor'
-        ? { circle_id: selectedCircleId, target_email: targetUserEmail }
-        : { circle_id: selectedCircleId, new_owner_email: targetUserEmail };
+    const body = roleType === 'editor'
+        ? { circle_id: Number(selectedCircleId), target_email: targetUserEmail }
+        : { circle_id: Number(selectedCircleId), new_owner_email: targetUserEmail };
 
     try {
       const res = await fetch(url, {
@@ -88,67 +77,47 @@ function Mypage() {
           ? 'editor 権限を付与しました'
           : 'owner 権限を譲渡しました'
       );
-
-      setTargetUserEmail('');
-      setShowAuthForm(false);
+      setTargetUserEmail(''); // メールアドレス欄をクリア
     } catch (err) {
       setError(err.message);
     }
   };
 
   return (
-    <div style={{ position: 'relative', minHeight: '100vh' }}>
-      {/*<header className="page-header">
-        <CircleLogo />
-      </header>*/}
-<Header></Header>
-      <main id="main">
+    <div className="mypage-container">
+      <Header />
+
+      <main id="main" className="main-content">
         <h1>{getUserName()}さんのマイページ</h1>
-        <button onClick={() => navigate('/add_circle')} className="allbutton">
-          サークルを追加
-        </button>
-        {/* owner のみ権限付与ボタン */}
+
+        {/* サークル追加ボタン */}
+        <div className="center-button-area">
+            <button onClick={() => navigate('/add_circle')} className="allbutton action-trigger-btn">
+            サークルを追加
+            </button>
+        </div>
+
         {isOwner && (
-          // <div style={{ position: 'absolute', top: '40px', right: '20px' }}>
-          <div style={{textAlign:'center',marginTop:'40px'}}>
-            <button
-              onClick={() => setShowAuthForm(!showAuthForm)}
-              style={{
-                padding: '8px 16px',
-                backgroundColor: '#007BFF',
-                color: 'white',
-                borderRadius: '6px',
-              }}
+          <div className="auth-section">
+            {/* ★開閉トグルボタン */}
+            <button 
+              className={`toggle-button ${isAuthFormOpen ? 'open' : ''}`}
+              onClick={() => setIsAuthFormOpen(!isAuthFormOpen)}
             >
-              権限付与（ownerのみ）
+              {isAuthFormOpen ? '▲ 権限付与パネルを閉じる' : '▼ 権限付与（owner）を開く'}
             </button>
 
-            {showAuthForm && (
-              <fieldset
-                ref={authFormRef}
-                style={{
-                  marginTop: '10px auto',
-                  background: 'white',
-                  padding: '15px',
-                  borderRadius: '8px',
-                  boxShadow: '0 0 6px rgba(0,0,0,0.15)',
-                  width: '260px',
-                  border: '1px solid #ddd',
-                }}
-              >
-                <legend>権限付与</legend>
-
-                <div style={{ marginBottom: '10px' }}>
-                  <label htmlFor="selectCircle">サークルを選択</label>
+            {/* ★展開されるフォームエリア */}
+            {isAuthFormOpen && (
+              <div className="auth-form-card">
+                <h3>権限付与設定</h3>
+                
+                <div className="form-group">
+                  <label>サークルを選択</label>
                   <select
-                    id="selectCircle"
                     value={selectedCircleId}
                     onChange={(e) => setSelectedCircleId(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '6px',
-                      marginTop: '4px',
-                    }}
+                    className="input-box"
                   >
                     <option value="">サークルを選択</option>
                     {circles
@@ -161,51 +130,43 @@ function Mypage() {
                   </select>
                 </div>
 
-                <input
-                  type="email"
-                  placeholder="ユーザーのメールアドレス"
-                  value={targetUserEmail}
-                  onChange={(e) => setTargetUserEmail(e.target.value)}
-                  style={{
-                    width: '90%',
-                    padding: '6px',
-                    marginBottom: '10px',
-                  }}
-                />
+                <div className="form-group">
+                  <label>相手のメール</label>
+                  <input
+                    type="email"
+                    placeholder="ユーザーのメールアドレス"
+                    value={targetUserEmail}
+                    onChange={(e) => setTargetUserEmail(e.target.value)}
+                    className="input-box"
+                  />
+                </div>
 
-                <button
-                  onClick={() => handleAddAuthorization('editor')}
-                  style={{
-                    padding: '6px 14px',
-                    backgroundColor: '#28a745',
-                    color: 'white',
-                    width: '100%',
-                    marginBottom: '8px',
-                    
-                  }}
-                >
-                  editor 権限付与
-                </button>
+                {/* ★ボタンエリア（統一デザイン） */}
+                <div className="auth-buttons-row">
+                  <button
+                    onClick={() => handleAddAuthorization('editor')}
+                    className="auth-action-btn editor-btn"
+                  >
+                    editor 権限付与
+                  </button>
+                  <button
+                    onClick={() => handleAddAuthorization('owner')}
+                    className="auth-action-btn owner-btn"
+                  >
+                    owner 権限譲渡
+                  </button>
+                </div>
 
-                <button
-                  onClick={() => handleAddAuthorization('owner')}
-                  style={{
-                    padding: '6px 14px',
-                    backgroundColor: '#ff5722',
-                    color: 'white',
-                    width: '100%',
-                  }}
-                >
-                  owner 権限付与（譲渡）
-                </button>
-
-                {message && <p style={{ color: 'green' }}>{message}</p>}
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-              </fieldset>
+                <div className="message-area">
+                    {message && <p className="success-text">{message}</p>}
+                    {error && <p className="error-text">{error}</p>}
+                </div>
+              </div>
             )}
           </div>
         )}
-        <h2 style={{ marginTop: '40px' }}>編集できるサークル一覧</h2>
+
+       <h2 style={{ marginTop: '40px' }}>編集できるサークル一覧</h2>
         {circles.length > 0 ? (
           <ul className="circle-list" style={{ listStyle: 'none', padding: 0, width: 'auto' }}>
             {circles.map((c) => (
@@ -239,5 +200,4 @@ function Mypage() {
     </div>
   );
 }
-
 export default Mypage;
