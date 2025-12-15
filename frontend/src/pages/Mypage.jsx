@@ -107,7 +107,7 @@ function Mypage() {
               className={`toggle-button ${isAuthFormOpen ? 'open' : ''}`}
               onClick={() => setIsAuthFormOpen(!isAuthFormOpen)}
             >
-              {isAuthFormOpen ? '▲ 権限付与パネルを閉じる' : '▼ 権限付与（owner）を開く'}
+              {isAuthFormOpen ? '▲ 権限付与窓を閉じる' : '▼ 権限付与窓を開く'}
             </button>
 
             {/* ★展開されるフォームエリア */}
