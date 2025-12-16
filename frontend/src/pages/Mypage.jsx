@@ -96,7 +96,7 @@ function Mypage() {
   return (
     <div className="mypage-container">
       <Header />
-      <LoginOutButton />
+      <LoginOutButton mypage={false} />
 
       <main id="main" className="main-content">
         <h1>{getUserName()}さんのマイページ</h1>

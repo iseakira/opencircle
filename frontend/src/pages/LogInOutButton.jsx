@@ -2,7 +2,7 @@ import { useContext, useState } from 'react';
 import { AuthContext } from '../AppContext';
 import { Link } from 'react-router-dom';
 
-function LoginOutButton(){
+function LoginOutButton({mypage = true}){
     const { getLogin, setLogin, setLogout, setUserName } = useContext(AuthContext);
 
     async function logout(){
@@ -36,9 +36,11 @@ function LoginOutButton(){
     }else{
         return (
             <>
-                <Link to="/Mypage" className="mypage_button">
-                    マイページ
-                </Link>
+                {mypage && (
+                    <Link to="/Mypage" className="mypage_button">
+                        マイページ
+                    </Link>
+                )}
                 <button
                   className="login"
                   onClick={() => logout()}
