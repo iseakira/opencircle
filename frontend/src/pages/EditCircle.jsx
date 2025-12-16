@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useParams, useNavigate,Link } from 'react-router-dom';
 import '/app/src/css/EditCircle.css';
 import '../css/App.css';
@@ -12,7 +12,10 @@ import CircleMen from '../conponents/CircleMen';
 import CircleFemen from '../conponents/CircleFemen';
 import Header from '../conponents/Header.jsx';
 import DefoImage from '../images/circleDefaultImage.png';
+import { ToastContext } from '../AppContext.jsx';
+
 function CircleEdit() {
+  const { setToast } = useContext(ToastContext);
   const { circleId } = useParams();
   const navigate = useNavigate();
 
@@ -198,7 +201,8 @@ const defaultImage={DefoImage}
       }
 
       const responseData = await response.json();
-      alert(responseData.message || 'サークル情報をしました！');
+      //alert(responseData.message || 'サークル情報をしました！');
+      setToast(responseData.message);
       navigate('/mypage');
     } catch (error) {
       console.error('通信エラー', error);
@@ -227,7 +231,7 @@ const defaultImage={DefoImage}
         throw new Error(errData.error || '削除に失敗しました');
       }
 
-      alert('サークルを削除しました');
+      setToast('サークルを削除しました');
 
       // 3. マイページへ戻る
       navigate('/mypage');

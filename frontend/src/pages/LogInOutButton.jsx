@@ -1,9 +1,10 @@
 import { useContext, useState } from 'react';
-import { AuthContext } from '../AppContext';
+import { AuthContext, ToastContext } from '../AppContext';
 import { Link } from 'react-router-dom';
 
 function LoginOutButton({mypage = true}){
     const { getLogin, setLogin, setLogout, setUserName } = useContext(AuthContext);
+    const { setToast } = useContext(ToastContext);
 
     async function logout(){
         try{
@@ -17,6 +18,7 @@ function LoginOutButton({mypage = true}){
                 console.log("success")
                 setUserName("")
                 setLogout()
+                setToast("ログアウトしました。")
             }else{
                 console.log("failure")
             }

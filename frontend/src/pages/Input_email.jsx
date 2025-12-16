@@ -52,6 +52,7 @@ function Input_email() {
           emailaddress: emailaddress,
           tmp_id: response_obj.tmp_id,
         });
+        setToast("メールアドレス宛に認証コードを送信しました。")
         localStorage.setItem('to_Make_Account', to_Make_Account_data);
         navigate('/Make_Account');
       }else{

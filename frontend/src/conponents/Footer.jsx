@@ -7,7 +7,7 @@ export default function Footer() {
     bottom: 0,
     left: 0,
     width: '100%',
-    zIndex: 1000,
+    //zIndex: 1000,
   };
   return (
     <footer style={fotterStyle} className="footer">

@@ -10,6 +10,7 @@
     flex-direction: column;
     gap: 10px;
     position: fixed;
+    z-index: 1;
     right: 20px;
     bottom: 50px;
 }
